@@ -18,7 +18,7 @@ public class GetProperty {
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnvironments(@PathParam("environment") String environment,
                                                @PathParam("application") String application,
-                                               @PathParam("key") String key) throws ConfigurationException, FileNotFoundException {
+                                               @PathParam("key") String key) throws ConfigurationException {
 
         return new Properties(environment, application).get(key);
     }

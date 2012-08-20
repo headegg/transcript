@@ -1,6 +1,7 @@
 package uk.org.sappho.applications.configuration.service;
 
 import com.google.gson.Gson;
+import sun.security.krb5.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,13 +31,23 @@ public class Properties extends WorkingCopy {
         versionedWorkingCopy.update(jsonFilename);
     }
 
-    public Map<String, String> getAll() throws FileNotFoundException {
+    public Map<String, String> getAll() throws ConfigurationException {
 
-        return new Gson().fromJson(new FileReader(new File(directory, jsonFilename)), HashMap.class);
+        Map<String, String> properties;
+        try {
+            properties = new Gson().fromJson(new FileReader(new File(directory, jsonFilename)), HashMap.class);
+        } catch (Exception exception) {
+            throw new ConfigurationException("Unable to read " + jsonFilename, exception);
+        }
+        return properties;
     }
 
-    public String get(String key) throws FileNotFoundException {
+    public String get(String key) throws ConfigurationException {
 
-        return getAll().get(key);
+        String value = getAll().get(key);
+        if (value == null) {
+            throw new ConfigurationException("No value for " + key);
+        }
+        return value;
     }
 }
