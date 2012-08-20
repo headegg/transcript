@@ -1,31 +1,23 @@
 package uk.org.sappho.applications.configuration.service.vcs;
 
-import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.SVNClient;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
-import uk.org.sappho.applications.configuration.service.VersionedWorkingCopy;
 
 import java.io.File;
-import java.io.IOException;
 
-public class SubversionWorkingCopy implements VersionedWorkingCopy {
+public class SubversionWorkingCopy {
 
-    private String path;
-    private static SVNClient svnClient = new SVNClient();
+    private static final SVNClient svnClient = new SVNClient();
 
-    public SubversionWorkingCopy(String path) {
-
-        this.path = path;
-    }
-
-    public void update(String subpath) throws ConfigurationException {
+    public void update(String workingCopyPath, String name) throws ConfigurationException {
 
         try {
-            svnClient.update(new File(path, subpath).getCanonicalPath(), Revision.HEAD, Depth.infinity, false, false, false);
+            svnClient.update(new File(workingCopyPath, name).getCanonicalPath(),
+                    Revision.HEAD, Depth.infinity, false, false, false);
         } catch (Exception exception) {
-            throw new ConfigurationException("Unable to update " + subpath, exception);
+            throw new ConfigurationException("Unable to update " + name + " from Subversion server", exception);
         }
     }
 }

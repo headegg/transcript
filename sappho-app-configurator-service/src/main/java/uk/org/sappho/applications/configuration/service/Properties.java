@@ -2,27 +2,24 @@ package uk.org.sappho.applications.configuration.service;
 
 import com.google.gson.Gson;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Properties extends WorkingCopy {
+public class Properties {
 
     private String jsonFilename;
 
     public Properties(String environment, String application) throws ConfigurationException {
 
-        super();
         jsonFilename = environment + "/" + application + ".json";
-        versionedWorkingCopy.update(jsonFilename);
     }
 
     public Map<String, String> getAll() throws ConfigurationException {
 
         Map<String, String> properties;
         try {
-            properties = new Gson().fromJson(new FileReader(new File(directory, jsonFilename)), HashMap.class);
+            properties = new Gson().fromJson(new FileReader(WorkingCopy.getInstance().getFile(jsonFilename)), HashMap.class);
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to read " + jsonFilename, exception);
         }

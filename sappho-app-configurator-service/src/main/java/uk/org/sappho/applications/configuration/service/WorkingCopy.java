@@ -6,21 +6,32 @@ import java.io.File;
 
 public class WorkingCopy {
 
-    protected VersionedWorkingCopy versionedWorkingCopy = null;
-    protected String directory;
+    private static final WorkingCopy instance = new WorkingCopy();
+    private final String workingCopyPath = System.getProperty("working.copy.path");
 
-    public WorkingCopy() throws ConfigurationException {
+    public File getFile(String name) throws ConfigurationException {
 
-        directory = System.getProperty("working.copy.path");
-        if (directory == null) {
+        if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
         }
-        File file = new File(directory, ".svn");
-        if (file.isDirectory()) {
-            versionedWorkingCopy = new SubversionWorkingCopy(directory);
+        File file = new File(workingCopyPath, ".svn");
+        if (file.exists() && file.isDirectory()) {
+            new SubversionWorkingCopy().update(workingCopyPath, name);
+        } else {
+            throw new ConfigurationException("Directory " + workingCopyPath + " is not under version control");
         }
-        if (versionedWorkingCopy == null) {
-            throw new ConfigurationException("Directory " + directory + " is not under version control");
+        file = new File(workingCopyPath, name);
+        if (!file.exists()) {
+            throw new ConfigurationException("Requested object " + name + " does not exist");
         }
+        return file;
+    }
+
+    public static WorkingCopy getInstance() {
+
+        return instance;
+    }
+
+    private WorkingCopy() {
     }
 }

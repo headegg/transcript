@@ -7,8 +7,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
-import java.util.Vector;
 
 @Path("/")
 public class GetEnvironments {
@@ -17,6 +15,6 @@ public class GetEnvironments {
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        return new Environments().get();
+        return new Environments().getAll();
     }
 }
