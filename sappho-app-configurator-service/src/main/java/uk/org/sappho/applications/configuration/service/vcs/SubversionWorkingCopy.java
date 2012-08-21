@@ -10,13 +10,26 @@ import java.io.File;
 
 public class SubversionWorkingCopy {
 
-    private static final SVNUpdateClient svnUpdateClient = SVNClientManager.newInstance().getUpdateClient();
+    private final SVNUpdateClient svnUpdateClient = SVNClientManager.newInstance().getUpdateClient();
+    private static Boolean updating = false;
 
     public void update(String workingCopyPath, String name) throws ConfigurationException {
 
         try {
-            svnUpdateClient.doUpdate(new File[] { new File(workingCopyPath, name) },
-                    SVNRevision.HEAD, SVNDepth.INFINITY, false, false, false);
+            boolean update = false;
+            synchronized (updating) {
+                if (!updating) {
+                    updating = true;
+                    update = true;
+                }
+            }
+            if (update) {
+                svnUpdateClient.doUpdate(new File[]{new File(workingCopyPath, name)},
+                        SVNRevision.HEAD, SVNDepth.INFINITY, false, false, false);
+                synchronized (updating) {
+                    updating = false;
+                }
+            }
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to update " + name + " from Subversion server", exception);
         }
