@@ -17,8 +17,8 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.tigris.subversion</groupId>
-            <artifactId>svnjavahl</artifactId>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit</artifactId>
         </dependency>
     </dependencies>
 
