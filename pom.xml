@@ -19,6 +19,7 @@
     <properties>
         <version.svnkit>1.7.5</version.svnkit>
         <version.jersey>1.6</version.jersey>
+        <version.gson>2.2.2</version.gson>
     </properties>
 
     <dependencyManagement>
@@ -36,7 +37,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.2.2</version>
+                <version>${version.gson}</version>
             </dependency>
             <dependency>
                 <groupId>org.tmatesoft.svnkit</groupId>
