@@ -11,7 +11,7 @@ import java.io.File;
 public class SubversionWorkingCopy {
 
     private final SVNUpdateClient svnUpdateClient = SVNClientManager.newInstance().getUpdateClient();
-    private static Boolean updating = false;
+    private Boolean updating = false;
 
     public void update(String workingCopyPath, String name) throws ConfigurationException {
 
