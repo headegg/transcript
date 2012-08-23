@@ -9,6 +9,7 @@ import java.util.Map;
 public class Properties {
 
     private String jsonFilename;
+    private WorkingCopy workingCopy = WorkingCopy.getInstance();
 
     public Properties(String environment, String application) throws ConfigurationException {
 
@@ -19,7 +20,10 @@ public class Properties {
 
         Map<String, String> properties;
         try {
-            properties = new Gson().fromJson(new FileReader(WorkingCopy.getInstance().getFile(jsonFilename)), HashMap.class);
+            WorkingCopyContext workingCopyContext = new WorkingCopyContext();
+            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyContext)), HashMap.class);
+            properties.put("vcs.head.revision", workingCopyContext.getHeadRevision());
+            properties.put("vcs.repository", workingCopyContext.getRepository());
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to read " + jsonFilename, exception);
         }

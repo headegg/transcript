@@ -14,7 +14,7 @@ public class Applications {
 
     public String[] getAll() throws ConfigurationException {
 
-        String[] applications = WorkingCopy.getInstance().getFile(environment).list(new FilenameFilter() {
+        String[] applications = WorkingCopy.getInstance().getFile(environment, new WorkingCopyContext()).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isFile() && name.endsWith(".json");
             }
