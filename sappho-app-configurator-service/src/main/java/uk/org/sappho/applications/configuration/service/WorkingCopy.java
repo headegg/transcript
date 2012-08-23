@@ -15,15 +15,14 @@ public class WorkingCopy {
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
         }
-        File file = new File(workingCopyPath, name);
-        if (file.exists()) {
-            File svnDirectory = new File(workingCopyPath, ".svn");
-            if (svnDirectory.exists() && svnDirectory.isDirectory()) {
-                subversionWorkingCopy.update(workingCopyPath, workingCopyContext);
-            } else {
-                throw new ConfigurationException("Directory " + workingCopyPath + " is not under version control");
-            }
+        File svnDirectory = new File(workingCopyPath, ".svn");
+        if (svnDirectory.exists() && svnDirectory.isDirectory()) {
+            subversionWorkingCopy.update(workingCopyPath, workingCopyContext);
         } else {
+            throw new ConfigurationException("Directory " + workingCopyPath + " is not under version control");
+        }
+        File file = new File(workingCopyPath, name);
+        if (!file.exists()) {
             throw new ConfigurationException("Requested object " + name + " does not exist");
         }
         return file;
