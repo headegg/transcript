@@ -18,22 +18,23 @@ import java.util.regex.Pattern;
 public class SubversionWorkingCopy {
 
     private final static Pattern revisionPattern = Pattern.compile("^Revision: ([0-9]*)$");
-    private final static Pattern urlPattern = Pattern.compile("^URL: (.*)$");
+    private final static Pattern urlPattern = Pattern.compile("^URL: (.+)$");
+    private final static String unknown = "unknown";
 
     public void update(String workingCopyPath, String filename, WorkingCopyContext workingCopyContext) throws ConfigurationException {
 
         try {
             File directory = new File(workingCopyPath);
-            Process process = Runtime.getRuntime().exec("svn update " + filename, null, directory);
+            Process process = Runtime.getRuntime().exec("svn update --non-interactive --quiet --accept theirs-full " + filename, null, directory);
             process.waitFor();
             process.destroy();
-            process = Runtime.getRuntime().exec("svn info " + filename, null, directory);
+            process = Runtime.getRuntime().exec("svn info --non-interactive " + filename, null, directory);
             process.waitFor();
             BufferedReader info = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String revision = "";
-            String url = "";
+            String revision = unknown;
+            String url = unknown;
             String line;
-            while ((revision.length() == 0 || url.length() == 0) && (line = info.readLine()) != null) {
+            while ((revision.equals(unknown) || url.equals(unknown)) && (line = info.readLine()) != null) {
                 Matcher matcher = revisionPattern.matcher(line);
                 if (matcher.matches()) {
                     revision = matcher.group(1);
