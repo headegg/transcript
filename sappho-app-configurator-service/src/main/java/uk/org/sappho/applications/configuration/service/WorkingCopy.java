@@ -18,8 +18,6 @@ public class WorkingCopy {
         File svnDirectory = new File(workingCopyPath, ".svn");
         if (svnDirectory.exists() && svnDirectory.isDirectory()) {
             subversionWorkingCopy.update(workingCopyPath, workingCopyContext);
-        } else {
-            throw new ConfigurationException("Directory " + workingCopyPath + " is not under version control");
         }
         File file = new File(workingCopyPath, name);
         if (!file.exists()) {
