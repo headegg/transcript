@@ -1,5 +1,5 @@
 <html>
 <body>
-<h1>There are only RESTful services here!</h1>
+<p>This web application supplies only RESTful services.</p>
 </body>
 </html>

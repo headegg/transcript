@@ -20,7 +20,7 @@
 
     <servlet-mapping>
         <servlet-name>app-config-read</servlet-name>
-        <url-pattern>/app-configurator/*</url-pattern>
+        <url-pattern>/environments/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
