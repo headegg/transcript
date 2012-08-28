@@ -14,14 +14,14 @@ public class SubversionWorkingCopy {
     private final static Pattern revisionPattern = Pattern.compile("^Revision: ([0-9]*)$");
     private final static Pattern urlPattern = Pattern.compile("^URL: (.*)$");
 
-    public void update(String workingCopyPath, WorkingCopyContext workingCopyContext) throws ConfigurationException {
+    public void update(String workingCopyPath, String filename, WorkingCopyContext workingCopyContext) throws ConfigurationException {
 
         try {
             File directory = new File(workingCopyPath);
-            Process process = Runtime.getRuntime().exec("svn update", null, directory);
+            Process process = Runtime.getRuntime().exec("svn update " + filename, null, directory);
             process.waitFor();
             process.destroy();
-            process = Runtime.getRuntime().exec("svn info", null, directory);
+            process = Runtime.getRuntime().exec("svn info " + filename, null, directory);
             process.waitFor();
             BufferedReader info = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String revision = "";

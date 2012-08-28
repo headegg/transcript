@@ -10,18 +10,18 @@ public class WorkingCopy {
     private final SubversionWorkingCopy subversionWorkingCopy = new SubversionWorkingCopy();
     private final String workingCopyPath = System.getProperty("working.copy.path");
 
-    synchronized public File getFile(String name, WorkingCopyContext workingCopyContext) throws ConfigurationException {
+    synchronized public File getFile(String filename, WorkingCopyContext workingCopyContext) throws ConfigurationException {
 
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
         }
         File svnDirectory = new File(workingCopyPath, ".svn");
         if (svnDirectory.exists() && svnDirectory.isDirectory()) {
-            subversionWorkingCopy.update(workingCopyPath, workingCopyContext);
+            subversionWorkingCopy.update(workingCopyPath, filename, workingCopyContext);
         }
-        File file = new File(workingCopyPath, name);
+        File file = new File(workingCopyPath, filename);
         if (!file.exists()) {
-            throw new ConfigurationException("Requested object " + name + " does not exist");
+            throw new ConfigurationException("Requested object " + filename + " does not exist");
         }
         return file;
     }
