@@ -48,6 +48,7 @@ public class SubversionWorkingCopy {
                         Matcher matcher = patterns.get(propertyKey).matcher(line);
                         if (matcher.matches()) {
                             workingCopyProperties.put(propertyKey, matcher.group(1));
+                            break;
                         }
                     }
                 }
