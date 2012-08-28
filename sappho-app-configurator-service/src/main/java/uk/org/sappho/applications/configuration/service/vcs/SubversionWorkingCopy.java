@@ -1,29 +1,45 @@
 package uk.org.sappho.applications.configuration.service.vcs;
 
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.SVNStatus;
-import org.tmatesoft.svn.core.wc.SVNStatusClient;
-import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.WorkingCopyContext;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SubversionWorkingCopy {
 
-    private final SVNUpdateClient svnUpdateClient = SVNClientManager.newInstance().getUpdateClient();
-    private final SVNStatusClient svnStatusClient = SVNClientManager.newInstance().getStatusClient();
+    private final static Pattern revisionPattern = Pattern.compile("^Revision: ([0-9]*)$");
+    private final static Pattern urlPattern = Pattern.compile("^URL: (.*)$");
 
     public void update(String workingCopyPath, WorkingCopyContext workingCopyContext) throws ConfigurationException {
 
         try {
             File directory = new File(workingCopyPath);
-            svnUpdateClient.doUpdate(new File[]{directory}, SVNRevision.HEAD, SVNDepth.INFINITY, true, true);
-            SVNStatus svnStatus = svnStatusClient.doStatus(directory, false);
-            workingCopyContext.setHeadRevision(svnStatus.getRevision().toString());
-            workingCopyContext.setRepository(svnStatus.getURL().toString());
+            Process process = Runtime.getRuntime().exec("svn update", null, directory);
+            process.waitFor();
+            process.destroy();
+            process = Runtime.getRuntime().exec("svn info", null, directory);
+            process.waitFor();
+            BufferedReader info = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String revision = "";
+            String url = "";
+            String line;
+            while ((revision.length() == 0 || url.length() == 0) && (line = info.readLine()) != null) {
+                Matcher matcher = revisionPattern.matcher(line);
+                if (matcher.matches()) {
+                    revision = matcher.group(1);
+                }
+                matcher = urlPattern.matcher(line);
+                if (matcher.matches()) {
+                    url = matcher.group(1);
+                }
+            }
+            process.destroy();
+            workingCopyContext.setHeadRevision(revision);
+            workingCopyContext.setRepository(url);
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to update from Subversion server", exception);
         }
