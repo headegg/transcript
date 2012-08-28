@@ -9,6 +9,7 @@ package uk.org.sappho.applications.configuration.service;
 import uk.org.sappho.applications.configuration.service.vcs.SubversionWorkingCopy;
 
 import java.io.File;
+import java.util.Map;
 
 public class WorkingCopy {
 
@@ -16,14 +17,14 @@ public class WorkingCopy {
     private final SubversionWorkingCopy subversionWorkingCopy = new SubversionWorkingCopy();
     private final String workingCopyPath = System.getProperty("working.copy.path");
 
-    synchronized public File getFile(String filename, WorkingCopyContext workingCopyContext) throws ConfigurationException {
+    synchronized public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
         }
         File svnDirectory = new File(workingCopyPath, ".svn");
         if (svnDirectory.exists() && svnDirectory.isDirectory()) {
-            subversionWorkingCopy.update(workingCopyPath, filename, workingCopyContext);
+            subversionWorkingCopy.update(workingCopyPath, filename, workingCopyProperties);
         }
         File file = new File(workingCopyPath, filename);
         if (!file.exists()) {

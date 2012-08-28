@@ -26,10 +26,11 @@ public class Properties {
 
         Map<String, String> properties;
         try {
-            WorkingCopyContext workingCopyContext = new WorkingCopyContext();
-            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyContext)), HashMap.class);
-            properties.put("vcs.head.revision", workingCopyContext.getHeadRevision());
-            properties.put("vcs.repository", workingCopyContext.getRepository());
+            Map<String, String> workingCopyProperties = new HashMap<String, String>();
+            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyProperties)), HashMap.class);
+            for (String propertyKey : workingCopyProperties.keySet()) {
+                properties.put(propertyKey, workingCopyProperties.get(propertyKey));
+            }
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to read " + jsonFilename, exception);
         }
