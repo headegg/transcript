@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
     <display-name>Application Configuration Reader</display-name>
 
@@ -11,15 +12,15 @@
             <param-value>uk.org.sappho.applications.configuration.restful</param-value>
         </init-param>
         <init-param>
-		    <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-		    <param-value>true</param-value>
-	    </init-param>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>app-config-read</servlet-name>
-        <url-pattern>/environments/*</url-pattern>
+        <url-pattern>/app-configurator/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
