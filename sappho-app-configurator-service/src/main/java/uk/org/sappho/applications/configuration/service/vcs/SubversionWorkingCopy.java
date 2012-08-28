@@ -33,11 +33,15 @@ public class SubversionWorkingCopy {
         try {
             File directory = new File(workingCopyPath);
             Process process = Runtime.getRuntime().exec("svn update --non-interactive --quiet --accept theirs-full " + filename, null, directory);
-            process.waitFor();
+            if (process.waitFor() != 0) {
+                throw new ConfigurationException("Unable to update from Subversion server");
+            }
             process.destroy();
             if (workingCopyProperties != null) {
                 process = Runtime.getRuntime().exec("svn info --non-interactive " + filename, null, directory);
-                process.waitFor();
+                if (process.waitFor() != 0) {
+                    throw new ConfigurationException("Unable to get status from Subversion server");
+                }
                 BufferedReader info = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while ((line = info.readLine()) != null) {
