@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class SubversionWorkingCopy {
 
     private final static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
+    private final static String unknown = "unknown";
 
     static {
         patterns.put("vcs.revision", Pattern.compile("^Revision: ([0-9]*)$"));
@@ -26,10 +27,7 @@ public class SubversionWorkingCopy {
         patterns.put("vcs.last.changed.date", Pattern.compile("^Last Changed Date: (.+)$"));
         patterns.put("vcs.last.changed.author", Pattern.compile("^Last Changed Author: (.+)$"));
         patterns.put("vcs.repository.location", Pattern.compile("^URL: (.+)$"));
-    }
-
-    ;
-    private final static String unknown = "unknown";
+    };
 
     public void update(String workingCopyPath, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
