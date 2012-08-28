@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 public class SubversionWorkingCopy {
 
     private final static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
-    private final static String unknown = "unknown";
 
     static {
         patterns.put("vcs.revision", Pattern.compile("^Revision: ([0-9]*)$"));
