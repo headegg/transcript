@@ -18,14 +18,14 @@ import java.util.regex.Pattern;
 
 public class SubversionWorkingCopy {
 
-    private final static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
+    private final static Map<Pattern, String> patterns = new HashMap<Pattern, String>();
 
     static {
-        patterns.put("vcs.revision", Pattern.compile("^Revision: ([0-9]*)$"));
-        patterns.put("vcs.last.changed.revision", Pattern.compile("^Last Changed Rev: ([0-9]*)$"));
-        patterns.put("vcs.last.changed.date", Pattern.compile("^Last Changed Date: (.+)$"));
-        patterns.put("vcs.last.changed.author", Pattern.compile("^Last Changed Author: (.+)$"));
-        patterns.put("vcs.repository.location", Pattern.compile("^URL: (.+)$"));
+        patterns.put(Pattern.compile("^Revision: ([0-9]*)$"), "vcs.revision");
+        patterns.put(Pattern.compile("^Last Changed Rev: ([0-9]*)$"), "vcs.last.changed.revision");
+        patterns.put(Pattern.compile("^Last Changed Date: (.+)$"), "vcs.last.changed.date");
+        patterns.put(Pattern.compile("^Last Changed Author: (.+)$"), "vcs.last.changed.author");
+        patterns.put(Pattern.compile("^URL: (.+)$"), "vcs.repository.location");
     };
 
     public void update(String workingCopyPath, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
@@ -45,10 +45,10 @@ public class SubversionWorkingCopy {
                 BufferedReader info = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while ((line = info.readLine()) != null) {
-                    for (String propertyKey : patterns.keySet()) {
-                        Matcher matcher = patterns.get(propertyKey).matcher(line);
+                    for (Pattern pattern : patterns.keySet()) {
+                        Matcher matcher = pattern.matcher(line);
                         if (matcher.matches()) {
-                            workingCopyProperties.put(propertyKey, matcher.group(1));
+                            workingCopyProperties.put(patterns.get(pattern), matcher.group(1));
                             break;
                         }
                     }
