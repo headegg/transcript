@@ -7,14 +7,38 @@
 
     <parent>
         <groupId>uk.org.sappho.pom</groupId>
-        <artifactId>sappho</artifactId>
-        <version>3</version>
+        <artifactId>sappho-maven</artifactId>
+        <version>5</version>
     </parent>
 
     <groupId>uk.org.sappho.applications.configuration</groupId>
     <artifactId>sappho-app-configurator</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/sappho-app-configurator.git</connection>
+        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/sappho-app-configurator.git</developerConnection>
+        <url>https://git.sappho.org.uk/projects/SCM/repos/sappho-app-configurator/browse</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License, version 3</name>
+            <url>http://www.gnu.org/licenses/gpl.html</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>andrewheald</id>
+            <name>Andrew Heald</name>
+            <roles>
+                <role>Developer and build Manager</role>
+            </roles>
+        </developer>
+    </developers>
 
     <properties>
         <version.jersey>1.6</version.jersey>
@@ -41,29 +65,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <modules>
         <module>sappho-app-configurator-service</module>
