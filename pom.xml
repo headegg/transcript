@@ -8,7 +8,7 @@
     <parent>
         <groupId>uk.org.sappho.pom</groupId>
         <artifactId>sappho-maven</artifactId>
-        <version>5</version>
+        <version>6-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.org.sappho.applications.configuration</groupId>
@@ -43,7 +43,6 @@
     <properties>
         <version.jersey>1.6</version.jersey>
         <version.gson>2.2.2</version.gson>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>

@@ -13,16 +13,20 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}/{application}/{key}")
 public class GetProperty {
 
+    @QueryParam("wci") private String workingCopyId;
+    @PathParam("environment") private String environment;
+    @PathParam("application") private String application;
+    @PathParam("key") private String key;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getEnvironments(@PathParam("environment") String environment,
-                                  @PathParam("application") String application,
-                                  @PathParam("key") String key) throws ConfigurationException {
+    public String getEnvironments() throws ConfigurationException {
 
         return new Properties(environment, application).get(key);
     }
