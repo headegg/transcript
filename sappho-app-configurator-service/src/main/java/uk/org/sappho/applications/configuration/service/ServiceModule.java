@@ -12,6 +12,5 @@ public class ServiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
     }
 }
