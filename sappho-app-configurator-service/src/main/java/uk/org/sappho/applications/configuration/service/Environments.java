@@ -11,9 +11,16 @@ import java.io.FilenameFilter;
 
 public class Environments {
 
+    private final String workingCopyId;
+
+    public Environments(String workingCopyId) {
+
+        this.workingCopyId = workingCopyId;
+    }
+
     public String[] getAll() throws ConfigurationException {
 
-        return WorkingCopy.getInstance().getFile(".", null).list(new FilenameFilter() {
+        return WorkingCopy.getInstance().getFile(workingCopyId, ".", null).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }

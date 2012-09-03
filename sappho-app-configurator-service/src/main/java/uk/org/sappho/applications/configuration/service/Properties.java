@@ -14,11 +14,13 @@ import java.util.Map;
 
 public class Properties {
 
+    private final String workingCopyId;
     private String jsonFilename;
     private WorkingCopy workingCopy = WorkingCopy.getInstance();
 
-    public Properties(String environment, String application) throws ConfigurationException {
+    public Properties(String workingCopyId, String environment, String application) throws ConfigurationException {
 
+        this.workingCopyId = workingCopyId;
         jsonFilename = environment + "/" + application + ".json";
     }
 
@@ -27,7 +29,7 @@ public class Properties {
         Map<String, String> properties;
         try {
             Map<String, String> workingCopyProperties = new HashMap<String, String>();
-            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyProperties)), HashMap.class);
+            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(workingCopyId, jsonFilename, workingCopyProperties)), HashMap.class);
             for (String propertyKey : workingCopyProperties.keySet()) {
                 properties.put(propertyKey, workingCopyProperties.get(propertyKey));
             }

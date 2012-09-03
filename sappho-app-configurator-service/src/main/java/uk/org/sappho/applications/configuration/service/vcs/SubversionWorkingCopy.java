@@ -28,17 +28,16 @@ public class SubversionWorkingCopy {
         patterns.put(Pattern.compile("^URL: (.+)$"), "vcs.repository.location");
     };
 
-    public void update(String workingCopyPath, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    public void update(File workingCopy, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         try {
-            File directory = new File(workingCopyPath);
-            Process process = Runtime.getRuntime().exec("svn update --non-interactive --quiet --accept theirs-full " + filename, null, directory);
+            Process process = Runtime.getRuntime().exec("svn update --non-interactive --quiet --accept theirs-full " + filename, null, workingCopy);
             if (process.waitFor() != 0) {
                 throw new ConfigurationException("Unable to update from Subversion server");
             }
             process.destroy();
             if (workingCopyProperties != null) {
-                process = Runtime.getRuntime().exec("svn info --non-interactive " + filename, null, directory);
+                process = Runtime.getRuntime().exec("svn info --non-interactive " + filename, null, workingCopy);
                 if (process.waitFor() != 0) {
                     throw new ConfigurationException("Unable to get status from Subversion server");
                 }

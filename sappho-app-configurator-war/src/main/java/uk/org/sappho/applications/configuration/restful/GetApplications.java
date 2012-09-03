@@ -26,6 +26,6 @@ public class GetApplications {
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        return new Applications(environment).getAll();
+        return new Applications(workingCopyId, environment).getAll();
     }
 }

@@ -17,16 +17,17 @@ public class WorkingCopy {
     private final SubversionWorkingCopy subversionWorkingCopy = new SubversionWorkingCopy();
     private final String workingCopyPath = System.getProperty("working.copy.path");
 
-    synchronized public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    synchronized public File getFile(String workingCopyId, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
         }
-        File svnDirectory = new File(workingCopyPath, ".svn");
+        File workingCopy = new File(workingCopyPath, workingCopyId != null ? workingCopyId : ".");
+        File svnDirectory = new File(workingCopy, ".svn");
         if (svnDirectory.exists() && svnDirectory.isDirectory()) {
-            subversionWorkingCopy.update(workingCopyPath, filename, workingCopyProperties);
+            subversionWorkingCopy.update(workingCopy, filename, workingCopyProperties);
         }
-        File file = new File(workingCopyPath, filename);
+        File file = new File(workingCopy, filename);
         if (!file.exists()) {
             throw new ConfigurationException("Requested object " + filename + " does not exist");
         }

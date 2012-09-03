@@ -11,16 +11,18 @@ import java.io.FilenameFilter;
 
 public class Applications {
 
-    private String environment;
+    private final String workingCopyId;
+    private final String environment;
 
-    public Applications(String environment) {
+    public Applications(String workingCopyId, String environment) {
 
+        this.workingCopyId = workingCopyId;
         this.environment = environment;
     }
 
     public String[] getAll() throws ConfigurationException {
 
-        String[] applications = WorkingCopy.getInstance().getFile(environment, null).list(new FilenameFilter() {
+        String[] applications = WorkingCopy.getInstance().getFile(workingCopyId, environment, null).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isFile() && name.endsWith(".json");
             }

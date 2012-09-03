@@ -28,6 +28,6 @@ public class GetProperty {
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnvironments() throws ConfigurationException {
 
-        return new Properties(environment, application).get(key);
+        return new Properties(workingCopyId, environment, application).get(key);
     }
 }
