@@ -6,21 +6,24 @@
 
 package uk.org.sappho.applications.configuration.service;
 
+import com.google.inject.Inject;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
 public class Environments {
 
-    private final String workingCopyId;
+    private WorkingCopy workingCopy;
 
-    public Environments(String workingCopyId) {
+    @Inject
+    public Environments(WorkingCopy workingCopy) {
 
-        this.workingCopyId = workingCopyId;
+        this.workingCopy = workingCopy;
     }
 
     public String[] getAll() throws ConfigurationException {
 
-        return WorkingCopy.getInstance().getFile(workingCopyId, ".", null).list(new FilenameFilter() {
+        return workingCopy.getFile(".", null).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }

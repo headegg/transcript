@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.configuration.service;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 
 import java.io.FileReader;
 import java.util.HashMap;
@@ -14,22 +15,21 @@ import java.util.Map;
 
 public class Properties {
 
-    private final String workingCopyId;
-    private String jsonFilename;
-    private WorkingCopy workingCopy = WorkingCopy.getInstance();
+    private WorkingCopy workingCopy;
 
-    public Properties(String workingCopyId, String environment, String application) throws ConfigurationException {
+    @Inject
+    public Properties(WorkingCopy workingCopy) throws ConfigurationException {
 
-        this.workingCopyId = workingCopyId;
-        jsonFilename = environment + "/" + application + ".json";
+        this.workingCopy = workingCopy;
     }
 
-    public Map<String, String> getAll() throws ConfigurationException {
+    public Map<String, String> getAll(String environment, String application) throws ConfigurationException {
 
+        String jsonFilename = environment + "/" + application + ".json";
         Map<String, String> properties;
         try {
             Map<String, String> workingCopyProperties = new HashMap<String, String>();
-            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(workingCopyId, jsonFilename, workingCopyProperties)), HashMap.class);
+            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyProperties)), HashMap.class);
             for (String propertyKey : workingCopyProperties.keySet()) {
                 properties.put(propertyKey, workingCopyProperties.get(propertyKey));
             }
@@ -39,9 +39,9 @@ public class Properties {
         return properties;
     }
 
-    public String get(String key) throws ConfigurationException {
+    public String get(String environment, String application, String key) throws ConfigurationException {
 
-        String value = getAll().get(key);
+        String value = getAll(environment, application).get(key);
         if (value == null) {
             throw new ConfigurationException("No value for " + key);
         }

@@ -26,7 +26,7 @@ public class SubversionWorkingCopy {
         patterns.put(Pattern.compile("^Last Changed Date: (.+)$"), "vcs.last.changed.date");
         patterns.put(Pattern.compile("^Last Changed Author: (.+)$"), "vcs.last.changed.author");
         patterns.put(Pattern.compile("^URL: (.+)$"), "vcs.repository.location");
-    };
+    }
 
     public void update(File workingCopy, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 

@@ -6,18 +6,28 @@
 
 package uk.org.sappho.applications.configuration.service;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import uk.org.sappho.applications.configuration.service.vcs.SubversionWorkingCopy;
 
 import java.io.File;
 import java.util.Map;
 
+@Singleton
 public class WorkingCopy {
 
-    private static final WorkingCopy instance = new WorkingCopy();
-    private final SubversionWorkingCopy subversionWorkingCopy = new SubversionWorkingCopy();
+    private SubversionWorkingCopy subversionWorkingCopy;
     private final String workingCopyPath = System.getProperty("working.copy.path");
+    private String workingCopyId;
 
-    synchronized public File getFile(String workingCopyId, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    @Inject
+    public WorkingCopy(ServiceProperties serviceProperties, SubversionWorkingCopy subversionWorkingCopy) {
+
+        workingCopyId = serviceProperties.getProperties().get("workingCopyId");
+        this.subversionWorkingCopy = subversionWorkingCopy;
+    }
+
+    synchronized public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
@@ -32,13 +42,5 @@ public class WorkingCopy {
             throw new ConfigurationException("Requested object " + filename + " does not exist");
         }
         return file;
-    }
-
-    public static WorkingCopy getInstance() {
-
-        return instance;
-    }
-
-    private WorkingCopy() {
     }
 }

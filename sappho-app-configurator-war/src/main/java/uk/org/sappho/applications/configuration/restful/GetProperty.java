@@ -13,21 +13,22 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}/{application}/{key}")
-public class GetProperty {
+public class GetProperty extends RestService {
 
-    @QueryParam("wci") private String workingCopyId;
-    @PathParam("environment") private String environment;
-    @PathParam("application") private String application;
-    @PathParam("key") private String key;
+    @PathParam("environment")
+    private String environment;
+    @PathParam("application")
+    private String application;
+    @PathParam("key")
+    private String key;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnvironments() throws ConfigurationException {
 
-        return new Properties(workingCopyId, environment, application).get(key);
+        return getInjector().getInstance(Properties.class).get(environment, application, key);
     }
 }

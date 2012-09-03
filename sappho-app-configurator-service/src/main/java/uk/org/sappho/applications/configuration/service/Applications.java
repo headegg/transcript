@@ -6,23 +6,24 @@
 
 package uk.org.sappho.applications.configuration.service;
 
+import com.google.inject.Inject;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
 public class Applications {
 
-    private final String workingCopyId;
-    private final String environment;
+    private WorkingCopy workingCopy;
 
-    public Applications(String workingCopyId, String environment) {
+    @Inject
+    public Applications(WorkingCopy workingCopy) {
 
-        this.workingCopyId = workingCopyId;
-        this.environment = environment;
+        this.workingCopy = workingCopy;
     }
 
-    public String[] getAll() throws ConfigurationException {
+    public String[] getAll(String environment) throws ConfigurationException {
 
-        String[] applications = WorkingCopy.getInstance().getFile(workingCopyId, environment, null).list(new FilenameFilter() {
+        String[] applications = workingCopy.getFile(environment, null).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isFile() && name.endsWith(".json");
             }
