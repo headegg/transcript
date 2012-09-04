@@ -78,7 +78,7 @@ public class SubversionWorkingCopy {
         }
         String authentication =
                 username != null && username.length() != 0 && password != null && password.length() != 0 ?
-                        " --username " + username + " --password " + password : " ";
+                        " --username " + username + " --password " + password : "";
         try {
             String command = "svn checkout --non-interactive --quiet" + authentication + " " + url + " " + workingCopyId;
             Process process = Runtime.getRuntime().exec(command, null, workingCopyBase);
