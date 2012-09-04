@@ -8,6 +8,7 @@ package uk.org.sappho.applications.configuration.service;
 
 import com.google.inject.Singleton;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,21 @@ import java.util.Map;
 public class ServiceProperties {
 
     private final Map<String, String> properties = new HashMap<String, String>();
+    private File workingCopyBase;
+    private String workingCopyId;
+
+    public ServiceProperties() throws ConfigurationException {
+
+        String workingCopyPath = System.getProperty("working.copy.path");
+        if (workingCopyPath == null || workingCopyPath.length() == 0) {
+            throw new ConfigurationException("System property working.copy.path not specified");
+        }
+        workingCopyBase = new File(workingCopyPath);
+        workingCopyId = properties.get("workingCopyId");
+        if (workingCopyId == null || workingCopyId.length() == 0) {
+            workingCopyId = "default";
+        }
+    }
 
     public void put(String key, List<String> values) {
 
@@ -29,5 +45,13 @@ public class ServiceProperties {
     public Map<String, String> getProperties() {
 
         return properties;
+    }
+
+    public File getWorkingCopyBase() {
+        return workingCopyBase;
+    }
+
+    public String getWorkingCopyId() {
+        return workingCopyId;
     }
 }

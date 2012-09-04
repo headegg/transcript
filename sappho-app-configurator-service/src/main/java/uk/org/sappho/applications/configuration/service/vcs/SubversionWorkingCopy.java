@@ -19,6 +19,11 @@ import java.util.regex.Pattern;
 public class SubversionWorkingCopy {
 
     private final static Map<Pattern, String> patterns = new HashMap<Pattern, String>();
+    private final static String checkoutCommand = "svn checkout --non-interactive --quiet";
+    private String username = System.getProperty("svn.username");
+    private String password = System.getProperty("svn.password");
+    private ServiceProperties serviceProperties;
+    private CommandExecuter commandExecuter;
 
     static {
         patterns.put(Pattern.compile(".*<entry.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
@@ -33,22 +38,17 @@ public class SubversionWorkingCopy {
                 "vcs.repository.location");
     }
 
-    private final static String checkoutCommand = "svn checkout --non-interactive --quiet";
-    private String url;
-    private String username = System.getProperty("svn.username");
-    private String password = System.getProperty("svn.password");
-    private CommandExecuter commandExecuter;
-
     @Inject
     public SubversionWorkingCopy(ServiceProperties serviceProperties, CommandExecuter commandExecuter) {
 
-        url = serviceProperties.getProperties().get("svn.url");
+        this.serviceProperties = serviceProperties;
         this.commandExecuter = commandExecuter;
     }
 
-    public void update(File workingCopy, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    public void update(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         try {
+            File workingCopy = new File(serviceProperties.getWorkingCopyBase(), serviceProperties.getWorkingCopyId());
             String command = "svn update --non-interactive --quiet --accept theirs-full " + filename;
             commandExecuter.execute(command, workingCopy, command);
             if (workingCopyProperties != null) {
@@ -66,8 +66,9 @@ public class SubversionWorkingCopy {
         }
     }
 
-    public void checkout(File workingCopyBase, String workingCopyId) throws ConfigurationException {
+    public void checkout() throws ConfigurationException {
 
+        String url = serviceProperties.getProperties().get("svn.url");
         if (url == null || url.length() == 0) {
             throw new ConfigurationException("Subversion repository checkout URL not specified");
         }
@@ -75,9 +76,9 @@ public class SubversionWorkingCopy {
                 username != null && username.length() != 0 && password != null && password.length() != 0 ?
                         " --username " + username + " --password " + password : "";
         try {
-            String directorySpec = " " + url + " " + workingCopyId;
+            String directorySpec = " " + url + " " + serviceProperties.getWorkingCopyId();
             String command = checkoutCommand + authentication + directorySpec;
-            commandExecuter.execute(command, workingCopyBase, checkoutCommand + directorySpec);
+            commandExecuter.execute(command, serviceProperties.getWorkingCopyBase(), checkoutCommand + directorySpec);
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to checkout from Subversion server", exception);
         }
