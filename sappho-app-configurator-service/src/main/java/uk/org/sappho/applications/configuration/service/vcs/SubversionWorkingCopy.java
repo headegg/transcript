@@ -31,15 +31,13 @@ public class SubversionWorkingCopy {
     }
 
     private String url;
-    private String username;
-    private String password;
+    private String username = System.getProperty("svn.username");
+    private String password = System.getProperty("svn.password");
 
     @Inject
     public SubversionWorkingCopy(ServiceProperties serviceProperties) {
 
         url = serviceProperties.getProperties().get("svn.url");
-        username = serviceProperties.getProperties().get("svn.username");
-        password = serviceProperties.getProperties().get("svn.password");
     }
 
     public void update(File workingCopy, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
