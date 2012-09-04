@@ -29,9 +29,8 @@ public class WorkingCopy {
         workingCopyBase = new File(workingCopyPath);
         workingCopyId = serviceProperties.getProperties().get("workingCopyId");
         if (workingCopyId == null || workingCopyId.length() == 0) {
-            workingCopyId = ".";
+            workingCopyId = "default";
         }
-        ;
         vcs = serviceProperties.getProperties().get("vcs");
         this.subversionWorkingCopy = subversionWorkingCopy;
     }
