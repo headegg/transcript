@@ -7,13 +7,11 @@
 package uk.org.sappho.applications.configuration.service;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import uk.org.sappho.applications.configuration.service.vcs.SubversionWorkingCopy;
 
 import java.io.File;
 import java.util.Map;
 
-@Singleton
 public class WorkingCopy {
 
     private SubversionWorkingCopy subversionWorkingCopy;
@@ -27,7 +25,7 @@ public class WorkingCopy {
         this.subversionWorkingCopy = subversionWorkingCopy;
     }
 
-    synchronized public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         if (workingCopyPath == null) {
             throw new ConfigurationException("System property working.copy.path not specified");
