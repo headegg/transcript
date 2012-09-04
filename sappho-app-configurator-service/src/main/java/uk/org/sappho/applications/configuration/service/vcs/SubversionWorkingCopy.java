@@ -6,7 +6,9 @@
 
 package uk.org.sappho.applications.configuration.service.vcs;
 
+import com.google.inject.Inject;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
+import uk.org.sappho.applications.configuration.service.ServiceProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,16 +30,29 @@ public class SubversionWorkingCopy {
         patterns.put(Pattern.compile("^URL: (.+)$"), "vcs.repository.location");
     }
 
+    private String url;
+    private String username;
+    private String password;
+
+    @Inject
+    public SubversionWorkingCopy(ServiceProperties serviceProperties) {
+
+        url = serviceProperties.getProperties().get("svn.url");
+        username = serviceProperties.getProperties().get("svn.username");
+        password = serviceProperties.getProperties().get("svn.password");
+    }
+
     public void update(File workingCopy, String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
         try {
-            Process process = Runtime.getRuntime().exec("svn update --non-interactive --quiet --accept theirs-full " + filename, null, workingCopy);
+            String command = "svn update --non-interactive --quiet --accept theirs-full " + filename;
+            Process process = Runtime.getRuntime().exec(command, null, workingCopy);
             if (process.waitFor() != 0) {
                 throw new ConfigurationException("Unable to update from Subversion server");
             }
-            process.destroy();
             if (workingCopyProperties != null) {
-                process = Runtime.getRuntime().exec("svn info --non-interactive " + filename, null, workingCopy);
+                command = "svn info --non-interactive " + filename;
+                process = Runtime.getRuntime().exec(command, null, workingCopy);
                 if (process.waitFor() != 0) {
                     throw new ConfigurationException("Unable to get status from Subversion server");
                 }
@@ -52,10 +67,28 @@ public class SubversionWorkingCopy {
                         }
                     }
                 }
-                process.destroy();
             }
         } catch (Exception exception) {
             throw new ConfigurationException("Unable to update from Subversion server", exception);
+        }
+    }
+
+    public void checkout(File workingCopyBase, String workingCopyId) throws ConfigurationException {
+
+        if (url == null || url.length() == 0) {
+            throw new ConfigurationException("Subversion repository checkout URL not specified");
+        }
+        String authentication =
+                username != null && username.length() != 0 && password != null && password.length() != 0 ?
+                        " --username " + username + " --password " + password : " ";
+        try {
+            String command = "svn checkout --non-interactive --quiet" + authentication + " " + url + " " + workingCopyId;
+            Process process = Runtime.getRuntime().exec(command, null, workingCopyBase);
+            if (process.waitFor() != 0) {
+                throw new ConfigurationException("Subversion checkout reported an error");
+            }
+        } catch (Exception exception) {
+            throw new ConfigurationException("Unable to checkout from Subversion server", exception);
         }
     }
 }

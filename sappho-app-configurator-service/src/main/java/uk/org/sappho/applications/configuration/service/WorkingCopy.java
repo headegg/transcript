@@ -15,22 +15,44 @@ import java.util.Map;
 public class WorkingCopy {
 
     private SubversionWorkingCopy subversionWorkingCopy;
-    private final String workingCopyPath = System.getProperty("working.copy.path");
+    private File workingCopyBase;
     private String workingCopyId;
+    private String vcs;
 
     @Inject
-    public WorkingCopy(ServiceProperties serviceProperties, SubversionWorkingCopy subversionWorkingCopy) {
+    public WorkingCopy(ServiceProperties serviceProperties, SubversionWorkingCopy subversionWorkingCopy) throws ConfigurationException {
 
+        String workingCopyPath = System.getProperty("working.copy.path");
+        if (workingCopyPath == null || workingCopyPath.length() == 0) {
+            throw new ConfigurationException("System property working.copy.path not specified");
+        }
+        workingCopyBase = new File(workingCopyPath);
         workingCopyId = serviceProperties.getProperties().get("workingCopyId");
+        if (workingCopyId == null || workingCopyId.length() == 0) {
+            workingCopyId = ".";
+        }
+        ;
+        vcs = serviceProperties.getProperties().get("vcs");
         this.subversionWorkingCopy = subversionWorkingCopy;
     }
 
     public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
-        if (workingCopyPath == null) {
-            throw new ConfigurationException("System property working.copy.path not specified");
+        File workingCopy = new File(workingCopyBase, workingCopyId);
+        if (workingCopy.exists()) {
+            if (!workingCopy.isDirectory()) {
+                throw new ConfigurationException("Requested working copy " + workingCopyId + " is not a directory");
+            }
+        } else {
+            if (vcs == null || vcs.length() == 0) {
+                throw new ConfigurationException("No VCS specified for configuration repository cloning");
+            }
+            if (vcs.equalsIgnoreCase("svn")) {
+                subversionWorkingCopy.checkout(workingCopyBase, workingCopyId);
+            } else {
+                throw new ConfigurationException("VCS " + vcs + " isn't a known system");
+            }
         }
-        File workingCopy = new File(workingCopyPath, workingCopyId != null ? workingCopyId : ".");
         File svnDirectory = new File(workingCopy, ".svn");
         if (svnDirectory.exists() && svnDirectory.isDirectory()) {
             subversionWorkingCopy.update(workingCopy, filename, workingCopyProperties);
