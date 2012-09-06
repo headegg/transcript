@@ -29,6 +29,6 @@ public class GetProperty extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnvironments() throws ConfigurationException {
 
-        return getInjector().getInstance(Properties.class).get(environment, application, key);
+        return getService(Properties.class).get(environment, application, key);
     }
 }

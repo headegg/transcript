@@ -25,6 +25,6 @@ public class GetApplications extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        return getInjector().getInstance(Applications.class).getAll(environment);
+        return getService(Applications.class).getAll(environment);
     }
 }

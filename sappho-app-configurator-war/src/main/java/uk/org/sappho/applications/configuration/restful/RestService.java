@@ -6,7 +6,6 @@
 
 package uk.org.sappho.applications.configuration.restful;
 
-import com.google.inject.Injector;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.ServiceModule;
 
@@ -19,13 +18,13 @@ public class RestService {
     @Context
     private UriInfo uriInfo;
 
-    protected Injector getInjector() throws ConfigurationException {
+    protected <T> T getService(Class<T> type) throws ConfigurationException {
 
         ServiceModule serviceModule = new ServiceModule();
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
         for (String key : queryParameters.keySet()) {
             serviceModule.setProperty(key, queryParameters.get(key));
         }
-        return serviceModule.getInjector();
+        return serviceModule.getInjector().getInstance(type);
     }
 }
