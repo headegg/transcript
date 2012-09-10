@@ -5,7 +5,7 @@
     <display-name>Application Configuration Reader</display-name>
 
     <servlet>
-        <servlet-name>app-config-read</servlet-name>
+        <servlet-name>app-properties</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
@@ -19,8 +19,8 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>app-config-read</servlet-name>
-        <url-pattern>/environments/*</url-pattern>
+        <servlet-name>app-properties</servlet-name>
+        <url-pattern>/properties/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

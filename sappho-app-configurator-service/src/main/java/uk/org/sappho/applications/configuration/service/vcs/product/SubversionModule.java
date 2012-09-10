@@ -23,6 +23,6 @@ public class SubversionModule extends AbstractServiceModule {
     @Override
     protected List<String> getRequiredProperties() {
 
-        return Arrays.asList("svn.url", "svn.username", "svn.password");
+        return Arrays.asList("url", "username", "password", "commit.message", "svn", "trust.server.certificate");
     }
 }

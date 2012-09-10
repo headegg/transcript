@@ -7,9 +7,12 @@
 package uk.org.sappho.applications.configuration.service;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,16 +28,11 @@ public class Properties {
 
     public Map<String, String> getAll(String environment, String application) throws ConfigurationException {
 
-        String jsonFilename = environment + "/" + application + ".json";
-        Map<String, String> properties;
-        try {
-            Map<String, String> workingCopyProperties = new HashMap<String, String>();
-            properties = new Gson().fromJson(new FileReader(workingCopy.getFile(jsonFilename, workingCopyProperties)), HashMap.class);
-            for (String propertyKey : workingCopyProperties.keySet()) {
-                properties.put(propertyKey, workingCopyProperties.get(propertyKey));
-            }
-        } catch (Exception exception) {
-            throw new ConfigurationException("Unable to read " + jsonFilename, exception);
+        Map<String, String> properties = getRawProperties(environment, application);
+        Map<String, String> versionControlProperties =
+                workingCopy.getVersionControlProperties(jsonFilename(environment, application));
+        for (String key : versionControlProperties.keySet()) {
+            properties.put(key, versionControlProperties.get(key));
         }
         return properties;
     }
@@ -47,4 +45,68 @@ public class Properties {
         }
         return value;
     }
+
+    public void put(String environment, String application, Map<String, String> properties) throws ConfigurationException {
+
+        workingCopy.getUpToDateFile(jsonFilename(environment, application));
+        putAllProperties(environment, application, properties);
+    }
+
+    public void put(String environment, String application, String key, String value) throws ConfigurationException {
+
+        Map<String, String> properties = getRawProperties(environment, application);
+        if (value != null) {
+            properties.put(key, value);
+        } else {
+            if (properties.containsKey(key)) {
+                properties.remove(key);
+            }
+        }
+        putAllProperties(environment, application, properties);
+    }
+
+    public void delete(String environment, String application, String key) throws ConfigurationException {
+
+        put(environment, application, key, null);
+    }
+
+    public void delete(String environment, String application) throws ConfigurationException {
+
+        put(environment, application, new HashMap<String, String>());
+    }
+
+    private String jsonFilename(String environment, String application) {
+
+        return environment + "/" + application + ".json";
+    }
+
+    private Map<String, String> getRawProperties(String environment, String application)
+            throws ConfigurationException {
+
+        try {
+            FileReader fileReader =
+                    new FileReader(workingCopy.getUpToDateFile(jsonFilename(environment, application)));
+            Map<String, String> properties = new Gson().fromJson(fileReader, HashMap.class);
+            fileReader.close();
+            return properties;
+        } catch (Throwable throwable) {
+            throw new ConfigurationException("Unable to read " + jsonFilename(environment, application), throwable);
+        }
+    }
+
+    private void putAllProperties(String environment, String application, Map<String, String> properties)
+            throws ConfigurationException {
+
+        try {
+            JsonWriter jsonWriter =
+                    new JsonWriter(new FileWriter(workingCopy.getFile(jsonFilename(environment, application))));
+            jsonWriter.setIndent("    ");
+            new Gson().toJson(properties, HashMap.class, jsonWriter);
+            jsonWriter.close();
+        } catch (Throwable throwable) {
+            throw new ConfigurationException("Unable to write " + jsonFilename(environment, application), throwable);
+        }
+        workingCopy.commit(jsonFilename(environment, application));
+    }
+
 }

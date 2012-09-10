@@ -12,7 +12,11 @@ import java.util.Map;
 
 public interface VersionControlSystem {
 
-    void update(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException;
+    void update(String filename) throws ConfigurationException;
+
+    void getProperties(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException;
 
     void checkout() throws ConfigurationException;
+
+    void commit(String filename) throws ConfigurationException;
 }

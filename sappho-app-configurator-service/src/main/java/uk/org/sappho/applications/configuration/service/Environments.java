@@ -23,7 +23,7 @@ public class Environments {
 
     public String[] getAll() throws ConfigurationException {
 
-        return workingCopy.getFile(".", null).list(new FilenameFilter() {
+        return workingCopy.getUpToDateFile(".").list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }

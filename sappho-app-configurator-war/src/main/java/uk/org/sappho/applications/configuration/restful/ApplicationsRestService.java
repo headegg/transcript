@@ -6,8 +6,8 @@
 
 package uk.org.sappho.applications.configuration.restful;
 
+import uk.org.sappho.applications.configuration.service.Applications;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
-import uk.org.sappho.applications.configuration.service.Properties;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,20 +15,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/{environment}/{application}/{key}")
-public class GetProperty extends RestService {
+@Path("/{environment}")
+public class ApplicationsRestService extends RestService {
 
     @PathParam("environment")
     private String environment;
-    @PathParam("application")
-    private String application;
-    @PathParam("key")
-    private String key;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getEnvironments() throws ConfigurationException {
+    public String[] getApplications() throws ConfigurationException {
 
-        return getService(Properties.class).get(environment, application, key);
+        return getService(Applications.class).getAll(environment);
     }
 }

@@ -11,6 +11,7 @@ import com.google.inject.name.Named;
 import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public class WorkingCopy {
@@ -29,7 +30,7 @@ public class WorkingCopy {
         this.versionControlSystem = versionControlSystem;
     }
 
-    public File getFile(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    public File getUpToDateFile(String filename) throws ConfigurationException {
 
         File workingCopy = new File(workingCopyPath, workingCopyId);
         if (workingCopy.exists()) {
@@ -40,14 +41,28 @@ public class WorkingCopy {
         } else {
             versionControlSystem.checkout();
         }
-        File svnDirectory = new File(workingCopy, ".svn");
-        if (svnDirectory.exists() && svnDirectory.isDirectory()) {
-            versionControlSystem.update(filename, workingCopyProperties);
-        }
+        versionControlSystem.update(filename);
         File file = new File(workingCopy, filename);
         if (!file.exists()) {
             throw new ConfigurationException("Requested object " + filename + " does not exist");
         }
         return file;
+    }
+
+    public Map<String, String> getVersionControlProperties(String filename) throws ConfigurationException {
+
+        Map<String, String> properties = new HashMap<String, String>();
+        versionControlSystem.getProperties(filename, properties);
+        return properties;
+    }
+
+    public File getFile(String filename) {
+
+        return new File(new File(workingCopyPath, workingCopyId), filename);
+    }
+
+    public void commit(String filename) throws ConfigurationException {
+
+        versionControlSystem.commit(filename);
     }
 }

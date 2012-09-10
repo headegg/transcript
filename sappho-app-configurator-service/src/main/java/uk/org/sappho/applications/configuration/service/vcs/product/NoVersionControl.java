@@ -6,15 +6,18 @@
 
 package uk.org.sappho.applications.configuration.service.vcs.product;
 
+import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
 
 import java.util.Map;
 
 public class NoVersionControl implements VersionControlSystem {
 
-    public void update(String filename, Map<String, String> workingCopyProperties) {
-    }
+    public void update(String filename) {}
 
-    public void checkout() {
-    }
+    public void getProperties(String filename, Map<String, String> workingCopyProperties) {}
+
+    public void checkout() {}
+
+    public void commit(String filename) {}
 }
