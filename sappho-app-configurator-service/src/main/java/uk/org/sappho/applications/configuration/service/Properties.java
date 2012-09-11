@@ -10,10 +10,10 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Properties {
@@ -46,10 +46,11 @@ public class Properties {
         return value;
     }
 
-    public void put(String environment, String application, Map<String, String> properties) throws ConfigurationException {
+    public void put(String environment, String application, Map<String, String> properties)
+            throws ConfigurationException {
 
-        workingCopy.getUpToDateFile(jsonFilename(environment, application));
-        putAllProperties(environment, application, properties);
+        getRawProperties(environment, application);
+        commitAllProperties(environment, application, properties);
     }
 
     public void put(String environment, String application, String key, String value) throws ConfigurationException {
@@ -62,7 +63,7 @@ public class Properties {
                 properties.remove(key);
             }
         }
-        putAllProperties(environment, application, properties);
+        commitAllProperties(environment, application, properties);
     }
 
     public void delete(String environment, String application, String key) throws ConfigurationException {
@@ -72,7 +73,7 @@ public class Properties {
 
     public void delete(String environment, String application) throws ConfigurationException {
 
-        put(environment, application, new HashMap<String, String>());
+        put(environment, application, new LinkedHashMap<String, String>());
     }
 
     private String jsonFilename(String environment, String application) {
@@ -80,33 +81,47 @@ public class Properties {
         return environment + "/" + application + ".json";
     }
 
-    private Map<String, String> getRawProperties(String environment, String application)
-            throws ConfigurationException {
+    private Map<String, String> getRawProperties(String environment, String application) throws ConfigurationException {
 
         try {
-            FileReader fileReader =
-                    new FileReader(workingCopy.getUpToDateFile(jsonFilename(environment, application)));
-            Map<String, String> properties = new Gson().fromJson(fileReader, HashMap.class);
-            fileReader.close();
+            File file = workingCopy.getUpToDateFile(jsonFilename(environment, application));
+            Map<String, String> properties = new LinkedHashMap<String, String>();
+            if (file.exists()) {
+                FileReader fileReader = new FileReader(file);
+                properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
+                fileReader.close();
+            } else {
+                putAllProperties(environment, application, properties);
+            }
             return properties;
         } catch (Throwable throwable) {
             throw new ConfigurationException("Unable to read " + jsonFilename(environment, application), throwable);
         }
     }
 
+    private void commitAllProperties(String environment, String application, Map<String, String> properties)
+            throws ConfigurationException {
+
+        putAllProperties(environment, application, properties);
+        workingCopy.commit(jsonFilename(environment, application));
+    }
+
     private void putAllProperties(String environment, String application, Map<String, String> properties)
             throws ConfigurationException {
 
         try {
+            File directory = workingCopy.getFile(environment);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
             JsonWriter jsonWriter =
                     new JsonWriter(new FileWriter(workingCopy.getFile(jsonFilename(environment, application))));
             jsonWriter.setIndent("    ");
-            new Gson().toJson(properties, HashMap.class, jsonWriter);
+            jsonWriter.setHtmlSafe(true);
+            new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
             jsonWriter.close();
         } catch (Throwable throwable) {
             throw new ConfigurationException("Unable to write " + jsonFilename(environment, application), throwable);
         }
-        workingCopy.commit(jsonFilename(environment, application));
     }
-
 }

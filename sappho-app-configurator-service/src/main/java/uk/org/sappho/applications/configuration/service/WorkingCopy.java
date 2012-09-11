@@ -38,21 +38,20 @@ public class WorkingCopy {
                 throw new ConfigurationException("Requested working copy " + workingCopyId +
                         " is not a directory");
             }
+            versionControlSystem.update(filename);
         } else {
             versionControlSystem.checkout();
         }
-        versionControlSystem.update(filename);
-        File file = new File(workingCopy, filename);
-        if (!file.exists()) {
-            throw new ConfigurationException("Requested object " + filename + " does not exist");
-        }
-        return file;
+        return new File(workingCopy, filename);
     }
 
-    public Map<String, String> getVersionControlProperties(String filename) throws ConfigurationException {
+    public Map<String, String> getVersionControlProperties(String filename) {
 
         Map<String, String> properties = new HashMap<String, String>();
-        versionControlSystem.getProperties(filename, properties);
+        try {
+            versionControlSystem.getProperties(filename, properties);
+        } catch (Throwable throwable) {
+        }
         return properties;
     }
 

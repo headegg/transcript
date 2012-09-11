@@ -69,6 +69,15 @@ public class SubversionVersionControl implements VersionControlSystem {
 
     public void update(String filename) throws ConfigurationException {
 
+        try {
+            tryUpdate(filename);
+        } catch (Throwable throwable) {
+            tryUpdate(".");
+        }
+    }
+
+    private void tryUpdate(String filename) throws ConfigurationException {
+
         execute("update", new String[]{"--quiet", "--accept", "theirs-full", filename},
                 new File(workingCopyPath, workingCopyId));
     }
