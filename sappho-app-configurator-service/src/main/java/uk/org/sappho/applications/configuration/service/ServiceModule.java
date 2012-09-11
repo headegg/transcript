@@ -21,7 +21,6 @@ public class ServiceModule extends AbstractModule {
 
     private final static Map<String, Class<? extends AbstractServiceModule>> vcsModules =
             new HashMap<String, Class<? extends AbstractServiceModule>>();
-    private String workingCopyPath;
     private final Map<String, String> properties = new HashMap<String, String>();
 
     static {
@@ -30,10 +29,6 @@ public class ServiceModule extends AbstractModule {
 
     public ServiceModule() throws ConfigurationException {
 
-        workingCopyPath = System.getProperty("working.copy.path");
-        if (workingCopyPath == null || workingCopyPath.length() == 0) {
-            throw new ConfigurationException("System property working.copy.path not specified");
-        }
         for (String key : System.getProperties().stringPropertyNames()) {
             setProperty(key, System.getProperty(key));
         }
@@ -61,7 +56,10 @@ public class ServiceModule extends AbstractModule {
 
     public Injector getInjector() throws ConfigurationException {
 
-        properties.put("working.copy.path", workingCopyPath);
+        String workingCopyPath = properties.get("working.copy.path");
+        if (workingCopyPath == null || workingCopyPath.length() == 0) {
+            throw new ConfigurationException("Application property working.copy.path not specified");
+        }
         String workingCopyId = properties.get("working.copy.id");
         if (workingCopyId == null || workingCopyId.length() == 0) {
             properties.put("working.copy.id", "default");
