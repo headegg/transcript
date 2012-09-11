@@ -14,9 +14,7 @@ import uk.org.sappho.applications.configuration.service.vcs.CommandExecuter;
 import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,13 +69,13 @@ public class SubversionVersionControl implements VersionControlSystem {
 
     public void update(String filename) throws ConfigurationException {
 
-        execute("update", new String[] {"--quiet",  "--accept", "theirs-full", filename},
+        execute("update", new String[]{"--quiet", "--accept", "theirs-full", filename},
                 new File(workingCopyPath, workingCopyId));
     }
 
     public void getProperties(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
 
-        String output = execute("info", new String[] {"--xml", filename}, new File(workingCopyPath, workingCopyId));
+        String output = execute("info", new String[]{"--xml", filename}, new File(workingCopyPath, workingCopyId));
         for (Pattern pattern : patterns.keySet()) {
             Matcher matcher = pattern.matcher(output);
             if (matcher.matches()) {
@@ -91,7 +89,7 @@ public class SubversionVersionControl implements VersionControlSystem {
         if (url.length() == 0) {
             throw new ConfigurationException("Subversion repository checkout URL not specified");
         }
-        execute("checkout", new String[] {"--quiet", url, workingCopyId}, new File(workingCopyPath));
+        execute("checkout", new String[]{"--quiet", url, workingCopyId}, new File(workingCopyPath));
     }
 
     public void commit(String filename) throws ConfigurationException {
@@ -99,7 +97,7 @@ public class SubversionVersionControl implements VersionControlSystem {
         if (commitMessage.length() == 0) {
             throw new ConfigurationException("Subversion commit message not specified");
         }
-        execute("commit", new String[] {"--quiet", "--message", commitMessage, filename},
+        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename},
                 new File(workingCopyPath, workingCopyId));
     }
 
@@ -115,6 +113,6 @@ public class SubversionVersionControl implements VersionControlSystem {
         for (String parameter : parameters) {
             command.add(parameter, false);
         }
-        return commandExecuter.execute(command.getCommand(), directory, command.getSafeCommand());
+        return commandExecuter.execute(command, directory);
     }
 }

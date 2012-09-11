@@ -13,15 +13,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 
 public class CommandExecuter {
 
-    public String execute(List<String> command, File directory, String errorMessage) throws ConfigurationException {
+    public String execute(Command command, File directory) throws ConfigurationException {
 
         try {
-            String[] commandArray = new String[command.size()];
-            Process process = Runtime.getRuntime().exec(command.toArray(commandArray), null, directory);
+            String[] commandArray = new String[command.getCommand().size()];
+            Process process = Runtime.getRuntime().exec(command.getCommand().toArray(commandArray), null, directory);
             int exitCode = process.waitFor();
             String standardOutput = processOutput(process.getInputStream());
             if (exitCode != 0) {
@@ -29,7 +28,7 @@ public class CommandExecuter {
             }
             return standardOutput;
         } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to execute VCS command: " + errorMessage, throwable);
+            throw new ConfigurationException("Unable to execute system command: " + command.getSafeCommand(), throwable);
         }
     }
 
