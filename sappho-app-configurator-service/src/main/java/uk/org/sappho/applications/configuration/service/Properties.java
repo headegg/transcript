@@ -49,13 +49,31 @@ public class Properties {
     public void put(String environment, String application, Map<String, String> properties)
             throws ConfigurationException {
 
-        getRawProperties(environment, application);
-        commitAllProperties(environment, application, properties);
+        Map<String, String> savedProperties = getRawProperties(environment, application);
+        try {
+            commitAllProperties(environment, application, properties);
+        } catch (ConfigurationException exception) {
+            putAllProperties(environment, application, savedProperties);
+            throw exception;
+        }
     }
 
     public void put(String environment, String application, String key, String value) throws ConfigurationException {
 
         Map<String, String> properties = getRawProperties(environment, application);
+        String savedValue = properties.get(key);
+        put(properties, key, value);
+        try {
+            commitAllProperties(environment, application, properties);
+        } catch (ConfigurationException exception) {
+            put(properties, key, savedValue);
+            putAllProperties(environment, application, properties);
+            throw exception;
+        }
+    }
+
+    private void put(Map<String, String> properties, String key, String value) {
+
         if (value != null) {
             properties.put(key, value);
         } else {
@@ -63,7 +81,6 @@ public class Properties {
                 properties.remove(key);
             }
         }
-        commitAllProperties(environment, application, properties);
     }
 
     public void delete(String environment, String application, String key) throws ConfigurationException {
