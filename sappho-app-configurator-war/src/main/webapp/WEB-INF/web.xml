@@ -20,7 +20,7 @@
 
     <servlet-mapping>
         <servlet-name>app-properties</servlet-name>
-        <url-pattern>/properties/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
