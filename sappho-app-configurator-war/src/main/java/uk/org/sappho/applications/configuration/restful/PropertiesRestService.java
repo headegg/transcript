@@ -11,6 +11,7 @@ import uk.org.sappho.applications.configuration.service.Properties;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Path("/{environment}/{application}")
@@ -30,7 +31,7 @@ public class PropertiesRestService extends RestService {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setProperties(Map<String, String> properties) throws ConfigurationException {
+    public void setProperties(LinkedHashMap<String, String> properties) throws ConfigurationException {
 
         getService(Properties.class).put(environment, application, properties);
     }

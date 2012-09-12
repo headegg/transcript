@@ -15,7 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/")
-public class EnvironmentsRestService extends RestService {
+public class RootRestService extends RestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

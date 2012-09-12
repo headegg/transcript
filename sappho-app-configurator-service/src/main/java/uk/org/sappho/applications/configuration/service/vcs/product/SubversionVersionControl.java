@@ -8,20 +8,21 @@ package uk.org.sappho.applications.configuration.service.vcs.product;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.vcs.Command;
 import uk.org.sappho.applications.configuration.service.vcs.CommandExecuter;
 import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SubversionVersionControl implements VersionControlSystem {
 
-    private final static Map<Pattern, String> patterns = new HashMap<Pattern, String>();
+    private final static Map<Pattern, String> patterns = new LinkedHashMap<Pattern, String>();
     private String workingCopyPath;
     private String workingCopyId;
     private String url;
@@ -43,6 +44,8 @@ public class SubversionVersionControl implements VersionControlSystem {
                 "vcs.last.changed.author");
         patterns.put(Pattern.compile(".*<url>(.+)</url>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.repository.location");
+        patterns.put(Pattern.compile(".*<checksum>(.+)</checksum>.*", Pattern.MULTILINE + Pattern.DOTALL),
+                "vcs.hash");
     }
 
     @Inject
@@ -69,34 +72,30 @@ public class SubversionVersionControl implements VersionControlSystem {
 
     public void update(String filename) throws ConfigurationException {
 
-        try {
-            tryUpdate(filename);
-        } catch (Throwable throwable) {
-            tryUpdate(".");
-        }
-    }
-
-    private void tryUpdate(String filename) throws ConfigurationException {
-
-        execute("update", new String[]{"--quiet", "--accept", "theirs-full", filename},
+        execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", "."},
                 new File(workingCopyPath, workingCopyId));
     }
 
-    public void getProperties(String filename, Map<String, String> workingCopyProperties) throws ConfigurationException {
+    public Map<String, String> getProperties(String filename) {
 
-        String output = execute("info", new String[]{"--xml", filename}, new File(workingCopyPath, workingCopyId));
-        for (Pattern pattern : patterns.keySet()) {
-            Matcher matcher = pattern.matcher(output);
-            if (matcher.matches()) {
-                workingCopyProperties.put(patterns.get(pattern), matcher.group(1));
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+        try {
+            String output = execute("info", new String[]{"--xml", filename}, new File(workingCopyPath, workingCopyId));
+            for (Pattern pattern : patterns.keySet()) {
+                Matcher matcher = pattern.matcher(output);
+                if (matcher.matches()) {
+                    properties.put(patterns.get(pattern), matcher.group(1));
+                }
             }
         }
+        catch (Throwable throwable) {}
+        return properties;
     }
 
     public void checkout() throws ConfigurationException {
 
         if (url.length() == 0) {
-            throw new ConfigurationException("Subversion repository checkout URL not specified");
+            throw new ConfigurationException("Subversion repository checkout URL not supplied");
         }
         execute("checkout", new String[]{"--quiet", url, workingCopyId}, new File(workingCopyPath));
     }
@@ -104,13 +103,53 @@ public class SubversionVersionControl implements VersionControlSystem {
     public void commit(String filename) throws ConfigurationException {
 
         if (commitMessage.length() == 0) {
-            throw new ConfigurationException("Subversion commit message not specified");
+            throw new ConfigurationException("Subversion commit message not supplied");
+        }
+        File basePath = new File(workingCopyPath, workingCopyId);
+        String fileUrl = getFileUrl(filename);
+        if (fileUrl == null) {
+            try {
+                execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
+                        new File(workingCopyPath, workingCopyId));
+            }
+            catch (ConfigurationException exception) {
+                filename = new File(filename).getParent();
+                if (filename != null && filename.length() != 0) {
+                    execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
+                            new File(workingCopyPath, workingCopyId));
+                } else {
+                    throw exception;
+                }
+            }
         }
         execute("commit", new String[]{"--quiet", "--message", commitMessage, filename},
-                new File(workingCopyPath, workingCopyId));
+            new File(workingCopyPath, workingCopyId));
     }
 
-    private String execute(String subversionCommand, String[] parameters, File directory) throws ConfigurationException {
+    public void delete(String filename) throws ConfigurationException {
+
+        File basePath = new File(workingCopyPath, workingCopyId);
+        String fileUrl = getFileUrl(filename);
+        if (fileUrl != null) {
+            execute("delete", new String[] {"--force", "--quiet", filename}, basePath);
+            commit(filename);
+        } else {
+            try {
+                FileUtils.forceDelete(new File(basePath, filename));
+            }
+            catch (Throwable throwable) {
+                throw new ConfigurationException("Unable to delete " + filename);
+            }
+        }
+    }
+
+    private String getFileUrl(String filename) {
+
+        return getProperties(filename).get("vcs.repository.location");
+    }
+
+    private String execute(String subversionCommand, String[] parameters, File directory)
+            throws ConfigurationException {
 
         Command command = new Command();
         command.add(executable, false);

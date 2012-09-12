@@ -45,23 +45,23 @@ public class WorkingCopy {
         return new File(workingCopy, filename);
     }
 
-    public Map<String, String> getVersionControlProperties(String filename) {
-
-        Map<String, String> properties = new HashMap<String, String>();
-        try {
-            versionControlSystem.getProperties(filename, properties);
-        } catch (Throwable throwable) {
-        }
-        return properties;
-    }
-
     public File getFile(String filename) {
 
         return new File(new File(workingCopyPath, workingCopyId), filename);
     }
 
+    public Map<String, String> getVersionControlProperties(String filename) {
+
+        return versionControlSystem.getProperties(filename);
+    }
+
     public void commit(String filename) throws ConfigurationException {
 
         versionControlSystem.commit(filename);
+    }
+
+    public void delete(String filename) throws ConfigurationException {
+
+        versionControlSystem.delete(filename);
     }
 }

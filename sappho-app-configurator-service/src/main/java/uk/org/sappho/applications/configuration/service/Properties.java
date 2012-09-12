@@ -90,7 +90,13 @@ public class Properties {
 
     public void delete(String environment, String application) throws ConfigurationException {
 
-        put(environment, application, new LinkedHashMap<String, String>());
+        Map<String, String> savedProperties = getRawProperties(environment, application);
+        try {
+            workingCopy.delete(jsonFilename(environment, application));
+        } catch (ConfigurationException exception) {
+            putAllProperties(environment, application, savedProperties);
+            throw exception;
+        }
     }
 
     private String jsonFilename(String environment, String application) {
@@ -102,12 +108,14 @@ public class Properties {
 
         try {
             File file = workingCopy.getUpToDateFile(jsonFilename(environment, application));
-            Map<String, String> properties = new LinkedHashMap<String, String>();
+            Map<String, String> properties = null;
             if (file.exists()) {
                 FileReader fileReader = new FileReader(file);
                 properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
                 fileReader.close();
-            } else {
+            }
+            if (properties == null) {
+                properties = new LinkedHashMap<String, String>();
                 putAllProperties(environment, application, properties);
             }
             return properties;

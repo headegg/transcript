@@ -19,8 +19,7 @@ import java.util.Map;
 
 public class ServiceModule extends AbstractModule {
 
-    private final static Map<String, Class<? extends AbstractServiceModule>> vcsModules =
-            new HashMap<String, Class<? extends AbstractServiceModule>>();
+    private final static Map<String, Class<? extends AbstractServiceModule>> vcsModules = new HashMap<String, Class<? extends AbstractServiceModule>>();
     private final Map<String, String> properties = new HashMap<String, String>();
 
     static {
@@ -29,8 +28,10 @@ public class ServiceModule extends AbstractModule {
 
     public ServiceModule() throws ConfigurationException {
 
-        for (String key : System.getProperties().stringPropertyNames()) {
-            setProperty(key, System.getProperty(key));
+        if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
+            for (String key : System.getProperties().stringPropertyNames()) {
+                setProperty(key, System.getProperty(key));
+            }
         }
     }
 
