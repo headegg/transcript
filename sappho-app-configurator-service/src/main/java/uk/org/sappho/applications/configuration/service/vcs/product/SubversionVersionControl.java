@@ -87,8 +87,8 @@ public class SubversionVersionControl implements VersionControlSystem {
                     properties.put(patterns.get(pattern), matcher.group(1));
                 }
             }
+        } catch (Throwable throwable) {
         }
-        catch (Throwable throwable) {}
         return properties;
     }
 
@@ -111,8 +111,7 @@ public class SubversionVersionControl implements VersionControlSystem {
             try {
                 execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
                         new File(workingCopyPath, workingCopyId));
-            }
-            catch (ConfigurationException exception) {
+            } catch (ConfigurationException exception) {
                 filename = new File(filename).getParent();
                 if (filename != null && filename.length() != 0) {
                     execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
@@ -123,7 +122,7 @@ public class SubversionVersionControl implements VersionControlSystem {
             }
         }
         execute("commit", new String[]{"--quiet", "--message", commitMessage, filename},
-            new File(workingCopyPath, workingCopyId));
+                new File(workingCopyPath, workingCopyId));
     }
 
     public void delete(String filename) throws ConfigurationException {
@@ -131,13 +130,12 @@ public class SubversionVersionControl implements VersionControlSystem {
         File basePath = new File(workingCopyPath, workingCopyId);
         String fileUrl = getFileUrl(filename);
         if (fileUrl != null) {
-            execute("delete", new String[] {"--force", "--quiet", filename}, basePath);
+            execute("delete", new String[]{"--force", "--quiet", filename}, basePath);
             commit(filename);
         } else {
             try {
                 FileUtils.forceDelete(new File(basePath, filename));
-            }
-            catch (Throwable throwable) {
+            } catch (Throwable throwable) {
                 throw new ConfigurationException("Unable to delete " + filename);
             }
         }

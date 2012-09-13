@@ -6,6 +6,8 @@
 
 package uk.org.sappho.applications.configuration.service.vcs;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 
 import java.io.BufferedReader;
@@ -16,19 +18,30 @@ import java.io.InputStreamReader;
 
 public class CommandExecuter {
 
+    private Object lock;
+
+    @Inject
+    public CommandExecuter(@Named("working.copy.id") String workingCopyId,
+                           CommandSynchronizer commandSynchronizer) {
+
+        lock = commandSynchronizer.getLock(workingCopyId);
+    }
+
     public String execute(Command command, File directory) throws ConfigurationException {
 
-        try {
-            String[] commandArray = new String[command.getCommand().size()];
-            Process process = Runtime.getRuntime().exec(command.getCommand().toArray(commandArray), null, directory);
-            int exitCode = process.waitFor();
-            String standardOutput = processOutput(process.getInputStream());
-            if (exitCode != 0) {
-                throw new ConfigurationException(processOutput(process.getErrorStream()));
+        synchronized (lock) {
+            try {
+                String[] commandArray = new String[command.getCommand().size()];
+                Process process = Runtime.getRuntime().exec(command.getCommand().toArray(commandArray), null, directory);
+                int exitCode = process.waitFor();
+                String standardOutput = processOutput(process.getInputStream());
+                if (exitCode != 0) {
+                    throw new ConfigurationException(processOutput(process.getErrorStream()));
+                }
+                return standardOutput;
+            } catch (Throwable throwable) {
+                throw new ConfigurationException("Unable to execute system command: " + command.getSafeCommand(), throwable);
             }
-            return standardOutput;
-        } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to execute system command: " + command.getSafeCommand(), throwable);
         }
     }
 
