@@ -72,8 +72,16 @@ public class SubversionVersionControl implements VersionControlSystem {
 
     public void update(String filename) throws ConfigurationException {
 
-        execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", "."},
-                new File(workingCopyPath, workingCopyId));
+        try {
+            execute("info", new String[]{filename}, new File(workingCopyPath, workingCopyId));
+            execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", "."},
+                    new File(workingCopyPath, workingCopyId));
+        } catch (Throwable throwable) {
+            if (!filename.equals(".")) {
+                String parent = new File(filename).getParent();
+                update(parent != null ? parent : ".");
+            }
+        }
     }
 
     public Map<String, String> getProperties(String filename) {
