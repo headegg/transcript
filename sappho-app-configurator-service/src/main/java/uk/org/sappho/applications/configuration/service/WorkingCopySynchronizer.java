@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service.vcs;
+package uk.org.sappho.applications.configuration.service;
 
 import com.google.inject.Singleton;
 
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
-public class CommandSynchronizer {
+public class WorkingCopySynchronizer {
 
     private Map<String, Object> locks = new HashMap<String, Object>();
 
