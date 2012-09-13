@@ -17,6 +17,6 @@ public class ServiceExceptionMapper implements ExceptionMapper<ConfigurationExce
 
     public Response toResponse(ConfigurationException exception) {
 
-        return Response.status(404).entity(exception.getMessage()).type("text/plain").build();
+        return Response.status(404).entity(exception.getMessage() + "\n").type("text/plain").build();
     }
 }

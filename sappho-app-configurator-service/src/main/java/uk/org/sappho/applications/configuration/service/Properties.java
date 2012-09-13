@@ -6,14 +6,8 @@
 
 package uk.org.sappho.applications.configuration.service;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Properties {
@@ -26,127 +20,51 @@ public class Properties {
         this.workingCopy = workingCopy;
     }
 
-    public Map<String, String> getAll(String environment, String application) throws ConfigurationException {
+    public Map<String, String> getAll() throws ConfigurationException {
 
-        Map<String, String> properties = getRawProperties(environment, application);
-        Map<String, String> versionControlProperties =
-                workingCopy.getVersionControlProperties(jsonFilename(environment, application));
-        for (String key : versionControlProperties.keySet()) {
-            properties.put(key, versionControlProperties.get(key));
-        }
-        return properties;
+        return workingCopy.getPropertiesFromFile(true);
     }
 
-    public String get(String environment, String application, String key) throws ConfigurationException {
+    public String get(String key) throws ConfigurationException {
 
-        String value = getAll(environment, application).get(key);
+        String value = getAll().get(key);
         if (value == null) {
-            throw new ConfigurationException("No value for " + key);
+            throw new ConfigurationException("There is no value for " + key);
         }
         return value;
     }
 
-    public void put(String environment, String application, Map<String, String> properties)
-            throws ConfigurationException {
+    public void put(Map<String, String> properties) throws ConfigurationException {
 
-        Map<String, String> savedProperties = getRawProperties(environment, application);
-        try {
-            commitAllProperties(environment, application, properties);
-        } catch (ConfigurationException exception) {
-            putAllProperties(environment, application, savedProperties);
-            throw exception;
-        }
+        workingCopy.putPropertiesToFile(properties);
     }
 
-    public void put(String environment, String application, String key, String value) throws ConfigurationException {
+    public void put(String key, String value) throws ConfigurationException {
 
-        Map<String, String> properties = getRawProperties(environment, application);
-        String savedValue = properties.get(key);
-        put(properties, key, value);
-        try {
-            commitAllProperties(environment, application, properties);
-        } catch (ConfigurationException exception) {
-            put(properties, key, savedValue);
-            putAllProperties(environment, application, properties);
-            throw exception;
-        }
-    }
-
-    private void put(Map<String, String> properties, String key, String value) {
-
+        Map<String, String> properties = workingCopy.getPropertiesFromFile(false);
+        boolean changed = false;
         if (value != null) {
+            String oldValue = properties.get(key);
             properties.put(key, value);
+            changed = oldValue == null || !oldValue.equals(value);
         } else {
             if (properties.containsKey(key)) {
                 properties.remove(key);
+                changed = true;
             }
+        }
+        if (changed) {
+            workingCopy.putPropertiesToFile(properties);
         }
     }
 
-    public void delete(String environment, String application, String key) throws ConfigurationException {
+    public void delete(String key) throws ConfigurationException {
 
-        put(environment, application, key, null);
+        put(key, null);
     }
 
-    public void delete(String environment, String application) throws ConfigurationException {
+    public void delete() throws ConfigurationException {
 
-        Map<String, String> savedProperties = getRawProperties(environment, application);
-        try {
-            workingCopy.delete(jsonFilename(environment, application));
-        } catch (ConfigurationException exception) {
-            putAllProperties(environment, application, savedProperties);
-            throw exception;
-        }
-    }
-
-    private String jsonFilename(String environment, String application) {
-
-        return environment + "/" + application + ".json";
-    }
-
-    private Map<String, String> getRawProperties(String environment, String application) throws ConfigurationException {
-
-        try {
-            File file = workingCopy.getUpToDateFile(jsonFilename(environment, application));
-            Map<String, String> properties = null;
-            if (file.exists()) {
-                FileReader fileReader = new FileReader(file);
-                properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
-                fileReader.close();
-            }
-            if (properties == null) {
-                properties = new LinkedHashMap<String, String>();
-                putAllProperties(environment, application, properties);
-            }
-            return properties;
-        } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to read " + jsonFilename(environment, application), throwable);
-        }
-    }
-
-    private void commitAllProperties(String environment, String application, Map<String, String> properties)
-            throws ConfigurationException {
-
-        putAllProperties(environment, application, properties);
-        workingCopy.commit(jsonFilename(environment, application));
-    }
-
-    private void putAllProperties(String environment, String application, Map<String, String> properties)
-            throws ConfigurationException {
-
-        try {
-            File directory = workingCopy.getFile(environment);
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-            JsonWriter jsonWriter =
-                    new JsonWriter(new FileWriter(workingCopy.getFile(jsonFilename(environment, application))));
-            jsonWriter.setIndent("    ");
-            jsonWriter.setHtmlSafe(true);
-            new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
-            jsonWriter.close();
-        } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to write " + jsonFilename(environment, application), throwable);
-        }
+        workingCopy.delete();
     }
 }

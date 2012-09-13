@@ -8,7 +8,6 @@ package uk.org.sappho.applications.configuration.service.vcs.product;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.vcs.Command;
 import uk.org.sappho.applications.configuration.service.vcs.CommandExecuter;
@@ -34,18 +33,18 @@ public class SubversionVersionControl implements VersionControlSystem {
     private CommandExecuter commandExecuter;
 
     static {
-        patterns.put(Pattern.compile(".*<entry.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
-                "vcs.revision");
         patterns.put(Pattern.compile(".*<commit.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.revision");
         patterns.put(Pattern.compile(".*<commit.*?<date>(.+)</date>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.date");
         patterns.put(Pattern.compile(".*<commit.*?<author>(.+)</author>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.author");
-        patterns.put(Pattern.compile(".*<url>(.+)</url>.*", Pattern.MULTILINE + Pattern.DOTALL),
-                "vcs.repository.location");
         patterns.put(Pattern.compile(".*<checksum>(.+)</checksum>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.hash");
+        patterns.put(Pattern.compile(".*<url>(.+)</url>.*", Pattern.MULTILINE + Pattern.DOTALL),
+                "vcs.repository.location");
+        patterns.put(Pattern.compile(".*<entry.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
+                "vcs.revision");
     }
 
     @Inject
@@ -73,29 +72,28 @@ public class SubversionVersionControl implements VersionControlSystem {
     public void update(String filename) throws ConfigurationException {
 
         try {
-            execute("info", new String[]{filename}, new File(workingCopyPath, workingCopyId));
-            execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", "."},
-                    new File(workingCopyPath, workingCopyId));
-        } catch (Throwable throwable) {
-            if (!filename.equals(".")) {
+            execute("revert", new String[]{"--quiet", filename});
+            execute("info", new String[]{filename});
+            execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", filename});
+        } catch (ConfigurationException exception) {
+            if (filename.equals(".")) {
+                throw exception;
+            } else {
                 String parent = new File(filename).getParent();
                 update(parent != null ? parent : ".");
             }
         }
     }
 
-    public Map<String, String> getProperties(String filename) {
+    public Map<String, String> getProperties(String filename) throws ConfigurationException {
 
         Map<String, String> properties = new LinkedHashMap<String, String>();
-        try {
-            String output = execute("info", new String[]{"--xml", filename}, new File(workingCopyPath, workingCopyId));
-            for (Pattern pattern : patterns.keySet()) {
-                Matcher matcher = pattern.matcher(output);
-                if (matcher.matches()) {
-                    properties.put(patterns.get(pattern), matcher.group(1));
-                }
+        String output = execute("info", new String[]{"--xml", filename});
+        for (Pattern pattern : patterns.keySet()) {
+            Matcher matcher = pattern.matcher(output);
+            if (matcher.matches()) {
+                properties.put(patterns.get(pattern), matcher.group(1));
             }
-        } catch (Throwable throwable) {
         }
         return properties;
     }
@@ -105,56 +103,33 @@ public class SubversionVersionControl implements VersionControlSystem {
         if (url.length() == 0) {
             throw new ConfigurationException("Subversion repository checkout URL not supplied");
         }
-        execute("checkout", new String[]{"--quiet", url, workingCopyId}, new File(workingCopyPath));
+        execute("checkout", new String[]{"--quiet", url, workingCopyId});
     }
 
-    public void commit(String filename) throws ConfigurationException {
+    public void commit(String filename, boolean isNew) throws ConfigurationException {
 
-        if (commitMessage.length() == 0) {
-            throw new ConfigurationException("Subversion commit message not supplied");
+        checkCommitMessage();
+        if (isNew) {
+            execute("add", new String[]{"--quiet", "--no-ignore", filename});
         }
-        File basePath = new File(workingCopyPath, workingCopyId);
-        String fileUrl = getFileUrl(filename);
-        if (fileUrl == null) {
-            try {
-                execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
-                        new File(workingCopyPath, workingCopyId));
-            } catch (ConfigurationException exception) {
-                filename = new File(filename).getParent();
-                if (filename != null && filename.length() != 0) {
-                    execute("add", new String[]{"--force", "--quiet", "--no-ignore", filename},
-                            new File(workingCopyPath, workingCopyId));
-                } else {
-                    throw exception;
-                }
-            }
-        }
-        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename},
-                new File(workingCopyPath, workingCopyId));
+        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename});
     }
 
     public void delete(String filename) throws ConfigurationException {
 
-        File basePath = new File(workingCopyPath, workingCopyId);
-        String fileUrl = getFileUrl(filename);
-        if (fileUrl != null) {
-            execute("delete", new String[]{"--force", "--quiet", filename}, basePath);
-            commit(filename);
-        } else {
-            try {
-                FileUtils.forceDelete(new File(basePath, filename));
-            } catch (Throwable throwable) {
-                throw new ConfigurationException("Unable to delete " + filename);
-            }
+        checkCommitMessage();
+        execute("delete", new String[]{"--quiet", filename});
+        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename});
+    }
+
+    private void checkCommitMessage() throws ConfigurationException {
+
+        if (commitMessage.length() == 0) {
+            throw new ConfigurationException("Subversion commit message not supplied");
         }
     }
 
-    private String getFileUrl(String filename) {
-
-        return getProperties(filename).get("vcs.repository.location");
-    }
-
-    private String execute(String subversionCommand, String[] parameters, File directory)
+    private String execute(String subversionCommand, String[] parameters)
             throws ConfigurationException {
 
         Command command = new Command();
@@ -166,6 +141,10 @@ public class SubversionVersionControl implements VersionControlSystem {
         command.add("--password", password, true);
         for (String parameter : parameters) {
             command.add(parameter, false);
+        }
+        File directory = new File(workingCopyPath);
+        if (!subversionCommand.equals("checkout")) {
+            directory = new File(directory, workingCopyId);
         }
         return commandExecuter.execute(command, directory);
     }

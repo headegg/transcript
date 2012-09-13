@@ -21,6 +21,6 @@ public class RootRestService extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        return getService(Environments.class).getAll();
+        return getService(Environments.class, ".", ".").getAll();
     }
 }

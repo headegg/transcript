@@ -14,11 +14,11 @@ public interface VersionControlSystem {
 
     void update(String filename) throws ConfigurationException;
 
-    Map<String, String> getProperties(String filename);
+    Map<String, String> getProperties(String filename) throws ConfigurationException;
 
     void checkout() throws ConfigurationException;
 
-    void commit(String filename) throws ConfigurationException;
+    void commit(String filename, boolean isNew) throws ConfigurationException;
 
     void delete(String filename) throws ConfigurationException;
 }

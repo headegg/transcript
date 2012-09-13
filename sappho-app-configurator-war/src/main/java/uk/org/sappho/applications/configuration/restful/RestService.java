@@ -22,9 +22,9 @@ public class RestService {
     @Context
     private ServletContext servletContext;
 
-    protected <T> T getService(Class<T> type) throws ConfigurationException {
+    protected <T> T getService(Class<T> type, String environment, String application) throws ConfigurationException {
 
-        ServiceModule serviceModule = new ServiceModule();
+        ServiceModule serviceModule = new ServiceModule(environment, application);
         Enumeration keys = servletContext.getInitParameterNames();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement().toString();

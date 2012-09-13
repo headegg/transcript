@@ -9,7 +9,13 @@ package uk.org.sappho.applications.configuration.restful;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
 import uk.org.sappho.applications.configuration.service.Properties;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}/{application}/{key}")
@@ -26,19 +32,24 @@ public class PropertyRestService extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String getProperty() throws ConfigurationException {
 
-        return getService(Properties.class).get(environment, application, key);
+        return properties().get(key);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void setProperty(String value) throws ConfigurationException {
 
-        getService(Properties.class).put(environment, application, key, value);
+        properties().put(key, value);
     }
 
     @DELETE
     public void deleteProperty() throws ConfigurationException {
 
-        getService(Properties.class).delete(environment, application, key);
+        properties().delete(key);
+    }
+
+    private Properties properties() throws ConfigurationException {
+
+        return getService(Properties.class, environment, application);
     }
 }

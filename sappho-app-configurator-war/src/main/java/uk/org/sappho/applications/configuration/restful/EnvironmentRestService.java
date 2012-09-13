@@ -8,9 +8,11 @@ package uk.org.sappho.applications.configuration.restful;
 
 import uk.org.sappho.applications.configuration.service.Applications;
 import uk.org.sappho.applications.configuration.service.ConfigurationException;
-import uk.org.sappho.applications.configuration.service.Environments;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}")
@@ -23,6 +25,6 @@ public class EnvironmentRestService extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getApplications() throws ConfigurationException {
 
-        return getService(Applications.class).getAll(environment);
+        return getService(Applications.class, environment, ".").getAll(environment);
     }
 }

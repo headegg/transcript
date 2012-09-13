@@ -10,7 +10,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
-import uk.org.sappho.applications.configuration.service.vcs.product.NoVersionControlModule;
 import uk.org.sappho.applications.configuration.service.vcs.product.SubversionModule;
 
 import java.util.HashMap;
@@ -26,13 +25,15 @@ public class ServiceModule extends AbstractModule {
         vcsModules.put("svn", SubversionModule.class);
     }
 
-    public ServiceModule() throws ConfigurationException {
+    public ServiceModule(String environment, String application) throws ConfigurationException {
 
         if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
             for (String key : System.getProperties().stringPropertyNames()) {
                 setProperty(key, System.getProperty(key));
             }
         }
+        setProperty("environment", environment);
+        setProperty("application", application);
     }
 
     public void setProperty(String key, List<String> values) {
@@ -65,14 +66,16 @@ public class ServiceModule extends AbstractModule {
         if (workingCopyId == null || workingCopyId.length() == 0) {
             properties.put("working.copy.id", "default");
         }
-        AbstractServiceModule vcsModule = new NoVersionControlModule();
+        AbstractServiceModule vcsModule;
         String vcs = properties.get("vcs");
         if (vcs != null && vcs.length() != 0) {
             try {
                 vcsModule = vcsModules.get(vcs).newInstance();
             } catch (Throwable throwable) {
-                throw new ConfigurationException("Specified VCS \"" + vcs + "\" is not supported");
+                throw new ConfigurationException("Specified VCS " + vcs + " is not supported", throwable);
             }
+        } else {
+            throw new ConfigurationException("No VCS has been specified");
         }
         vcsModule.fixProperties(properties);
         return Guice.createInjector(this, vcsModule);
