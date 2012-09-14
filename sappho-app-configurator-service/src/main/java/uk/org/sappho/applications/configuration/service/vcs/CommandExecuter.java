@@ -13,12 +13,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Logger;
 
 public class CommandExecuter {
+
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     public String execute(Command command, File directory) throws ConfigurationException {
 
         try {
+            logger.info(command.getSafeCommand());
             String[] commandArray = new String[command.getCommand().size()];
             Process process = Runtime.getRuntime().exec(command.getCommand().toArray(commandArray), null, directory);
             int exitCode = process.waitFor();
