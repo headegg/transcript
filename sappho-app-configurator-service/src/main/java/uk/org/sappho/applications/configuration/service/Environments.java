@@ -23,10 +23,11 @@ public class Environments {
 
     public String[] getAll() throws ConfigurationException {
 
-        return workingCopy.getUpToDatePath(".").list(new FilenameFilter() {
+        String[] environments = workingCopy.getUpToDatePath(".").list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }
         });
+        return environments != null ? environments : new String[0];
     }
 }

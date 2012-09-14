@@ -28,9 +28,13 @@ public class Applications {
                 return new File(dir, name).isFile() && name.endsWith(".json");
             }
         });
-        for (int i = 0; i < applications.length; i++) {
-            String name = applications[i];
-            applications[i] = name.substring(0, name.length() - 5);
+        if (applications != null) {
+            for (int i = 0; i < applications.length; i++) {
+                String name = applications[i];
+                applications[i] = name.substring(0, name.length() - 5);
+            }
+        } else {
+            applications = new String[0];
         }
         return applications;
     }
