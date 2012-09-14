@@ -59,6 +59,11 @@
                 <version>${version.jersey}</version>
             </dependency>
             <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${version.jersey}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${version.gson}</version>
@@ -84,6 +89,7 @@
     <modules>
         <module>sappho-app-configurator-service</module>
         <module>sappho-app-configurator-war</module>
+        <module>sappho-devops-utilities-war</module>
     </modules>
 
 </project>
