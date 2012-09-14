@@ -4,9 +4,8 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.devops.restful.json;
+package uk.org.sappho.applications.devops.deployment.restful;
 
-import uk.org.sappho.applications.devops.restful.RestService;
 import uk.org.sappho.applications.devops.service.ConfigurationException;
 import uk.org.sappho.applications.devops.service.Properties;
 
