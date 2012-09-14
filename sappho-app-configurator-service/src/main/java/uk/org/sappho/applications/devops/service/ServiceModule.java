@@ -4,13 +4,13 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service;
+package uk.org.sappho.applications.devops.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
-import uk.org.sappho.applications.configuration.service.vcs.product.SubversionModule;
+import uk.org.sappho.applications.devops.service.vcs.product.SubversionModule;
 
 import java.util.HashMap;
 import java.util.List;

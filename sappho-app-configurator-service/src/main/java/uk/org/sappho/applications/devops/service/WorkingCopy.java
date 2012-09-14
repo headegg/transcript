@@ -4,14 +4,14 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service;
+package uk.org.sappho.applications.devops.service;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.codehaus.plexus.util.FileUtils;
-import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.devops.service.vcs.VersionControlSystem;
 
 import java.io.File;
 import java.io.FileReader;

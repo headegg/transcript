@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service;
+package uk.org.sappho.applications.devops.service;
 
 import com.google.inject.AbstractModule;
 

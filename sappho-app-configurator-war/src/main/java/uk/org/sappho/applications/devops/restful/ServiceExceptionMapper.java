@@ -4,9 +4,9 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.restful;
+package uk.org.sappho.applications.devops.restful;
 
-import uk.org.sappho.applications.configuration.service.ConfigurationException;
+import uk.org.sappho.applications.devops.service.ConfigurationException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

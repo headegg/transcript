@@ -4,10 +4,10 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.restful;
+package uk.org.sappho.applications.devops.restful;
 
-import uk.org.sappho.applications.configuration.service.ConfigurationException;
-import uk.org.sappho.applications.configuration.service.ServiceModule;
+import uk.org.sappho.applications.devops.service.ConfigurationException;
+import uk.org.sappho.applications.devops.service.ServiceModule;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;

@@ -4,10 +4,10 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service.vcs.product;
+package uk.org.sappho.applications.devops.service.vcs.product;
 
-import uk.org.sappho.applications.configuration.service.AbstractServiceModule;
-import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.devops.service.AbstractServiceModule;
+import uk.org.sappho.applications.devops.service.vcs.VersionControlSystem;
 
 import java.util.Arrays;
 import java.util.List;

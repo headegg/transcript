@@ -4,9 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service.vcs;
-
-import uk.org.sappho.applications.configuration.service.ConfigurationException;
+package uk.org.sappho.applications.devops.service.vcs;
 
 import java.util.ArrayList;
 import java.util.List;

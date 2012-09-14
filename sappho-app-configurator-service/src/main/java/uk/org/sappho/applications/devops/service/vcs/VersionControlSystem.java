@@ -4,9 +4,9 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service.vcs;
+package uk.org.sappho.applications.devops.service.vcs;
 
-import uk.org.sappho.applications.configuration.service.ConfigurationException;
+import uk.org.sappho.applications.devops.service.ConfigurationException;
 
 import java.util.Map;
 

@@ -4,14 +4,14 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.configuration.service.vcs.product;
+package uk.org.sappho.applications.devops.service.vcs.product;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import uk.org.sappho.applications.configuration.service.ConfigurationException;
-import uk.org.sappho.applications.configuration.service.vcs.Command;
-import uk.org.sappho.applications.configuration.service.vcs.CommandExecuter;
-import uk.org.sappho.applications.configuration.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.devops.service.ConfigurationException;
+import uk.org.sappho.applications.devops.service.vcs.Command;
+import uk.org.sappho.applications.devops.service.vcs.CommandExecuter;
+import uk.org.sappho.applications.devops.service.vcs.VersionControlSystem;
 
 import java.io.File;
 import java.util.LinkedHashMap;
