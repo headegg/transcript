@@ -89,6 +89,7 @@
     <modules>
         <module>sappho-app-configurator-service</module>
         <module>sappho-app-configurator-war</module>
+        <module>sappho-devops-utilities-war</module>
     </modules>
 
 </project>

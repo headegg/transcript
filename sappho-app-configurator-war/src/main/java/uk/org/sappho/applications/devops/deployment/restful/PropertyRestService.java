@@ -16,7 +16,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}/{application}/{key}")
@@ -34,18 +33,6 @@ public class PropertyRestService extends RestService {
     public String getProperty() throws ConfigurationException {
 
         return properties().get(key);
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String getPropertyAsHTML(@QueryParam("default") String defaultValue) throws ConfigurationException {
-
-        String value = null;
-        try {
-            value = properties().get(key);
-        } catch (Throwable throwable) {
-        }
-        return value != null ? value : (defaultValue != null ? defaultValue : "");
     }
 
     @PUT
