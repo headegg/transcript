@@ -25,7 +25,7 @@ public class WorkingCopy {
     private String workingCopyPath;
     private String workingCopyId;
     private String environment;
-    private String application;
+    private boolean useCache;
     private String jsonFilename;
     private VersionControlSystem versionControlSystem;
     private Object lock;
@@ -35,14 +35,15 @@ public class WorkingCopy {
                        @Named("working.copy.id") String workingCopyId,
                        @Named("environment") String environment,
                        @Named("application") String application,
+                       @Named("use.cache") String useCache,
                        VersionControlSystem versionControlSystem,
                        WorkingCopySynchronizer workingCopySynchronizer) throws ConfigurationException {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
         this.environment = environment;
-        this.application = application;
         jsonFilename = environment + "/" + application + ".json";
+        this.useCache = useCache.equals("true");
         this.versionControlSystem = versionControlSystem;
         lock = workingCopySynchronizer.getLock(workingCopyId);
     }
@@ -56,7 +57,9 @@ public class WorkingCopy {
                     throw new ConfigurationException("Requested working copy " + workingCopyId +
                             " is not a directory");
                 }
-                versionControlSystem.update(path);
+                if (!useCache) {
+                    versionControlSystem.update(path);
+                }
             } else {
                 versionControlSystem.checkout();
             }
