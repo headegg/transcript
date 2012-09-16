@@ -21,7 +21,7 @@ public class ConvertJsonStringToHtml {
     private String url;
 
     @QueryParam("d")
-    private String def;
+    private String defaultValue;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -32,6 +32,6 @@ public class ConvertJsonStringToHtml {
             str = Client.create().resource(url).get(String.class);
         } catch (Throwable throwable) {
         }
-        return str != null ? str : (def != null ? def : "");
+        return str != null ? str : (defaultValue != null ? defaultValue : "");
     }
 }
