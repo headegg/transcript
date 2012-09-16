@@ -89,7 +89,6 @@
     <modules>
         <module>transcript-service</module>
         <module>transcript-registry-war</module>
-        <module>transcript-utilities-war</module>
     </modules>
 
 </project>
