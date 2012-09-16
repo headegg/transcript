@@ -62,10 +62,6 @@ public class ServiceModule extends AbstractModule {
         if (workingCopyPath == null || workingCopyPath.length() == 0) {
             throw new ConfigurationException("Application property working.copy.path not specified");
         }
-        String workingCopyId = properties.get("working.copy.id");
-        if (workingCopyId == null || workingCopyId.length() == 0) {
-            properties.put("working.copy.id", "default");
-        }
         AbstractServiceModule vcsModule;
         String vcs = properties.get("vcs");
         if (vcs != null && vcs.length() != 0) {
@@ -77,7 +73,20 @@ public class ServiceModule extends AbstractModule {
         } else {
             throw new ConfigurationException("No VCS has been specified");
         }
-        vcsModule.fixProperties(properties);
+        for (String key : vcsModule.getRequiredProperties()) {
+            fixProperty(key, "");
+        }
+        fixProperty("working.copy.id", "default");
+        fixProperty("use.cache", "false");
+        fixProperty("read.only", "false");
         return Guice.createInjector(this, vcsModule);
+    }
+
+    private void fixProperty(String key, String defaultValue) {
+
+        String value = properties.get(key);
+        if (value == null || value.length() == 0) {
+            properties.put(key, defaultValue);
+        }
     }
 }

@@ -15,10 +15,6 @@
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
             <param-value>true</param-value>
         </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>uk.org.sappho.applications.restful.transcript.registry.CacheCheckRequestFilter</param-value>
-        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

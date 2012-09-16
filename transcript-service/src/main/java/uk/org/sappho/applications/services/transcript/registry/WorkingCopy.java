@@ -26,6 +26,7 @@ public class WorkingCopy {
     private String workingCopyId;
     private String environment;
     private boolean useCache;
+    private boolean readOnly;
     private String jsonFilename;
     private VersionControlSystem versionControlSystem;
     private Object lock;
@@ -36,6 +37,7 @@ public class WorkingCopy {
                        @Named("environment") String environment,
                        @Named("application") String application,
                        @Named("use.cache") String useCache,
+                       @Named("read.only") String readOnly,
                        VersionControlSystem versionControlSystem,
                        WorkingCopySynchronizer workingCopySynchronizer) throws ConfigurationException {
 
@@ -44,6 +46,7 @@ public class WorkingCopy {
         this.environment = environment;
         jsonFilename = environment + "/" + application + ".json";
         this.useCache = useCache.equals("true");
+        this.readOnly = readOnly.equals("true");
         this.versionControlSystem = versionControlSystem;
         lock = workingCopySynchronizer.getLock(workingCopyId);
     }
@@ -98,6 +101,7 @@ public class WorkingCopy {
 
     public void putPropertiesToFile(Map<String, String> properties) throws ConfigurationException {
 
+        checkReadOnly();
         synchronized (lock) {
             File jsonFile = getUpToDatePath(jsonFilename);
             File directory = new File(new File(workingCopyPath, workingCopyId), environment);
@@ -137,8 +141,16 @@ public class WorkingCopy {
 
     public void delete() throws ConfigurationException {
 
+        checkReadOnly();
         synchronized (lock) {
             versionControlSystem.delete(jsonFilename);
+        }
+    }
+
+    public void checkReadOnly() throws ConfigurationException {
+
+        if (readOnly) {
+            throw new ConfigurationException("Working copy " + workingCopyId + " is read only");
         }
     }
 }
