@@ -14,13 +14,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Path("/json-str-html")
+@Path("/html")
 public class ConvertJsonStringToHtml {
 
-    @QueryParam("url")
+    @QueryParam("u")
     private String url;
 
-    @QueryParam("def")
+    @QueryParam("d")
     private String def;
 
     @GET
