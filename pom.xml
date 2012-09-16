@@ -12,15 +12,15 @@
     </parent>
 
     <groupId>uk.org.sappho.applications.configuration</groupId>
-    <artifactId>sappho-app-configurator</artifactId>
+    <artifactId>transcript</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/sappho-app-configurator.git</connection>
-        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/sappho-app-configurator.git
+        <connection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git</connection>
+        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git
         </developerConnection>
-        <url>https://git.sappho.org.uk/projects/SCM/repos/sappho-app-configurator/browse</url>
+        <url>https://git.sappho.org.uk/projects/SCM/repos/transcript/browse</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -87,9 +87,9 @@
     </dependencyManagement>
 
     <modules>
-        <module>sappho-app-configurator-service</module>
-        <module>sappho-app-configurator-war</module>
-        <module>sappho-devops-utilities-war</module>
+        <module>transcript-service</module>
+        <module>transcript-registry-war</module>
+        <module>transcript-utilities-war</module>
     </modules>
 
 </project>
