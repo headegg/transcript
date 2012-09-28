@@ -90,6 +90,7 @@
         <module>transcript-service</module>
         <module>transcript-registry-war</module>
         <module>transcript-import</module>
+        <module>transcript-editor-war</module>
     </modules>
 
 </project>
