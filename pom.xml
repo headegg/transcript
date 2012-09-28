@@ -89,6 +89,7 @@
     <modules>
         <module>transcript-service</module>
         <module>transcript-registry-war</module>
+        <module>transcript-import</module>
     </modules>
 
 </project>
