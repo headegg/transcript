@@ -12,13 +12,13 @@ import java.util.Map;
 
 public interface VersionControlSystem {
 
-    void update(String filename) throws ConfigurationException;
+    void update(String path) throws ConfigurationException;
 
-    Map<String, String> getProperties(String filename) throws ConfigurationException;
+    Map<String, String> getProperties(String path) throws ConfigurationException;
 
     void checkout() throws ConfigurationException;
 
-    void commit(String filename, boolean isNew) throws ConfigurationException;
+    void commit(String path, boolean isNew) throws ConfigurationException;
 
-    void delete(String filename) throws ConfigurationException;
+    void delete(String path) throws ConfigurationException;
 }

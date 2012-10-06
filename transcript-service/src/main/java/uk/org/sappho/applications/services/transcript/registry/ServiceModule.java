@@ -25,15 +25,13 @@ public class ServiceModule extends AbstractModule {
         vcsModules.put("svn", SubversionModule.class);
     }
 
-    public ServiceModule(String environment, String application) throws ConfigurationException {
+    public ServiceModule() throws ConfigurationException {
 
         if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
             for (String key : System.getProperties().stringPropertyNames()) {
                 setProperty(key, System.getProperty(key));
             }
         }
-        setProperty("environment", environment);
-        setProperty("application", application);
     }
 
     public void setProperty(String key, List<String> values) {

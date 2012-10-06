@@ -21,9 +21,9 @@ public class Environments {
         this.workingCopy = workingCopy;
     }
 
-    public String[] getAll() throws ConfigurationException {
+    public String[] getEnvironmentNames() throws ConfigurationException {
 
-        String[] environments = workingCopy.getUpToDatePath(".").list(new FilenameFilter() {
+        String[] environments = workingCopy.getUpToDatePath("").list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }

@@ -20,28 +20,31 @@ public class Properties {
         this.workingCopy = workingCopy;
     }
 
-    public Map<String, String> getAll() throws ConfigurationException {
+    public Map<String, String> getAllProperties(String environment, String application,
+                                                boolean includeVersionControlProperties) throws ConfigurationException {
 
-        return workingCopy.getPropertiesFromFile(true);
+        return workingCopy.getProperties(environment, application, includeVersionControlProperties);
     }
 
-    public String get(String key) throws ConfigurationException {
+    public String get(String environment, String application, String key,
+                      boolean includeVersionControlProperties) throws ConfigurationException {
 
-        String value = getAll().get(key);
+        String value = getAllProperties(environment, application, includeVersionControlProperties).get(key);
         if (value == null) {
             throw new ConfigurationException("There is no value for " + key);
         }
         return value;
     }
 
-    public void put(Map<String, String> properties) throws ConfigurationException {
+    public void put(String environment, String application, Map<String, String> properties)
+            throws ConfigurationException {
 
-        workingCopy.putPropertiesToFile(properties);
+        workingCopy.putProperties(environment, application, properties);
     }
 
-    public void put(String key, String value) throws ConfigurationException {
+    public void put(String environment, String application, String key, String value) throws ConfigurationException {
 
-        Map<String, String> properties = workingCopy.getPropertiesFromFile(false);
+        Map<String, String> properties = workingCopy.getProperties(environment, application, false);
         boolean changed = false;
         if (value != null) {
             String oldValue = properties.get(key);
@@ -54,17 +57,17 @@ public class Properties {
             }
         }
         if (changed) {
-            workingCopy.putPropertiesToFile(properties);
+            workingCopy.putProperties(environment, application, properties);
         }
     }
 
-    public void delete(String key) throws ConfigurationException {
+    public void delete(String environment, String application, String key) throws ConfigurationException {
 
-        put(key, null);
+        put(environment, application, key, null);
     }
 
-    public void delete() throws ConfigurationException {
+    public void delete(String environment, String application) throws ConfigurationException {
 
-        workingCopy.delete();
+        workingCopy.deleteProperties(environment, application);
     }
 }

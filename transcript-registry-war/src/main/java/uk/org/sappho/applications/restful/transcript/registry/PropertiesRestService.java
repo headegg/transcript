@@ -6,6 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
+import uk.org.sappho.applications.restful.transcript.jersey.AbstractRestService;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
 
@@ -21,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Path("/{environment}/{application}")
-public class PropertiesRestService extends RestService {
+public class PropertiesRestService extends AbstractRestService {
 
     @PathParam("environment")
     private String environment;
@@ -32,24 +33,19 @@ public class PropertiesRestService extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> getProperties() throws ConfigurationException {
 
-        return properties().getAll();
+        return getService().getInstance(Properties.class).getAllProperties(environment, application, true);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void setProperties(LinkedHashMap<String, String> properties) throws ConfigurationException {
 
-        properties().put(properties);
+        getService().getInstance(Properties.class).put(environment, application, properties);
     }
 
     @DELETE
     public void deleteProperties() throws ConfigurationException {
 
-        properties().delete();
-    }
-
-    private Properties properties() throws ConfigurationException {
-
-        return getService(Properties.class, environment, application);
+        getService().getInstance(Properties.class).delete(environment, application);
     }
 }

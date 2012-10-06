@@ -9,7 +9,7 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>transcript-registry-war</artifactId>
+    <artifactId>transcript-reporter-war</artifactId>
     <packaging>war</packaging>
 
     <dependencies>

@@ -4,8 +4,9 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.restful.transcript.registry;
+package uk.org.sappho.applications.restful.transcript.jersey;
 
+import com.google.inject.Injector;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.ServiceModule;
 
@@ -15,16 +16,16 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.util.Enumeration;
 
-public class RestService {
+abstract public class AbstractRestService {
 
     @Context
     private UriInfo uriInfo;
     @Context
     private ServletContext servletContext;
 
-    protected <T> T getService(Class<T> type, String environment, String application) throws ConfigurationException {
+    protected Injector getService() throws ConfigurationException {
 
-        ServiceModule serviceModule = new ServiceModule(environment, application);
+        ServiceModule serviceModule = new ServiceModule();
         Enumeration keys = servletContext.getInitParameterNames();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement().toString();
@@ -36,6 +37,6 @@ public class RestService {
                 serviceModule.setProperty(key, queryParameters.get(key));
             }
         }
-        return serviceModule.getInjector().getInstance(type);
+        return serviceModule.getInjector();
     }
 }

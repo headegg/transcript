@@ -6,6 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
+import uk.org.sappho.applications.restful.transcript.jersey.AbstractRestService;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Environments;
 
@@ -15,12 +16,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/")
-public class RootRestService extends RestService {
+public class EnvironmentNamesRestService extends AbstractRestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        return getService(Environments.class, ".", ".").getAll();
+        return getService().getInstance(Environments.class).getEnvironmentNames();
     }
 }

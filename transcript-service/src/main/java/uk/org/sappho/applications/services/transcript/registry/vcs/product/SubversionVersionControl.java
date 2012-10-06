@@ -31,6 +31,7 @@ public class SubversionVersionControl implements VersionControlSystem {
     private String executable;
     private String certificateTrust;
     private CommandExecuter commandExecuter;
+    private String lastUpdatePath = null;
 
     static {
         patterns.put(Pattern.compile(".*<commit.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
@@ -69,26 +70,29 @@ public class SubversionVersionControl implements VersionControlSystem {
         this.commandExecuter = commandExecuter;
     }
 
-    public void update(String filename) throws ConfigurationException {
+    public void update(String path) throws ConfigurationException {
 
-        try {
-            execute("revert", new String[]{"--quiet", filename});
-            execute("info", new String[]{filename});
-            execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", filename});
-        } catch (ConfigurationException exception) {
-            if (filename.equals(".")) {
-                throw exception;
-            } else {
-                String parent = new File(filename).getParent();
-                update(parent != null ? parent : ".");
+        if (lastUpdatePath == null || !path.startsWith(lastUpdatePath)) {
+            try {
+                execute("revert", new String[]{"--quiet", path.length() == 0 ? "." : path});
+                execute("info", new String[]{path});
+                execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", path});
+                lastUpdatePath = path;
+            } catch (ConfigurationException exception) {
+                if (path.length() == 0) {
+                    throw exception;
+                } else {
+                    String parent = new File(path).getParent();
+                    update(parent != null ? parent : "");
+                }
             }
         }
     }
 
-    public Map<String, String> getProperties(String filename) throws ConfigurationException {
+    public Map<String, String> getProperties(String path) throws ConfigurationException {
 
         Map<String, String> properties = new LinkedHashMap<String, String>();
-        String output = execute("info", new String[]{"--xml", filename});
+        String output = execute("info", new String[]{"--xml", path});
         for (Pattern pattern : patterns.keySet()) {
             Matcher matcher = pattern.matcher(output);
             if (matcher.matches()) {
@@ -106,20 +110,20 @@ public class SubversionVersionControl implements VersionControlSystem {
         execute("checkout", new String[]{"--quiet", url, workingCopyId});
     }
 
-    public void commit(String filename, boolean isNew) throws ConfigurationException {
+    public void commit(String path, boolean isNew) throws ConfigurationException {
 
         checkCommitMessage();
         if (isNew) {
-            execute("add", new String[]{"--quiet", "--no-ignore", filename});
+            execute("add", new String[]{"--quiet", "--no-ignore", path});
         }
-        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename});
+        execute("commit", new String[]{"--quiet", "--message", commitMessage, path});
     }
 
-    public void delete(String filename) throws ConfigurationException {
+    public void delete(String path) throws ConfigurationException {
 
         checkCommitMessage();
-        execute("delete", new String[]{"--quiet", filename});
-        execute("commit", new String[]{"--quiet", "--message", commitMessage, filename});
+        execute("delete", new String[]{"--quiet", path});
+        execute("commit", new String[]{"--quiet", "--message", commitMessage, path});
     }
 
     private void checkCommitMessage() throws ConfigurationException {

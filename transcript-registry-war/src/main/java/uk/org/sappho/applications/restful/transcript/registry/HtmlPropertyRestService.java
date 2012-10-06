@@ -6,6 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
+import uk.org.sappho.applications.restful.transcript.jersey.AbstractRestService;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
 
 import javax.ws.rs.GET;
@@ -15,7 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/{environment}/{application}/{key}/{defaultValue}")
-public class HtmlPropertyRestService extends RestService {
+public class HtmlPropertyRestService extends AbstractRestService {
 
     @PathParam("environment")
     private String environment;
@@ -32,7 +33,7 @@ public class HtmlPropertyRestService extends RestService {
 
         String value = null;
         try {
-            value = getService(Properties.class, environment, application).get(key);
+            value = getService().getInstance(Properties.class).get(environment, application, key, true);
         } catch (Throwable throwable) {
         }
         return value != null ? value : (defaultValue != null ? defaultValue : "");

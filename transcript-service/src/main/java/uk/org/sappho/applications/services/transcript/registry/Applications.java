@@ -21,7 +21,7 @@ public class Applications {
         this.workingCopy = workingCopy;
     }
 
-    public String[] getAll(String environment) throws ConfigurationException {
+    public String[] getApplicationNames(String environment) throws ConfigurationException {
 
         String[] applications = workingCopy.getUpToDatePath(environment).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {

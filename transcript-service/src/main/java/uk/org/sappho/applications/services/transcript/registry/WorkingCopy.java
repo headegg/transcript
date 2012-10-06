@@ -9,6 +9,7 @@ package uk.org.sappho.applications.services.transcript.registry;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
@@ -20,22 +21,19 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Singleton
 public class WorkingCopy {
 
     private String workingCopyPath;
     private String workingCopyId;
-    private String environment;
     private boolean useCache;
     private boolean readOnly;
-    private String jsonFilename;
     private VersionControlSystem versionControlSystem;
     private Object lock;
 
     @Inject
     public WorkingCopy(@Named("working.copy.path") String workingCopyPath,
                        @Named("working.copy.id") String workingCopyId,
-                       @Named("environment") String environment,
-                       @Named("application") String application,
                        @Named("use.cache") String useCache,
                        @Named("read.only") String readOnly,
                        VersionControlSystem versionControlSystem,
@@ -43,8 +41,6 @@ public class WorkingCopy {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
-        this.environment = environment;
-        jsonFilename = environment + "/" + application + ".json";
         this.useCache = useCache.equals("true");
         this.readOnly = readOnly.equals("true");
         this.versionControlSystem = versionControlSystem;
@@ -70,12 +66,13 @@ public class WorkingCopy {
         }
     }
 
-    public Map<String, String> getPropertiesFromFile(boolean includeVersionControlProperties)
+    public Map<String, String> getProperties(String environment, String application,
+                                             boolean includeVersionControlProperties)
             throws ConfigurationException {
 
         synchronized (lock) {
             try {
-                File jsonFile = getUpToDatePath(jsonFilename);
+                File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
                 Map<String, String> properties = new LinkedHashMap<String, String>();
                 if (jsonFile.exists()) {
                     FileReader fileReader = new FileReader(jsonFile);
@@ -86,7 +83,7 @@ public class WorkingCopy {
                     }
                     if (includeVersionControlProperties) {
                         Map<String, String> versionControlProperties =
-                                versionControlSystem.getProperties(jsonFilename);
+                                versionControlSystem.getProperties(getJsonFilename(environment, application));
                         for (String key : versionControlProperties.keySet()) {
                             properties.put(key, versionControlProperties.get(key));
                         }
@@ -94,27 +91,28 @@ public class WorkingCopy {
                 }
                 return properties;
             } catch (Throwable throwable) {
-                throw new ConfigurationException("Unable to read " + jsonFilename, throwable);
+                throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
             }
         }
     }
 
-    public void putPropertiesToFile(Map<String, String> properties) throws ConfigurationException {
+    public void putProperties(String environment, String application, Map<String, String> properties)
+            throws ConfigurationException {
 
         checkReadOnly();
         synchronized (lock) {
-            File jsonFile = getUpToDatePath(jsonFilename);
+            File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
             File directory = new File(new File(workingCopyPath, workingCopyId), environment);
             boolean isNewDirectory = !directory.exists();
             boolean isNewFile = !jsonFile.exists();
             try {
                 if (isNewDirectory) {
                     if (!directory.mkdir()) {
-                        throw new IOException("Unable to create new environment " + environment);
+                        unableToCreateNewEnvironment(environment);
                     }
                 } else {
                     if (!directory.isDirectory()) {
-                        throw new IOException("Unable to create new environment " + environment);
+                        unableToCreateNewEnvironment(environment);
                     }
                 }
                 JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
@@ -125,7 +123,7 @@ public class WorkingCopy {
                 if (isNewDirectory) {
                     versionControlSystem.commit(environment, true);
                 } else {
-                    versionControlSystem.commit(jsonFilename, isNewFile);
+                    versionControlSystem.commit(getJsonFilename(environment, application), isNewFile);
                 }
             } catch (Throwable throwable) {
                 if (isNewFile) {
@@ -134,16 +132,16 @@ public class WorkingCopy {
                     } catch (Throwable deleteException) {
                     }
                 }
-                throw new ConfigurationException("Unable to write " + jsonFilename, throwable);
+                throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
             }
         }
     }
 
-    public void delete() throws ConfigurationException {
+    public void deleteProperties(String environment, String application) throws ConfigurationException {
 
         checkReadOnly();
         synchronized (lock) {
-            versionControlSystem.delete(jsonFilename);
+            versionControlSystem.delete(getJsonFilename(environment, application));
         }
     }
 
@@ -152,5 +150,15 @@ public class WorkingCopy {
         if (readOnly) {
             throw new ConfigurationException("Working copy " + workingCopyId + " is read only");
         }
+    }
+
+    private String getJsonFilename(String environment, String application) {
+
+        return environment + "/" + application + ".json";
+    }
+
+    private void unableToCreateNewEnvironment(String environment) throws IOException {
+
+        throw new IOException("Unable to create new environment " + environment);
     }
 }

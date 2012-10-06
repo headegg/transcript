@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.restful.transcript.registry;
+package uk.org.sappho.applications.restful.transcript.jersey;
 
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 
