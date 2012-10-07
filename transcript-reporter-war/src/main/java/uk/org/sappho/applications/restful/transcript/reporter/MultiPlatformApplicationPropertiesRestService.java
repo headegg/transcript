@@ -28,7 +28,7 @@ public class MultiPlatformApplicationPropertiesRestService extends AbstractRestS
     private String application;
     @PathParam("template")
     private String template;
-    @QueryParam("includeVCSProps")
+    @QueryParam("include.vcs.props")
     private boolean includeVersionControlProperties;
     @Context
     private ServletContext servletContext;
