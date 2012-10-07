@@ -11,9 +11,9 @@
         <tbody>
         <#list keys as key>
         <tr>
-            <th class="confluenceTh">${key.id}</th>
+            <th class="confluenceTh"><code>${key.id}</code></th>
             <#list key.values as value>
-                <td class="confluenceTd">${value!"[undefined]"}</td>
+                <td class="confluenceTd"><code>${value!"[undefined]"}</code></td>
             </#list>
         </tr>
         </#list>
