@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface VersionControlSystem {
 
-    void update(String path) throws ConfigurationException;
+    void update(String path);
 
     Map<String, String> getProperties(String path) throws ConfigurationException;
 

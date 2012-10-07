@@ -30,6 +30,7 @@ public class SubversionVersionControl implements VersionControlSystem {
     private String commitMessage;
     private String executable;
     private String certificateTrust;
+    private boolean readOnly;
     private CommandExecuter commandExecuter;
     private String lastUpdatePath = null;
 
@@ -57,6 +58,7 @@ public class SubversionVersionControl implements VersionControlSystem {
                                     @Named("commit.message") String commitMessage,
                                     @Named("svn") String executable,
                                     @Named("trust.server.certificate") String trustServerCertificate,
+                                    @Named("read.only") String readOnly,
                                     CommandExecuter commandExecuter) {
 
         this.workingCopyPath = workingCopyPath;
@@ -67,21 +69,22 @@ public class SubversionVersionControl implements VersionControlSystem {
         this.commitMessage = commitMessage;
         this.executable = executable.length() != 0 ? executable : "svn";
         certificateTrust = trustServerCertificate.equalsIgnoreCase("true") ? "--trust-server-cert" : "";
+        this.readOnly = readOnly.equals("true");
         this.commandExecuter = commandExecuter;
     }
 
-    public void update(String path) throws ConfigurationException {
+    public void update(String path) {
 
         if (lastUpdatePath == null || !path.startsWith(lastUpdatePath)) {
             try {
-                execute("revert", new String[]{"--quiet", path.length() == 0 ? "." : path});
+                if (!readOnly) {
+                    execute("revert", new String[]{"--quiet", path.length() == 0 ? "." : path});
+                }
                 execute("info", new String[]{path});
                 execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", path});
                 lastUpdatePath = path;
             } catch (ConfigurationException exception) {
-                if (path.length() == 0) {
-                    throw exception;
-                } else {
+                if (path.length() != 0) {
                     String parent = new File(path).getParent();
                     update(parent != null ? parent : "");
                 }
