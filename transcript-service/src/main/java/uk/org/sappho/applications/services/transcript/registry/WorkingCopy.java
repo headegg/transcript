@@ -29,70 +29,63 @@ public class WorkingCopy {
     private boolean useCache;
     private boolean readOnly;
     private VersionControlSystem versionControlSystem;
-    private Object lock;
 
     @Inject
     public WorkingCopy(@Named("working.copy.path") String workingCopyPath,
                        @Named("working.copy.id") String workingCopyId,
                        @Named("use.cache") String useCache,
                        @Named("read.only") String readOnly,
-                       VersionControlSystem versionControlSystem,
-                       WorkingCopySynchronizer workingCopySynchronizer) throws ConfigurationException {
+                       VersionControlSystem versionControlSystem) throws ConfigurationException {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
         this.useCache = useCache.equals("true");
         this.readOnly = readOnly.equals("true");
         this.versionControlSystem = versionControlSystem;
-        lock = workingCopySynchronizer.getLock(workingCopyId);
     }
 
     public File getUpToDatePath(String path) throws ConfigurationException {
 
-        synchronized (lock) {
-            File workingCopy = new File(workingCopyPath, workingCopyId);
-            if (workingCopy.exists()) {
-                if (!workingCopy.isDirectory()) {
-                    throw new ConfigurationException("Requested working copy " + workingCopyId +
-                            " is not a directory");
-                }
-                if (!useCache) {
-                    versionControlSystem.update(path);
-                }
-            } else {
-                versionControlSystem.checkout();
+        File workingCopy = new File(workingCopyPath, workingCopyId);
+        if (workingCopy.exists()) {
+            if (!workingCopy.isDirectory()) {
+                throw new ConfigurationException("Requested working copy " + workingCopyId +
+                        " is not a directory");
             }
-            return new File(workingCopy, path);
+            if (!useCache) {
+                versionControlSystem.update(path);
+            }
+        } else {
+            versionControlSystem.checkout();
         }
+        return new File(workingCopy, path);
     }
 
     public Map<String, String> getProperties(String environment, String application,
                                              boolean includeVersionControlProperties)
             throws ConfigurationException {
 
-        synchronized (lock) {
-            try {
-                File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-                Map<String, String> properties = new LinkedHashMap<String, String>();
-                if (jsonFile.exists()) {
-                    FileReader fileReader = new FileReader(jsonFile);
-                    properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
-                    fileReader.close();
-                    if (properties == null) {
-                        properties = new LinkedHashMap<String, String>();
-                    }
-                    if (includeVersionControlProperties) {
-                        Map<String, String> versionControlProperties =
-                                versionControlSystem.getProperties(getJsonFilename(environment, application));
-                        for (String key : versionControlProperties.keySet()) {
-                            properties.put(key, versionControlProperties.get(key));
-                        }
+        try {
+            File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
+            Map<String, String> properties = new LinkedHashMap<String, String>();
+            if (jsonFile.exists()) {
+                FileReader fileReader = new FileReader(jsonFile);
+                properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
+                fileReader.close();
+                if (properties == null) {
+                    properties = new LinkedHashMap<String, String>();
+                }
+                if (includeVersionControlProperties) {
+                    Map<String, String> versionControlProperties =
+                            versionControlSystem.getProperties(getJsonFilename(environment, application));
+                    for (String key : versionControlProperties.keySet()) {
+                        properties.put(key, versionControlProperties.get(key));
                     }
                 }
-                return properties;
-            } catch (Throwable throwable) {
-                throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
             }
+            return properties;
+        } catch (Throwable throwable) {
+            throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
         }
     }
 
@@ -100,49 +93,45 @@ public class WorkingCopy {
             throws ConfigurationException {
 
         checkReadOnly();
-        synchronized (lock) {
-            File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-            File directory = new File(new File(workingCopyPath, workingCopyId), environment);
-            boolean isNewDirectory = !directory.exists();
-            boolean isNewFile = !jsonFile.exists();
-            try {
-                if (isNewDirectory) {
-                    if (!directory.mkdir()) {
-                        unableToCreateNewEnvironment(environment);
-                    }
-                } else {
-                    if (!directory.isDirectory()) {
-                        unableToCreateNewEnvironment(environment);
-                    }
+        File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
+        File directory = new File(new File(workingCopyPath, workingCopyId), environment);
+        boolean isNewDirectory = !directory.exists();
+        boolean isNewFile = !jsonFile.exists();
+        try {
+            if (isNewDirectory) {
+                if (!directory.mkdir()) {
+                    unableToCreateNewEnvironment(environment);
                 }
-                JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
-                jsonWriter.setIndent("    ");
-                jsonWriter.setHtmlSafe(true);
-                new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
-                jsonWriter.close();
-                if (isNewDirectory) {
-                    versionControlSystem.commit(environment, true);
-                } else {
-                    versionControlSystem.commit(getJsonFilename(environment, application), isNewFile);
+            } else {
+                if (!directory.isDirectory()) {
+                    unableToCreateNewEnvironment(environment);
                 }
-            } catch (Throwable throwable) {
-                if (isNewFile) {
-                    try {
-                        FileUtils.forceDelete(isNewDirectory ? directory : jsonFile);
-                    } catch (Throwable deleteException) {
-                    }
-                }
-                throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
             }
+            JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
+            jsonWriter.setIndent("    ");
+            jsonWriter.setHtmlSafe(true);
+            new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
+            jsonWriter.close();
+            if (isNewDirectory) {
+                versionControlSystem.commit(environment, true);
+            } else {
+                versionControlSystem.commit(getJsonFilename(environment, application), isNewFile);
+            }
+        } catch (Throwable throwable) {
+            if (isNewFile) {
+                try {
+                    FileUtils.forceDelete(isNewDirectory ? directory : jsonFile);
+                } catch (Throwable deleteException) {
+                }
+            }
+            throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
         }
     }
 
     public void deleteProperties(String environment, String application) throws ConfigurationException {
 
         checkReadOnly();
-        synchronized (lock) {
-            versionControlSystem.delete(getJsonFilename(environment, application));
-        }
+        versionControlSystem.delete(getJsonFilename(environment, application));
     }
 
     public void checkReadOnly() throws ConfigurationException {
