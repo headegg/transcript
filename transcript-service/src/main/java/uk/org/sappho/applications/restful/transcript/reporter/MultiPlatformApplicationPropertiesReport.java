@@ -18,6 +18,7 @@ import uk.org.sappho.applications.services.transcript.registry.WorkingCopy;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -40,17 +41,34 @@ public class MultiPlatformApplicationPropertiesReport {
         this.properties = properties;
     }
 
-    public String generate(String[] environmentList, String application, boolean includeVersionControlProperties,
+    public String generate(String[] environmentList, String application,
+                           boolean includeVersionControlProperties,
+                           boolean includeUndefinedEnvironments,
                            Configuration freemarkerConfiguration)
             throws ConfigurationException {
 
+        List<String> reportableEnvironments = null;
         if (environmentList == null || environmentList.length == 0) {
             environmentList = environments.getEnvironmentNames();
+            if (!includeUndefinedEnvironments) {
+                reportableEnvironments = new LinkedList<String>();
+                for (String environment : environmentList) {
+                    if (!properties.getAllProperties(environment, application, false).isEmpty()) {
+                        reportableEnvironments.add(environment);
+                    }
+                }
+            }
         } else {
             workingCopy.getUpToDatePath("");
         }
+        if (reportableEnvironments == null) {
+            reportableEnvironments = new LinkedList<String>();
+            for (String environment : environmentList) {
+                reportableEnvironments.add(environment);
+            }
+        }
         SortedMap<String, Map<String, String>> allProperties = new TreeMap<String, Map<String, String>>();
-        for (String environment : environmentList) {
+        for (String environment : reportableEnvironments) {
             Map<String, String> rawProperties = properties.getAllProperties(
                     environment, application, includeVersionControlProperties);
             for (String key : rawProperties.keySet()) {
@@ -67,7 +85,7 @@ public class MultiPlatformApplicationPropertiesReport {
             Template template = freemarkerConfiguration.getTemplate("all-app-props.ftl");
             StringWriter stringWriter = new StringWriter();
             List<String> environments = new Vector<String>();
-            for (String environment : environmentList) {
+            for (String environment : reportableEnvironments) {
                 environments.add(environment);
             }
             List<SimpleHash> keys = new Vector<SimpleHash>();
@@ -75,7 +93,7 @@ public class MultiPlatformApplicationPropertiesReport {
                 SimpleHash keyData = new SimpleHash();
                 keyData.put("id", key);
                 List<String> values = new Vector<String>();
-                for (String environment : environmentList) {
+                for (String environment : reportableEnvironments) {
                     values.add(allProperties.get(key).get(environment));
                 }
                 keyData.put("values", values);

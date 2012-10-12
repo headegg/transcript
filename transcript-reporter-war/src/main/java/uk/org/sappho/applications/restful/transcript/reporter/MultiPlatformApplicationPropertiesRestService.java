@@ -30,6 +30,8 @@ public class MultiPlatformApplicationPropertiesRestService extends AbstractRestS
     private String template;
     @QueryParam("include.vcs.props")
     private boolean includeVersionControlProperties;
+    @QueryParam("include.undefined.environments")
+    boolean includeUndefinedEnvironments;
     @Context
     private ServletContext servletContext;
 
@@ -44,6 +46,7 @@ public class MultiPlatformApplicationPropertiesRestService extends AbstractRestS
         Configuration freemarkerConfiguration = new Configuration();
         freemarkerConfiguration.setServletContextForTemplateLoading(servletContext, "templates/" + template);
         return getService().getInstance(MultiPlatformApplicationPropertiesReport.class).generate(
-                environmentList, application, includeVersionControlProperties, freemarkerConfiguration);
+                environmentList, application, includeVersionControlProperties, includeUndefinedEnvironments,
+                freemarkerConfiguration);
     }
 }
