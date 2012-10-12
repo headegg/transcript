@@ -82,6 +82,7 @@ public class MultiPlatformApplicationPropertiesReport {
                 keys.add(keyData);
             }
             SimpleHash root = new SimpleHash();
+            root.put("application", application);
             root.put("environments", environments);
             root.put("keys", keys);
             template.process(root, stringWriter);

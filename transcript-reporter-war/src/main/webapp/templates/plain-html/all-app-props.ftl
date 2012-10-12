@@ -3,7 +3,7 @@
     <table>
         <thead>
         <tr>
-            <th/>
+            <th>${application}</th>
             <#list environments as environment>
                 <th>${environment}</th>
             </#list>

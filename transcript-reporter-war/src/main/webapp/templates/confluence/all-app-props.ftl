@@ -3,7 +3,7 @@
     <table class="confluenceTable">
         <thead>
         <tr>
-            <th class="confluenceTh"/>
+            <th class="confluenceTh">${application}</th>
             <#list environments as environment>
                 <th class="confluenceTh">${environment}</th>
             </#list>
