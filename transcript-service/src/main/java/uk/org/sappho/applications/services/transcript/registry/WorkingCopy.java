@@ -70,8 +70,14 @@ public class WorkingCopy {
             Map<String, String> properties = new LinkedHashMap<String, String>();
             if (jsonFile.exists()) {
                 FileReader fileReader = new FileReader(jsonFile);
-                properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
-                fileReader.close();
+                try {
+                    properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
+                } finally {
+                    try {
+                        fileReader.close();
+                    } catch (Throwable throwable) {
+                    }
+                }
                 if (properties == null) {
                     properties = new LinkedHashMap<String, String>();
                 }
@@ -108,10 +114,17 @@ public class WorkingCopy {
                 }
             }
             JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
-            jsonWriter.setIndent("    ");
-            jsonWriter.setHtmlSafe(true);
-            new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
-            jsonWriter.close();
+            try {
+                jsonWriter.setIndent("    ");
+                jsonWriter.setHtmlSafe(true);
+                new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
+                jsonWriter.close();
+            } finally {
+                try {
+                    jsonWriter.close();
+                } catch (Throwable closeException) {
+                }
+            }
             if (isNewDirectory) {
                 versionControlSystem.commit(environment, true);
             } else {
