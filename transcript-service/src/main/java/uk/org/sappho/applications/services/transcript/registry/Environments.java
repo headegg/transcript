@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 
 public class Environments {
 
@@ -28,6 +29,11 @@ public class Environments {
                 return new File(dir, name).isDirectory() && !name.startsWith(".");
             }
         });
-        return environments != null ? environments : new String[0];
+        if (environments != null) {
+            Arrays.sort(environments);
+        } else {
+            environments = new String[0];
+        }
+        return environments;
     }
 }

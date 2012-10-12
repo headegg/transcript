@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 
 public class Applications {
 
@@ -33,6 +34,7 @@ public class Applications {
                 String name = applications[i];
                 applications[i] = name.substring(0, name.length() - 5);
             }
+            Arrays.sort(applications);
         } else {
             applications = new String[0];
         }
