@@ -80,9 +80,7 @@ public class SubversionVersionControl implements VersionControlSystem {
                 if (!readOnly) {
                     execute("revert", new String[]{"--quiet", path.length() == 0 ? "." : path});
                 }
-                if (path.length() != 0) {
-                    execute("info", new String[]{path});
-                }
+                execute("info", new String[]{path});
                 execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", path});
                 lastUpdatePath = path;
             } catch (ConfigurationException exception) {
