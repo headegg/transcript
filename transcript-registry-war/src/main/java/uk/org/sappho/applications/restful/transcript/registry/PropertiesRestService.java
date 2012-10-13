@@ -18,8 +18,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @Path("/{environment}/{application}")
 public class PropertiesRestService extends AbstractRestService {
@@ -31,14 +31,14 @@ public class PropertiesRestService extends AbstractRestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> getProperties() throws ConfigurationException {
+    public SortedMap<String, String> getProperties() throws ConfigurationException {
 
         return getService().getInstance(Properties.class).getAllProperties(environment, application, true);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setProperties(LinkedHashMap<String, String> properties) throws ConfigurationException {
+    public void setProperties(TreeMap<String, String> properties) throws ConfigurationException {
 
         getService().getInstance(Properties.class).put(environment, application, properties);
     }

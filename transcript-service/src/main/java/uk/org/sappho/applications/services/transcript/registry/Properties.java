@@ -8,7 +8,7 @@ package uk.org.sappho.applications.services.transcript.registry;
 
 import com.google.inject.Inject;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 public class Properties {
 
@@ -20,8 +20,8 @@ public class Properties {
         this.workingCopy = workingCopy;
     }
 
-    public Map<String, String> getAllProperties(String environment, String application,
-                                                boolean includeVersionControlProperties) throws ConfigurationException {
+    public SortedMap<String, String> getAllProperties(String environment, String application,
+                                                      boolean includeVersionControlProperties) throws ConfigurationException {
 
         return workingCopy.getProperties(environment, application, includeVersionControlProperties);
     }
@@ -36,7 +36,7 @@ public class Properties {
         return value;
     }
 
-    public void put(String environment, String application, Map<String, String> properties)
+    public void put(String environment, String application, SortedMap<String, String> properties)
             throws ConfigurationException {
 
         workingCopy.putProperties(environment, application, properties);
@@ -44,7 +44,7 @@ public class Properties {
 
     public void put(String environment, String application, String key, String value) throws ConfigurationException {
 
-        Map<String, String> properties = workingCopy.getProperties(environment, application, false);
+        SortedMap<String, String> properties = workingCopy.getProperties(environment, application, false);
         boolean changed = false;
         if (value != null) {
             String oldValue = properties.get(key);

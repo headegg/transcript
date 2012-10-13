@@ -18,8 +18,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @Singleton
 public class WorkingCopy {
@@ -61,17 +62,17 @@ public class WorkingCopy {
         return new File(workingCopy, path);
     }
 
-    public Map<String, String> getProperties(String environment, String application,
-                                             boolean includeVersionControlProperties)
+    public SortedMap<String, String> getProperties(String environment, String application,
+                                                   boolean includeVersionControlProperties)
             throws ConfigurationException {
 
         try {
             File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-            Map<String, String> properties = new LinkedHashMap<String, String>();
+            SortedMap<String, String> properties = new TreeMap<String, String>();
             if (jsonFile.exists()) {
                 FileReader fileReader = new FileReader(jsonFile);
                 try {
-                    properties = new Gson().fromJson(fileReader, LinkedHashMap.class);
+                    properties = new Gson().fromJson(fileReader, TreeMap.class);
                 } finally {
                     try {
                         fileReader.close();
@@ -79,7 +80,7 @@ public class WorkingCopy {
                     }
                 }
                 if (properties == null) {
-                    properties = new LinkedHashMap<String, String>();
+                    properties = new TreeMap<String, String>();
                 }
                 if (includeVersionControlProperties) {
                     Map<String, String> versionControlProperties =
@@ -95,7 +96,7 @@ public class WorkingCopy {
         }
     }
 
-    public void putProperties(String environment, String application, Map<String, String> properties)
+    public void putProperties(String environment, String application, SortedMap<String, String> properties)
             throws ConfigurationException {
 
         checkReadOnly();
@@ -117,7 +118,7 @@ public class WorkingCopy {
             try {
                 jsonWriter.setIndent("    ");
                 jsonWriter.setHtmlSafe(true);
-                new Gson().toJson(properties, LinkedHashMap.class, jsonWriter);
+                new Gson().toJson(properties, properties.getClass(), jsonWriter);
                 jsonWriter.close();
             } finally {
                 try {

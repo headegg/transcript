@@ -15,6 +15,8 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Import {
 
@@ -34,11 +36,15 @@ public class Import {
             FileReader fileReader = new FileReader(new File(directory, filename));
             properties.load(fileReader);
             fileReader.close();
+            SortedMap<String, String> sortedProperties = new TreeMap<String, String>();
+            for (String key : properties.stringPropertyNames()) {
+                sortedProperties.put(key, properties.getProperty(key));
+            }
             JsonWriter jsonWriter = new JsonWriter(new FileWriter(
                     new File(directory, filename.substring(0, filename.length() - 10) + "json")));
             jsonWriter.setIndent("    ");
             jsonWriter.setHtmlSafe(true);
-            new Gson().toJson(properties, Properties.class, jsonWriter);
+            new Gson().toJson(sortedProperties, sortedProperties.getClass(), jsonWriter);
             jsonWriter.close();
         }
     }
