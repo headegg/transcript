@@ -6,24 +6,30 @@
 
 package uk.org.sappho.applications.restful.transcript.jersey;
 
-import com.google.inject.Injector;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.ServiceModule;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.util.Enumeration;
 
-abstract public class AbstractRestService {
+public class RestService<T> {
 
-    @Context
     private UriInfo uriInfo;
-    @Context
     private ServletContext servletContext;
+    private Class<T> type;
+    private RestSession restSession;
 
-    protected Injector getService() throws ConfigurationException {
+    public RestService(UriInfo uriInfo, ServletContext servletContext, Class<T> type, RestSession restSession) {
+
+        this.uriInfo = uriInfo;
+        this.servletContext = servletContext;
+        this.type = type;
+        this.restSession = restSession;
+    }
+
+    public T getService() throws ConfigurationException {
 
         ServiceModule serviceModule = new ServiceModule();
         Enumeration keys = servletContext.getInitParameterNames();
@@ -37,6 +43,11 @@ abstract public class AbstractRestService {
                 serviceModule.setProperty(key, queryParameters.get(key));
             }
         }
-        return serviceModule.getInjector();
+        return serviceModule.getInjector().getInstance(type);
+    }
+
+    public RestSession getSession() {
+
+        return restSession;
     }
 }
