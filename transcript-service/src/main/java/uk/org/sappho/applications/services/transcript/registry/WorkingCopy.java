@@ -99,7 +99,7 @@ public class WorkingCopy {
     public void putProperties(String environment, String application, SortedMap<String, String> properties)
             throws ConfigurationException {
 
-        checkReadOnly();
+        checkWritable();
         File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
         File directory = new File(new File(workingCopyPath, workingCopyId), environment);
         boolean isNewDirectory = !directory.exists();
@@ -144,11 +144,13 @@ public class WorkingCopy {
 
     public void deleteProperties(String environment, String application) throws ConfigurationException {
 
-        checkReadOnly();
-        versionControlSystem.delete(getJsonFilename(environment, application));
+        checkWritable();
+        String filename = getJsonFilename(environment, application);
+        getUpToDatePath(filename);
+        versionControlSystem.delete(filename);
     }
 
-    public void checkReadOnly() throws ConfigurationException {
+    private void checkWritable() throws ConfigurationException {
 
         if (readOnly) {
             throw new ConfigurationException("Working copy " + workingCopyId + " is read only");
