@@ -17,8 +17,8 @@ public class RestSession {
         T getResponse();
     }
 
-    synchronized public void execute(Action session) throws ConfigurationException {
+    synchronized public void execute(Action action) throws ConfigurationException {
 
-        session.execute();
+        action.execute();
     }
 }
