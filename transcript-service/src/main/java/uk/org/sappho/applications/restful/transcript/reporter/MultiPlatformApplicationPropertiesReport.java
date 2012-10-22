@@ -47,6 +47,7 @@ public class MultiPlatformApplicationPropertiesReport {
                            Configuration freemarkerConfiguration)
             throws ConfigurationException {
 
+        workingCopy.getUpToDatePath("");
         List<String> reportableEnvironments = null;
         if (environmentList == null || environmentList.length == 0) {
             environmentList = environments.getEnvironmentNames();
@@ -58,13 +59,18 @@ public class MultiPlatformApplicationPropertiesReport {
                     }
                 }
             }
-        } else {
-            workingCopy.getUpToDatePath("");
         }
         if (reportableEnvironments == null) {
             reportableEnvironments = new LinkedList<String>();
             for (String environment : environmentList) {
-                reportableEnvironments.add(environment);
+                if (environment.endsWith("*")) {
+                    for (String discoveredEnvironment :
+                            environments.getEnvironmentNames(environment.substring(0, environment.length() - 1))) {
+                        reportableEnvironments.add(discoveredEnvironment);
+                    }
+                } else {
+                    reportableEnvironments.add(environment);
+                }
             }
         }
         SortedMap<String, Map<String, String>> allProperties = new TreeMap<String, Map<String, String>>();
