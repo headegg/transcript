@@ -13,17 +13,16 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class RestServiceResolver implements ContextResolver<RestService> {
+public class RestServiceResolver implements ContextResolver<RestServiceContext> {
 
     @Context
     private UriInfo uriInfo;
     @Context
     private ServletContext servletContext;
-    private RestSession restSession = new RestSession();
 
     @Override
-    public RestService getContext(Class<?> type) {
+    public RestServiceContext getContext(Class<?> type) {
 
-        return new RestService(uriInfo, servletContext, type, restSession);
+        return new RestServiceContext(uriInfo, servletContext, type);
     }
 }

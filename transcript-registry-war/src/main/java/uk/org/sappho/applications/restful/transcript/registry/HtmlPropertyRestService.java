@@ -6,8 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
-import uk.org.sappho.applications.restful.transcript.jersey.RestService;
-import uk.org.sappho.applications.restful.transcript.jersey.RestSession;
+import uk.org.sappho.applications.restful.transcript.jersey.RestServiceContext;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
 
@@ -31,30 +30,18 @@ public class HtmlPropertyRestService {
     @PathParam("defaultValue")
     private String defaultValue;
     @Context
-    private ContextResolver<RestService> restServiceContextResolver;
+    private ContextResolver<RestServiceContext> restServiceContextResolver;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String getProperty() throws ConfigurationException {
 
-        final RestService<Properties> restService = restServiceContextResolver.getContext(Properties.class);
-        RestSession.Action<String> action = new RestSession.Action<String>() {
-            private String value = null;
-
-            @Override
-            public void execute() {
-                try {
-                    value = restService.getService().get(environment, application, key, true);
-                } catch (Throwable throwable) {
-                }
-            }
-
-            @Override
-            public String getResponse() {
-                return value != null ? value : (defaultValue != null ? defaultValue : "");
-            }
-        };
-        restService.getSession().execute(action);
-        return action.getResponse();
+        RestServiceContext<Properties> context = restServiceContextResolver.getContext(Properties.class);
+        String value = null;
+        try {
+            value = context.getService().get(environment, application, key, true);
+        } catch (Throwable throwable) {
+        }
+        return value != null ? value : (defaultValue != null ? defaultValue : "");
     }
 }

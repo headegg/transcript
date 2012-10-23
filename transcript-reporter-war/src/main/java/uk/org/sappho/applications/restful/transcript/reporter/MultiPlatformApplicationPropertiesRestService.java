@@ -7,8 +7,7 @@
 package uk.org.sappho.applications.restful.transcript.reporter;
 
 import freemarker.template.Configuration;
-import uk.org.sappho.applications.restful.transcript.jersey.RestService;
-import uk.org.sappho.applications.restful.transcript.jersey.RestSession;
+import uk.org.sappho.applications.restful.transcript.jersey.RestServiceContext;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 
 import javax.servlet.ServletContext;
@@ -35,7 +34,7 @@ public class MultiPlatformApplicationPropertiesRestService {
     @QueryParam("include.undefined.environments")
     boolean includeUndefinedEnvironments;
     @Context
-    private ContextResolver<RestService> restServiceContextResolver;
+    private ContextResolver<RestServiceContext> restServiceContextResolver;
     @Context
     private ServletContext servletContext;
 
@@ -43,29 +42,15 @@ public class MultiPlatformApplicationPropertiesRestService {
     @Produces(MediaType.TEXT_HTML)
     public String getProperty() throws ConfigurationException {
 
-        final RestService<MultiPlatformApplicationPropertiesReport> restService =
+        RestServiceContext<MultiPlatformApplicationPropertiesReport> context =
                 restServiceContextResolver.getContext(MultiPlatformApplicationPropertiesReport.class);
-        RestSession.Action<String> action = new RestSession.Action<String>() {
-            private String report;
-
-            @Override
-            public void execute() throws ConfigurationException {
-                String[] environmentList = null;
-                if (environments != null && environments.length() != 0) {
-                    environmentList = environments.split(",");
-                }
-                Configuration freemarkerConfiguration = new Configuration();
-                freemarkerConfiguration.setServletContextForTemplateLoading(servletContext, "templates/" + template);
-                report = restService.getService().generate(environmentList, application,
-                        includeVersionControlProperties, includeUndefinedEnvironments, freemarkerConfiguration);
-            }
-
-            @Override
-            public String getResponse() {
-                return report;
-            }
-        };
-        restService.getSession().execute(action);
-        return action.getResponse();
+        String[] environmentList = null;
+        if (environments != null && environments.length() != 0) {
+            environmentList = environments.split(",");
+        }
+        Configuration freemarkerConfiguration = new Configuration();
+        freemarkerConfiguration.setServletContextForTemplateLoading(servletContext, "templates/" + template);
+        return context.getService().generate(environmentList, application,
+                includeVersionControlProperties, includeUndefinedEnvironments, freemarkerConfiguration);
     }
 }

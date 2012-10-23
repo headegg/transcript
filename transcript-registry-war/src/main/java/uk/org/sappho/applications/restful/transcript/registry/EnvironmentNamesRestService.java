@@ -6,8 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
-import uk.org.sappho.applications.restful.transcript.jersey.RestService;
-import uk.org.sappho.applications.restful.transcript.jersey.RestSession;
+import uk.org.sappho.applications.restful.transcript.jersey.RestServiceContext;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Environments;
 
@@ -22,27 +21,13 @@ import javax.ws.rs.ext.ContextResolver;
 public class EnvironmentNamesRestService {
 
     @Context
-    private ContextResolver<RestService> restServiceContextResolver;
+    private ContextResolver<RestServiceContext> restServiceContextResolver;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String[] getEnvironments() throws ConfigurationException {
 
-        final RestService<Environments> restService = restServiceContextResolver.getContext(Environments.class);
-        RestSession.Action<String[]> action = new RestSession.Action<String[]>() {
-            private String[] environmentNames;
-
-            @Override
-            public void execute() throws ConfigurationException {
-                environmentNames = restService.getService().getEnvironmentNames();
-            }
-
-            @Override
-            public String[] getResponse() {
-                return environmentNames;
-            }
-        };
-        restService.getSession().execute(action);
-        return action.getResponse();
+        RestServiceContext<Environments> context = restServiceContextResolver.getContext(Environments.class);
+        return context.getService().getEnvironmentNames();
     }
 }

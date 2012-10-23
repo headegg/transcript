@@ -14,19 +14,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.util.Enumeration;
 
-public class RestService<T> {
+public class RestServiceContext<T> {
 
     private UriInfo uriInfo;
     private ServletContext servletContext;
     private Class<T> type;
-    private RestSession restSession;
 
-    public RestService(UriInfo uriInfo, ServletContext servletContext, Class<T> type, RestSession restSession) {
+    public RestServiceContext(UriInfo uriInfo, ServletContext servletContext, Class<T> type) {
 
         this.uriInfo = uriInfo;
         this.servletContext = servletContext;
         this.type = type;
-        this.restSession = restSession;
     }
 
     public T getService() throws ConfigurationException {
@@ -44,10 +42,5 @@ public class RestService<T> {
             }
         }
         return serviceModule.getInjector().getInstance(type);
-    }
-
-    public RestSession getSession() {
-
-        return restSession;
     }
 }

@@ -18,11 +18,12 @@ import java.util.Map;
 
 public class ServiceModule extends AbstractModule {
 
-    private final static Map<String, Class<? extends AbstractServiceModule>> vcsModules = new HashMap<String, Class<? extends AbstractServiceModule>>();
+    private final static Map<String, Class<? extends AbstractServiceModule>> VCS_MODULES = new HashMap<String, Class<? extends AbstractServiceModule>>();
+    private final static WorkingCopyLocking LOCKING = new WorkingCopyLocking();
     private final Map<String, String> properties = new HashMap<String, String>();
 
     static {
-        vcsModules.put("svn", SubversionModule.class);
+        VCS_MODULES.put("svn", SubversionModule.class);
     }
 
     public ServiceModule() throws ConfigurationException {
@@ -51,6 +52,7 @@ public class ServiceModule extends AbstractModule {
     @Override
     protected void configure() {
 
+        bind(WorkingCopyLocking.class).toInstance(LOCKING);
         Names.bindProperties(binder(), properties);
     }
 
@@ -64,7 +66,7 @@ public class ServiceModule extends AbstractModule {
         String vcs = properties.get("vcs");
         if (vcs != null && vcs.length() != 0) {
             try {
-                vcsModule = vcsModules.get(vcs).newInstance();
+                vcsModule = VCS_MODULES.get(vcs).newInstance();
             } catch (Throwable throwable) {
                 throw new ConfigurationException("Specified VCS " + vcs + " is not supported", throwable);
             }

@@ -6,8 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.registry;
 
-import uk.org.sappho.applications.restful.transcript.jersey.RestService;
-import uk.org.sappho.applications.restful.transcript.jersey.RestSession;
+import uk.org.sappho.applications.restful.transcript.jersey.RestServiceContext;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
 
@@ -32,64 +31,31 @@ public class PropertyRestService {
     @PathParam("key")
     private String key;
     @Context
-    private ContextResolver<RestService> restServiceContextResolver;
+    private ContextResolver<RestServiceContext> restServiceContextResolver;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getProperty() throws ConfigurationException {
 
-        final RestService<Properties> restService = restServiceContextResolver.getContext(Properties.class);
-        RestSession.Action<String> action = new RestSession.Action<String>() {
-            private String value;
-
-            @Override
-            public void execute() throws ConfigurationException {
-                value = restService.getService().get(environment, application, key, true);
-            }
-
-            @Override
-            public String getResponse() {
-                return value;
-            }
-        };
-        restService.getSession().execute(action);
-        return action.getResponse();
+        return getService().get(environment, application, key, true);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void setProperty(final String value) throws ConfigurationException {
 
-        final RestService<Properties> restService = restServiceContextResolver.getContext(Properties.class);
-        RestSession.Action<Object> action = new RestSession.Action<Object>() {
-            @Override
-            public void execute() throws ConfigurationException {
-                restService.getService().put(environment, application, key, value);
-            }
-
-            @Override
-            public Object getResponse() {
-                return null;
-            }
-        };
-        restService.getSession().execute(action);
+        getService().put(environment, application, key, value);
     }
 
     @DELETE
     public void deleteProperty() throws ConfigurationException {
 
-        final RestService<Properties> restService = restServiceContextResolver.getContext(Properties.class);
-        RestSession.Action<Object> action = new RestSession.Action<Object>() {
-            @Override
-            public void execute() throws ConfigurationException {
-                restService.getService().delete(environment, application, key);
-            }
+        getService().delete(environment, application, key);
+    }
 
-            @Override
-            public Object getResponse() {
-                return null;
-            }
-        };
-        restService.getSession().execute(action);
+    private Properties getService() throws ConfigurationException {
+
+        RestServiceContext<Properties> context = restServiceContextResolver.getContext(Properties.class);
+        return context.getService();
     }
 }

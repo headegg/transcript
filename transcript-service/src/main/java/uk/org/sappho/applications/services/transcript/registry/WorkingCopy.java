@@ -9,7 +9,6 @@ package uk.org.sappho.applications.services.transcript.registry;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-@Singleton
 public class WorkingCopy {
 
     private String workingCopyPath;
@@ -30,34 +28,39 @@ public class WorkingCopy {
     private boolean useCache;
     private boolean readOnly;
     private VersionControlSystem versionControlSystem;
+    private WorkingCopyLocking workingCopyLocking;
 
     @Inject
     public WorkingCopy(@Named("working.copy.path") String workingCopyPath,
                        @Named("working.copy.id") String workingCopyId,
                        @Named("use.cache") String useCache,
                        @Named("read.only") String readOnly,
-                       VersionControlSystem versionControlSystem) throws ConfigurationException {
+                       VersionControlSystem versionControlSystem,
+                       WorkingCopyLocking workingCopyLocking) throws ConfigurationException {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
         this.useCache = useCache.equals("true");
         this.readOnly = readOnly.equals("true");
         this.versionControlSystem = versionControlSystem;
+        this.workingCopyLocking = workingCopyLocking;
     }
 
     public File getUpToDatePath(String path) throws ConfigurationException {
 
         File workingCopy = new File(workingCopyPath, workingCopyId);
-        if (workingCopy.exists()) {
-            if (!workingCopy.isDirectory()) {
-                throw new ConfigurationException("Requested working copy " + workingCopyId +
-                        " is not a directory");
+        synchronized (getLock()) {
+            if (workingCopy.exists()) {
+                if (!workingCopy.isDirectory()) {
+                    throw new ConfigurationException("Requested working copy " + workingCopyId +
+                            " is not a directory");
+                }
+                if (!useCache) {
+                    versionControlSystem.update(path);
+                }
+            } else {
+                versionControlSystem.checkout();
             }
-            if (!useCache) {
-                versionControlSystem.update(path);
-            }
-        } else {
-            versionControlSystem.checkout();
         }
         return new File(workingCopy, path);
     }
@@ -67,26 +70,28 @@ public class WorkingCopy {
             throws ConfigurationException {
 
         try {
-            File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
             SortedMap<String, String> properties = new TreeMap<String, String>();
-            if (jsonFile.exists()) {
-                FileReader fileReader = new FileReader(jsonFile);
-                try {
-                    properties = new Gson().fromJson(fileReader, TreeMap.class);
-                } finally {
+            synchronized (getLock()) {
+                File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
+                if (jsonFile.exists()) {
+                    FileReader fileReader = new FileReader(jsonFile);
                     try {
-                        fileReader.close();
-                    } catch (Throwable throwable) {
+                        properties = new Gson().fromJson(fileReader, TreeMap.class);
+                    } finally {
+                        try {
+                            fileReader.close();
+                        } catch (Throwable throwable) {
+                        }
                     }
-                }
-                if (properties == null) {
-                    properties = new TreeMap<String, String>();
-                }
-                if (includeVersionControlProperties) {
-                    Map<String, String> versionControlProperties =
-                            versionControlSystem.getProperties(getJsonFilename(environment, application));
-                    for (String key : versionControlProperties.keySet()) {
-                        properties.put(key, versionControlProperties.get(key));
+                    if (properties == null) {
+                        properties = new TreeMap<String, String>();
+                    }
+                    if (includeVersionControlProperties) {
+                        Map<String, String> versionControlProperties =
+                                versionControlSystem.getProperties(getJsonFilename(environment, application));
+                        for (String key : versionControlProperties.keySet()) {
+                            properties.put(key, versionControlProperties.get(key));
+                        }
                     }
                 }
             }
@@ -100,45 +105,47 @@ public class WorkingCopy {
             throws ConfigurationException {
 
         checkWritable();
-        File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-        File directory = new File(new File(workingCopyPath, workingCopyId), environment);
-        boolean isNewDirectory = !directory.exists();
-        boolean isNewFile = !jsonFile.exists();
-        try {
-            if (isNewDirectory) {
-                if (!directory.mkdir()) {
-                    unableToCreateNewEnvironment(environment);
-                }
-            } else {
-                if (!directory.isDirectory()) {
-                    unableToCreateNewEnvironment(environment);
-                }
-            }
-            JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
+        synchronized (getLock()) {
+            File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
+            File directory = new File(new File(workingCopyPath, workingCopyId), environment);
+            boolean isNewDirectory = !directory.exists();
+            boolean isNewFile = !jsonFile.exists();
             try {
-                jsonWriter.setIndent("    ");
-                jsonWriter.setHtmlSafe(true);
-                new Gson().toJson(properties, properties.getClass(), jsonWriter);
-                jsonWriter.close();
-            } finally {
+                if (isNewDirectory) {
+                    if (!directory.mkdir()) {
+                        unableToCreateNewEnvironment(environment);
+                    }
+                } else {
+                    if (!directory.isDirectory()) {
+                        unableToCreateNewEnvironment(environment);
+                    }
+                }
+                JsonWriter jsonWriter = new JsonWriter(new FileWriter(jsonFile));
                 try {
+                    jsonWriter.setIndent("    ");
+                    jsonWriter.setHtmlSafe(true);
+                    new Gson().toJson(properties, properties.getClass(), jsonWriter);
                     jsonWriter.close();
-                } catch (Throwable closeException) {
+                } finally {
+                    try {
+                        jsonWriter.close();
+                    } catch (Throwable closeException) {
+                    }
                 }
-            }
-            if (isNewDirectory) {
-                versionControlSystem.commit(environment, true);
-            } else {
-                versionControlSystem.commit(getJsonFilename(environment, application), isNewFile);
-            }
-        } catch (Throwable throwable) {
-            if (isNewFile) {
-                try {
-                    FileUtils.forceDelete(isNewDirectory ? directory : jsonFile);
-                } catch (Throwable deleteException) {
+                if (isNewDirectory) {
+                    versionControlSystem.commit(environment, true);
+                } else {
+                    versionControlSystem.commit(getJsonFilename(environment, application), isNewFile);
                 }
+            } catch (Throwable throwable) {
+                if (isNewFile) {
+                    try {
+                        FileUtils.forceDelete(isNewDirectory ? directory : jsonFile);
+                    } catch (Throwable deleteException) {
+                    }
+                }
+                throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
             }
-            throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
         }
     }
 
@@ -146,8 +153,10 @@ public class WorkingCopy {
 
         checkWritable();
         String filename = getJsonFilename(environment, application);
-        getUpToDatePath(filename);
-        versionControlSystem.delete(filename);
+        synchronized (getLock()) {
+            getUpToDatePath(filename);
+            versionControlSystem.delete(filename);
+        }
     }
 
     private void checkWritable() throws ConfigurationException {
@@ -165,5 +174,10 @@ public class WorkingCopy {
     private void unableToCreateNewEnvironment(String environment) throws IOException {
 
         throw new IOException("Unable to create new environment " + environment);
+    }
+
+    private Object getLock() {
+
+        return workingCopyLocking.getLock(workingCopyId);
     }
 }
