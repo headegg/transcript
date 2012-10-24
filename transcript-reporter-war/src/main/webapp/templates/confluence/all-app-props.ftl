@@ -14,7 +14,7 @@
             <tr>
                 <th class="property-key confluenceTh">${key.id}</th>
                 <#list key.values as value>
-                    <td class="property-value <#if ! value??>un</#if>defined-property-value confluenceTd">${value!""}</td>
+                    <td class="<#if value??><#if value?trim?length == 0>blank<#else>defined</#if><#else>undefined</#if>-property-value confluenceTd">${value!""}</td>
                 </#list>
             </tr>
             </#list>
