@@ -7,16 +7,15 @@
 package uk.org.sappho.applications.services.transcript.registry;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import uk.org.sappho.applications.services.transcript.registry.vcs.product.SubversionModule;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceModule extends AbstractModule {
+public class TranscriptServiceModule extends AbstractModule {
 
     private final static Map<String, Class<? extends AbstractServiceModule>> VCS_MODULES = new HashMap<String, Class<? extends AbstractServiceModule>>();
     private final static WorkingCopyLocking LOCKING = new WorkingCopyLocking();
@@ -26,7 +25,7 @@ public class ServiceModule extends AbstractModule {
         VCS_MODULES.put("svn", SubversionModule.class);
     }
 
-    public ServiceModule() throws ConfigurationException {
+    public TranscriptServiceModule() throws ConfigurationException {
 
         if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
             for (String key : System.getProperties().stringPropertyNames()) {
@@ -56,7 +55,7 @@ public class ServiceModule extends AbstractModule {
         Names.bindProperties(binder(), properties);
     }
 
-    public Injector getInjector() throws ConfigurationException {
+    public List<AbstractModule> getConfiguredModules() throws ConfigurationException {
 
         String workingCopyPath = properties.get("working.copy.path");
         if (workingCopyPath == null || workingCopyPath.length() == 0) {
@@ -79,7 +78,7 @@ public class ServiceModule extends AbstractModule {
         fixProperty("working.copy.id", "default");
         fixProperty("use.cache", "false");
         fixProperty("read.only", "false");
-        return Guice.createInjector(this, vcsModule);
+        return Arrays.asList(this, vcsModule);
     }
 
     private void fixProperty(String key, String defaultValue) {

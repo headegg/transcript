@@ -6,8 +6,9 @@
 
 package uk.org.sappho.applications.restful.transcript.jersey;
 
+import com.google.inject.Guice;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
-import uk.org.sappho.applications.services.transcript.registry.ServiceModule;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptServiceModule;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
@@ -29,18 +30,18 @@ public class RestServiceContext<T> {
 
     public T getService() throws ConfigurationException {
 
-        ServiceModule serviceModule = new ServiceModule();
+        TranscriptServiceModule transcriptServiceModule = new TranscriptServiceModule();
         Enumeration keys = servletContext.getInitParameterNames();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement().toString();
-            serviceModule.setProperty(key, servletContext.getInitParameter(key));
+            transcriptServiceModule.setProperty(key, servletContext.getInitParameter(key));
         }
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
         for (String key : queryParameters.keySet()) {
             if (!key.equals("working.copy.path")) {
-                serviceModule.setProperty(key, queryParameters.get(key));
+                transcriptServiceModule.setProperty(key, queryParameters.get(key));
             }
         }
-        return serviceModule.getInjector().getInstance(type);
+        return Guice.createInjector(transcriptServiceModule.getConfiguredModules()).getInstance(type);
     }
 }
