@@ -9,6 +9,7 @@ package uk.org.sappho.applications.services.transcript.registry;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Singleton
 public class WorkingCopy {
 
     private String workingCopyPath;
