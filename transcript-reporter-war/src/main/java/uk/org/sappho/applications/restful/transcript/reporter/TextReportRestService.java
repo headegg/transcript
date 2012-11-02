@@ -6,7 +6,7 @@
 
 package uk.org.sappho.applications.restful.transcript.reporter;
 
-import freemarker.template.Configuration;
+import freemarker.cache.WebappTemplateLoader;
 import uk.org.sappho.applications.restful.transcript.jersey.RestServiceContext;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 
@@ -20,19 +20,21 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
-@Path("/all-app-props/{template}/{application}")
-public class MultiPlatformApplicationPropertiesRestService {
+@Path("/text/{templateName}")
+public class TextReportRestService {
 
     @QueryParam("environments")
     private String environments;
-    @PathParam("application")
-    private String application;
-    @PathParam("template")
-    private String template;
+    @QueryParam("applications")
+    private String applications;
+    @QueryParam("keys")
+    private String keys;
+    @PathParam("templateName")
+    private String templateName;
     @QueryParam("include.vcs.props")
     private boolean includeVersionControlProperties;
     @QueryParam("include.undefined.environments")
-    boolean includeUndefinedEnvironments;
+    private boolean includeUndefinedEnvironments;
     @Context
     private ContextResolver<RestServiceContext> restServiceContextResolver;
     @Context
@@ -42,15 +44,22 @@ public class MultiPlatformApplicationPropertiesRestService {
     @Produces(MediaType.TEXT_HTML)
     public String getProperty() throws ConfigurationException {
 
-        RestServiceContext<MultiPlatformApplicationPropertiesReport> context =
-                restServiceContextResolver.getContext(MultiPlatformApplicationPropertiesReport.class);
+        RestServiceContext<TextTemplatedReport> context =
+                restServiceContextResolver.getContext(TextTemplatedReport.class);
         String[] environmentList = null;
         if (environments != null && environments.length() != 0) {
             environmentList = environments.split(",");
         }
-        Configuration freemarkerConfiguration = new Configuration();
-        freemarkerConfiguration.setServletContextForTemplateLoading(servletContext, "templates/" + template);
-        return context.getService().generate(environmentList, application,
-                includeVersionControlProperties, includeUndefinedEnvironments, freemarkerConfiguration);
+        String[] applicationList = null;
+        if (applications != null && applications.length() != 0) {
+            applicationList = applications.split(",");
+        }
+        String[] keyList = null;
+        if (keys != null && keys.length() != 0) {
+            keyList = keys.split(",");
+        }
+        return context.getService().generate(templateName, environmentList, applicationList, keyList,
+                includeVersionControlProperties, includeUndefinedEnvironments,
+                new WebappTemplateLoader(servletContext, "templates"));
     }
 }

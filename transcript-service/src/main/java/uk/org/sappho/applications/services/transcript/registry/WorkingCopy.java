@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.services.transcript.registry;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.StringMap;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -94,6 +95,33 @@ public class WorkingCopy {
                         for (String key : versionControlProperties.keySet()) {
                             properties.put(key, versionControlProperties.get(key));
                         }
+                    }
+                }
+            }
+            return properties;
+        } catch (Throwable throwable) {
+            throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
+        }
+    }
+
+    public StringMap getProperties(String environment, String application) throws ConfigurationException {
+
+        try {
+            StringMap properties = new StringMap();
+            synchronized (getLock()) {
+                File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
+                if (jsonFile.exists()) {
+                    FileReader fileReader = new FileReader(jsonFile);
+                    try {
+                        properties = new Gson().fromJson(fileReader, StringMap.class);
+                    } finally {
+                        try {
+                            fileReader.close();
+                        } catch (Throwable throwable) {
+                        }
+                    }
+                    if (properties == null) {
+                        properties = new StringMap();
                     }
                 }
             }

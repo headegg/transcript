@@ -21,7 +21,8 @@ public class Properties {
     }
 
     public SortedMap<String, String> getAllProperties(String environment, String application,
-                                                      boolean includeVersionControlProperties) throws ConfigurationException {
+                                                      boolean includeVersionControlProperties)
+            throws ConfigurationException {
 
         return workingCopy.getProperties(environment, application, includeVersionControlProperties);
     }
@@ -42,7 +43,8 @@ public class Properties {
         workingCopy.putProperties(environment, application, properties);
     }
 
-    public void put(String environment, String application, String key, String value) throws ConfigurationException {
+    public void put(String environment, String application, String key, String value)
+            throws ConfigurationException {
 
         SortedMap<String, String> properties = workingCopy.getProperties(environment, application, false);
         boolean changed = false;
