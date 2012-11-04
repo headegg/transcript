@@ -12,4 +12,12 @@
     <artifactId>transcript-editor-war</artifactId>
     <packaging>war</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>uk.org.sappho.applications.configuration</groupId>
+            <artifactId>transcript-jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>
