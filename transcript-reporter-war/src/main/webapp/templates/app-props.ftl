@@ -1,7 +1,7 @@
 <#assign environments = getDictionaryMap("environments")>
 <#assign applications = getDictionaryMap("applications")>
 <#escape x as x?html>
-<div class="properties-table-wrap table-wrap">
+<div <#if reportId??>id="${reportId}" </#if>class="properties-table-wrap table-wrap">
     <table class="properties-table confluenceTable">
         <thead>
         <tr>

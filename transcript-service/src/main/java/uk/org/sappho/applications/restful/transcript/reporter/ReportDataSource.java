@@ -27,6 +27,7 @@ public class ReportDataSource {
     private WorkingCopy workingCopy;
     private String devopsEnvironmentName;
     private String devopsDictionaryName;
+    private String reportId;
     private StringMap dictionary;
     private String[] requiredEnvironments = new String[0];
     private String[] requiredApplications = new String[0];
@@ -63,6 +64,16 @@ public class ReportDataSource {
     public StringMap getDictionaryMap(String key) {
 
         return (StringMap) dictionary.get(key);
+    }
+
+    public String getReportId() {
+
+        return reportId;
+    }
+
+    public void setReportId(String reportId) {
+
+        this.reportId = reportId;
     }
 
     public String[] getRequiredEnvironments() {

@@ -23,6 +23,8 @@ import javax.ws.rs.ext.ContextResolver;
 @Path("/text/{templateName}")
 public class TextReportRestService {
 
+    @QueryParam("report.id")
+    private String reportId;
     @QueryParam("environments")
     private String environments;
     @QueryParam("applications")
@@ -58,7 +60,7 @@ public class TextReportRestService {
         if (keys != null && keys.length() != 0) {
             keyList = keys.split(",");
         }
-        return context.getService().generate(templateName, environmentList, applicationList, keyList,
+        return context.getService().generate(templateName, reportId, environmentList, applicationList, keyList,
                 includeVersionControlProperties, includeUndefinedEnvironments,
                 new WebappTemplateLoader(servletContext, "templates"));
     }

@@ -2,7 +2,7 @@
 <#assign applications = getDictionaryMap("applications")>
 ${setIncludeUndefinedEnvironments(true)}
 <#escape x as x?html>
-<div class="pivot-table-wrap table-wrap">
+<div <#if reportId??>id="${reportId}" </#if>class="pivot-table-wrap table-wrap">
     <table class="pivot-table confluenceTable">
         <thead>
         <tr>

@@ -33,6 +33,7 @@ public class TextTemplatedReport {
     }
 
     public String generate(String templateName,
+                           String reportId,
                            String[] requiredEnvironments,
                            String[] requiredApplications,
                            String[] requiredKeys,
@@ -44,6 +45,7 @@ public class TextTemplatedReport {
         try {
             workingCopy.getUpToDatePath("");
             reportDataSource.loadDictionary();
+            reportDataSource.setReportId(reportId);
             reportDataSource.setRequiredEnvironments(requiredEnvironments);
             reportDataSource.setRequiredApplications(requiredApplications);
             reportDataSource.setRequiredKeys(requiredKeys);
