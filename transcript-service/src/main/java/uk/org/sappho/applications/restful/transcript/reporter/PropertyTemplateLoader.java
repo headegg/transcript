@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.restful.transcript.reporter;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import freemarker.cache.TemplateLoader;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
 
@@ -17,18 +18,24 @@ import java.io.StringReader;
 public class PropertyTemplateLoader implements TemplateLoader {
 
     private Properties properties;
+    private String devopsEnvironmentName;
+    private String devopsTemplatesName;
     private String template = null;
 
     @Inject
-    public PropertyTemplateLoader(Properties properties) {
+    public PropertyTemplateLoader(Properties properties,
+                                  @Named("devops.env") String devopsEnvironmentName,
+                                  @Named("devops.templates") String devopsTemplatesName) {
 
         this.properties = properties;
+        this.devopsEnvironmentName = devopsEnvironmentName;
+        this.devopsTemplatesName = devopsTemplatesName;
     }
 
     public boolean loadTemplate(String name) {
 
         try {
-            template = properties.get(".devops", ".templates", name, false);
+            template = properties.get(devopsEnvironmentName, devopsTemplatesName, name, false);
         } catch (Throwable throwable) {
         }
         return template != null;

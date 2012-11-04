@@ -78,6 +78,9 @@ public class TranscriptServiceModule extends AbstractModule {
         fixProperty("working.copy.id", "default");
         fixProperty("use.cache", "false");
         fixProperty("read.only", "false");
+        fixProperty("devops.env", ".devops");
+        fixProperty("devops.dict", ".dictionary");
+        fixProperty("devops.templates", ".templates");
         return Arrays.asList(this, vcsModule);
     }
 

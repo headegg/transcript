@@ -8,6 +8,7 @@ package uk.org.sappho.applications.restful.transcript.reporter;
 
 import com.google.gson.internal.StringMap;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import uk.org.sappho.applications.services.transcript.registry.Applications;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Environments;
@@ -24,6 +25,8 @@ public class ReportDataSource {
     private Applications applications;
     private Properties properties;
     private WorkingCopy workingCopy;
+    private String devopsEnvironmentName;
+    private String devopsDictionaryName;
     private StringMap dictionary;
     private String[] requiredEnvironments = new String[0];
     private String[] requiredApplications = new String[0];
@@ -40,17 +43,21 @@ public class ReportDataSource {
     public ReportDataSource(Environments environments,
                             Applications applications,
                             Properties properties,
-                            WorkingCopy workingCopy) {
+                            WorkingCopy workingCopy,
+                            @Named("devops.env") String devopsEnvironmentName,
+                            @Named("devops.dict") String devopsDictionaryName) {
 
         this.environments = environments;
         this.applications = applications;
         this.properties = properties;
         this.workingCopy = workingCopy;
+        this.devopsEnvironmentName = devopsEnvironmentName;
+        this.devopsDictionaryName = devopsDictionaryName;
     }
 
     public void loadDictionary() throws ConfigurationException {
 
-        dictionary = workingCopy.getProperties(".devops", ".dictionary");
+        dictionary = workingCopy.getProperties(devopsEnvironmentName, devopsDictionaryName);
     }
 
     public StringMap getDictionaryMap(String key) {
@@ -87,6 +94,11 @@ public class ReportDataSource {
         return environment;
     }
 
+    public void setEnvironment(String environment) {
+
+        requiredEnvironments = new String[]{environment};
+    }
+
     public String getApplication() {
 
         String application = null;
@@ -94,6 +106,11 @@ public class ReportDataSource {
             application = requiredApplications[0];
         }
         return application;
+    }
+
+    public void setApplication(String application) {
+
+        requiredApplications = new String[]{application};
     }
 
     public String[] getRequiredKeys() {
