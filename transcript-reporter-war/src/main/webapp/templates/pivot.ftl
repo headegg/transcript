@@ -1,5 +1,3 @@
-<#assign environments = getDictionaryMap("environments")>
-<#assign applications = getDictionaryMap("applications")>
 ${setIncludeUndefinedEnvironments(true)}
 <#escape x as x?html>
 <div <#if reportId??>id="${reportId}" </#if>class="pivot-table-wrap table-wrap">
@@ -10,14 +8,14 @@ ${setIncludeUndefinedEnvironments(true)}
                 <div class="key-name">${key}</div></#list>
             </th>
             <#list reportableEnvironments as environment>
-                <th class="environment-name confluenceTh">${environments[environment].name!environment}</th>
+                <th class="environment-name confluenceTh">${dictionary.environments[environment].name!environment}</th>
             </#list>
         </tr>
         </thead>
         <tbody>
             <#list reportableApplications as application>
             <tr>
-                <th class="application-name confluenceTh">${applications[application].name!application}</th>
+                <th class="application-name confluenceTh">${dictionary.applications[application].name!application}</th>
                 <#list reportableEnvironments as environment>
                     <td class="property-value confluenceTd">
                         <#list requiredKeys as key>

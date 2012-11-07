@@ -19,16 +19,16 @@ import java.io.StringWriter;
 public class TextTemplatedReport {
 
     private WorkingCopy workingCopy;
-    private ReportDataSource reportDataSource;
+    private ReportData reportData;
     private PropertyTemplateLoader propertyTemplateLoader;
 
     @Inject
     public TextTemplatedReport(WorkingCopy workingCopy,
-                               ReportDataSource reportDataSource,
+                               ReportData reportData,
                                PropertyTemplateLoader propertyTemplateLoader) {
 
         this.workingCopy = workingCopy;
-        this.reportDataSource = reportDataSource;
+        this.reportData = reportData;
         this.propertyTemplateLoader = propertyTemplateLoader;
     }
 
@@ -44,13 +44,12 @@ public class TextTemplatedReport {
 
         try {
             workingCopy.getUpToDatePath("");
-            reportDataSource.loadDictionary();
-            reportDataSource.setReportId(reportId);
-            reportDataSource.setRequiredEnvironments(requiredEnvironments);
-            reportDataSource.setRequiredApplications(requiredApplications);
-            reportDataSource.setRequiredKeys(requiredKeys);
-            reportDataSource.setIncludeVersionControlProperties(includeVersionControlProperties);
-            reportDataSource.setIncludeUndefinedEnvironments(includeUndefinedEnvironments);
+            reportData.setReportId(reportId);
+            reportData.setRequiredEnvironments(requiredEnvironments);
+            reportData.setRequiredApplications(requiredApplications);
+            reportData.setRequiredKeys(requiredKeys);
+            reportData.setIncludeVersionControlProperties(includeVersionControlProperties);
+            reportData.setIncludeUndefinedEnvironments(includeUndefinedEnvironments);
             if (propertyTemplateLoader.loadTemplate(templateName)) {
                 templateLoader = propertyTemplateLoader;
             }
@@ -59,7 +58,7 @@ public class TextTemplatedReport {
             freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
             Template template = freemarkerConfiguration.getTemplate(templateName + ".ftl");
             StringWriter stringWriter = new StringWriter();
-            template.process(reportDataSource, stringWriter);
+            template.process(reportData, stringWriter);
             stringWriter.close();
             return stringWriter.toString();
         } catch (Throwable throwable) {

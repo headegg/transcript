@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class ReportDataSource {
+public class ReportData {
 
     private Environments environments;
     private Applications applications;
@@ -28,7 +28,7 @@ public class ReportDataSource {
     private String devopsEnvironmentName;
     private String devopsDictionaryName;
     private String reportId;
-    private StringMap dictionary;
+    private StringMap dictionary = null;
     private String[] requiredEnvironments = new String[0];
     private String[] requiredApplications = new String[0];
     private String[] requiredKeys = new String[0];
@@ -41,12 +41,12 @@ public class ReportDataSource {
             new TreeMap<String, Map<String, Map<String, String>>>();
 
     @Inject
-    public ReportDataSource(Environments environments,
-                            Applications applications,
-                            Properties properties,
-                            WorkingCopy workingCopy,
-                            @Named("devops.env") String devopsEnvironmentName,
-                            @Named("devops.dict") String devopsDictionaryName) {
+    public ReportData(Environments environments,
+                      Applications applications,
+                      Properties properties,
+                      WorkingCopy workingCopy,
+                      @Named("devops.env") String devopsEnvironmentName,
+                      @Named("devops.dict") String devopsDictionaryName) {
 
         this.environments = environments;
         this.applications = applications;
@@ -56,14 +56,12 @@ public class ReportDataSource {
         this.devopsDictionaryName = devopsDictionaryName;
     }
 
-    public void loadDictionary() throws ConfigurationException {
+    public StringMap getDictionary() throws ConfigurationException {
 
-        dictionary = workingCopy.getProperties(devopsEnvironmentName, devopsDictionaryName);
-    }
-
-    public StringMap getDictionaryMap(String key) {
-
-        return (StringMap) dictionary.get(key);
+        if (dictionary == null) {
+            dictionary = workingCopy.getProperties(devopsEnvironmentName, devopsDictionaryName);
+        }
+        return dictionary;
     }
 
     public String getReportId() {
