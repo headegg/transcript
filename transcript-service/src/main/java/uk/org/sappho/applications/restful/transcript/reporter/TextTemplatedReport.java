@@ -18,9 +18,9 @@ import java.io.StringWriter;
 
 public class TextTemplatedReport {
 
-    private WorkingCopy workingCopy;
-    private ReportData reportData;
-    private PropertyTemplateLoader propertyTemplateLoader;
+    private final WorkingCopy workingCopy;
+    private final ReportData reportData;
+    private final PropertyTemplateLoader propertyTemplateLoader;
 
     @Inject
     public TextTemplatedReport(WorkingCopy workingCopy,
@@ -33,28 +33,14 @@ public class TextTemplatedReport {
     }
 
     public String generate(String templateName,
-                           String reportId,
-                           String[] requiredEnvironments,
-                           String[] requiredApplications,
-                           String[] requiredKeys,
-                           boolean includeVersionControlProperties,
-                           boolean includeUndefinedEnvironments,
-                           TemplateLoader templateLoader)
+                           TemplateLoader sourceTemplateLoader)
             throws ConfigurationException {
 
         try {
             workingCopy.getUpToDatePath("");
-            reportData.setReportId(reportId);
-            reportData.setRequiredEnvironments(requiredEnvironments);
-            reportData.setRequiredApplications(requiredApplications);
-            reportData.setRequiredKeys(requiredKeys);
-            reportData.setIncludeVersionControlProperties(includeVersionControlProperties);
-            reportData.setIncludeUndefinedEnvironments(includeUndefinedEnvironments);
-            if (propertyTemplateLoader.loadTemplate(templateName)) {
-                templateLoader = propertyTemplateLoader;
-            }
+            propertyTemplateLoader.setSourceTemplateLoader(sourceTemplateLoader);
             Configuration freemarkerConfiguration = new Configuration();
-            freemarkerConfiguration.setTemplateLoader(templateLoader);
+            freemarkerConfiguration.setTemplateLoader(propertyTemplateLoader);
             freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
             Template template = freemarkerConfiguration.getTemplate(templateName + ".ftl");
             StringWriter stringWriter = new StringWriter();

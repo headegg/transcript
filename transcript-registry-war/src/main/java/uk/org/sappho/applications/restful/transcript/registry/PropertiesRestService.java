@@ -37,7 +37,7 @@ public class PropertiesRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public SortedMap<String, String> getProperties() throws ConfigurationException {
 
-        return getService().getAllProperties(environment, application, true);
+        return getService().getAllProperties(environment, application);
     }
 
     @PUT

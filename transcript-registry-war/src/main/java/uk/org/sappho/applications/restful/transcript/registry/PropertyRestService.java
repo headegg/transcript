@@ -37,7 +37,7 @@ public class PropertyRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String getProperty() throws ConfigurationException {
 
-        return getService().get(environment, application, key, true);
+        return getService().get(environment, application, key);
     }
 
     @PUT

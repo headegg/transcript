@@ -20,17 +20,15 @@ public class Properties {
         this.workingCopy = workingCopy;
     }
 
-    public SortedMap<String, String> getAllProperties(String environment, String application,
-                                                      boolean includeVersionControlProperties)
+    public SortedMap<String, String> getAllProperties(String environment, String application)
             throws ConfigurationException {
 
-        return workingCopy.getProperties(environment, application, includeVersionControlProperties);
+        return workingCopy.getStringProperties(environment, application);
     }
 
-    public String get(String environment, String application, String key,
-                      boolean includeVersionControlProperties) throws ConfigurationException {
+    public String get(String environment, String application, String key) throws ConfigurationException {
 
-        String value = getAllProperties(environment, application, includeVersionControlProperties).get(key);
+        String value = getAllProperties(environment, application).get(key);
         if (value == null) {
             throw new ConfigurationException("There is no value for " + key);
         }
@@ -46,7 +44,7 @@ public class Properties {
     public void put(String environment, String application, String key, String value)
             throws ConfigurationException {
 
-        SortedMap<String, String> properties = workingCopy.getProperties(environment, application, false);
+        SortedMap<String, String> properties = workingCopy.getStringProperties(environment, application);
         boolean changed = false;
         if (value != null) {
             String oldValue = properties.get(key);
