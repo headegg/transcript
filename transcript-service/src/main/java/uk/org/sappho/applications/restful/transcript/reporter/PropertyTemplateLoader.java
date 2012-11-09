@@ -7,9 +7,8 @@
 package uk.org.sappho.applications.restful.transcript.reporter;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import freemarker.cache.TemplateLoader;
-import uk.org.sappho.applications.services.transcript.registry.Properties;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptParameters;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -17,49 +16,57 @@ import java.io.StringReader;
 
 public class PropertyTemplateLoader implements TemplateLoader {
 
-    private Properties properties;
-    private String devopsEnvironmentName;
-    private String devopsTemplatesName;
-    private String template = null;
+    private final ReportData reportData;
+    private TemplateLoader sourceTemplateLoader;
 
     @Inject
-    public PropertyTemplateLoader(Properties properties,
-                                  @Named("devops.env") String devopsEnvironmentName,
-                                  @Named("devops.templates") String devopsTemplatesName) {
+    public PropertyTemplateLoader(ReportData reportData) {
 
-        this.properties = properties;
-        this.devopsEnvironmentName = devopsEnvironmentName;
-        this.devopsTemplatesName = devopsTemplatesName;
+        this.reportData = reportData;
     }
 
-    public boolean loadTemplate(String name) {
+    public void setSourceTemplateLoader(TemplateLoader sourceTemplateLoader) {
 
-        try {
-            template = properties.get(devopsEnvironmentName, devopsTemplatesName, name, false);
-        } catch (Throwable throwable) {
-        }
-        return template != null;
+        this.sourceTemplateLoader = sourceTemplateLoader;
     }
 
     @Override
     public Object findTemplateSource(String name) throws IOException {
 
-        return template;
+        String template = null;
+        if (name.endsWith(".ftl")) {
+            TranscriptParameters transcriptParameters = reportData.getParameters();
+            boolean includeVersionControlProperties = transcriptParameters.isIncludeVersionControlProperties();
+            transcriptParameters.setIncludeVersionControlProperties(false);
+            try {
+                template = reportData.getProperties(transcriptParameters.getTemplatesEnvironment(),
+                        transcriptParameters.getTemplatesApplication()).get(name.substring(0, name.length() - 4));
+            } catch (Throwable throwable) {
+            }
+            transcriptParameters.setIncludeVersionControlProperties(includeVersionControlProperties);
+        }
+        return template != null ? template : sourceTemplateLoader.findTemplateSource(name);
     }
 
     @Override
     public long getLastModified(Object templateSource) {
 
-        return System.currentTimeMillis();
+        return templateSource instanceof String ?
+                System.currentTimeMillis() : sourceTemplateLoader.getLastModified(templateSource);
     }
 
     @Override
     public Reader getReader(Object templateSource, String encoding) throws IOException {
 
-        return new StringReader(template);
+        return templateSource instanceof String ?
+                new StringReader((String) templateSource) : sourceTemplateLoader.getReader(templateSource, encoding);
     }
 
     @Override
     public void closeTemplateSource(Object templateSource) throws IOException {
+
+        if (!(templateSource instanceof String)) {
+            sourceTemplateLoader.closeTemplateSource(templateSource);
+        }
     }
 }

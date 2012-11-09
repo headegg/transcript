@@ -1,11 +1,12 @@
+<#include "macros.ftl">
 <#escape x as x?html>
-<div <#if reportId??>id="${reportId}" </#if>class="properties-table-wrap table-wrap">
+<div <#if reportId??>id="${reportId}" </#if>class="properties-table table-wrap">
     <table class="properties-table confluenceTable">
         <thead>
         <tr>
-            <th class="application-name confluenceTh">${dictionary.applications[application].name!application}</th>
+            <th class="application-name confluenceTh"><@label type="applications" id=application /></th>
             <#list reportableEnvironments as environment>
-                <th class="environment-name confluenceTh">${dictionary.environments[environment].name!environment}</th>
+                <th class="environment-name confluenceTh"><@label type="environments" id=environment /></th>
             </#list>
         </tr>
         </thead>
@@ -15,7 +16,7 @@
                 <th class="property-key confluenceTh">${key}</th>
                 <#list reportableEnvironments as environment>
                     <#assign property = getProperty(environment, application, key)>
-                    <td class="<#if property.value??><#if property.value?length != 0>defined<#else>blank</#if><#else>undefined</#if>-property-value confluenceTd">${property.value!""}</td>
+                    <td class="confluenceTd"><@property class="property-value" environment=environment application=application key=key /></td>
                 </#list>
             </tr>
             </#list>

@@ -6,23 +6,22 @@
 
 package uk.org.sappho.applications.services.transcript.registry.vcs.product;
 
-import uk.org.sappho.applications.services.transcript.registry.AbstractServiceModule;
+import com.google.inject.AbstractModule;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
 
-import java.util.Arrays;
-import java.util.List;
+public class SubversionModule extends AbstractModule {
 
-public class SubversionModule extends AbstractServiceModule {
+    public final SubversionParameters subversionParameters;
+
+    public SubversionModule(SubversionParameters subversionParameters) {
+
+        this.subversionParameters = subversionParameters;
+    }
 
     @Override
     protected void configure() {
 
+        bind(SubversionParameters.class).toInstance(subversionParameters);
         bind(VersionControlSystem.class).to(SubversionVersionControl.class);
-    }
-
-    @Override
-    public List<String> getRequiredProperties() {
-
-        return Arrays.asList("url", "username", "password", "commit.message", "svn", "trust.server.certificate");
     }
 }

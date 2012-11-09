@@ -8,11 +8,11 @@ package uk.org.sappho.applications.restful.transcript.reporter;
 
 import com.google.gson.internal.StringMap;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import uk.org.sappho.applications.services.transcript.registry.Applications;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
 import uk.org.sappho.applications.services.transcript.registry.Environments;
 import uk.org.sappho.applications.services.transcript.registry.Properties;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptParameters;
 import uk.org.sappho.applications.services.transcript.registry.WorkingCopy;
 
 import java.util.Map;
@@ -21,23 +21,16 @@ import java.util.TreeMap;
 
 public class ReportData {
 
-    private Environments environments;
-    private Applications applications;
-    private Properties properties;
-    private WorkingCopy workingCopy;
-    private String devopsEnvironmentName;
-    private String devopsDictionaryName;
-    private String reportId;
+    private final Environments environments;
+    private final Applications applications;
+    private final Properties properties;
+    private final WorkingCopy workingCopy;
+    private final TranscriptParameters parameters;
     private StringMap dictionary = null;
-    private String[] requiredEnvironments = new String[0];
-    private String[] requiredApplications = new String[0];
-    private String[] requiredKeys = new String[0];
-    private boolean includeVersionControlProperties;
-    private boolean includeUndefinedEnvironments;
     private Set<String> reportableEnvironments = null;
     private Set<String> reportableApplications = null;
     private Set<String> reportableKeys = null;
-    private Map<String, Map<String, Map<String, String>>> cache =
+    private final Map<String, Map<String, Map<String, String>>> cache =
             new TreeMap<String, Map<String, Map<String, String>>>();
 
     @Inject
@@ -45,109 +38,36 @@ public class ReportData {
                       Applications applications,
                       Properties properties,
                       WorkingCopy workingCopy,
-                      @Named("devops.env") String devopsEnvironmentName,
-                      @Named("devops.dict") String devopsDictionaryName) {
+                      TranscriptParameters parameters) {
 
         this.environments = environments;
         this.applications = applications;
         this.properties = properties;
         this.workingCopy = workingCopy;
-        this.devopsEnvironmentName = devopsEnvironmentName;
-        this.devopsDictionaryName = devopsDictionaryName;
+        this.parameters = parameters;
+    }
+
+    public TranscriptParameters getParameters() {
+
+        return parameters;
     }
 
     public StringMap getDictionary() throws ConfigurationException {
 
         if (dictionary == null) {
-            dictionary = workingCopy.getProperties(devopsEnvironmentName, devopsDictionaryName);
+            dictionary = workingCopy.getPropertyTree(parameters.getDictionaryEnvironment(),
+                    parameters.getDictionaryApplication());
         }
         return dictionary;
-    }
-
-    public String getReportId() {
-
-        return reportId;
-    }
-
-    public void setReportId(String reportId) {
-
-        this.reportId = reportId;
-    }
-
-    public String[] getRequiredEnvironments() {
-
-        return requiredEnvironments;
-    }
-
-    public void setRequiredEnvironments(String[] requiredEnvironments) {
-
-        this.requiredEnvironments = requiredEnvironments;
-    }
-
-    public String[] getRequiredApplications() {
-
-        return requiredApplications;
-    }
-
-    public void setRequiredApplications(String[] requiredApplications) {
-
-        this.requiredApplications = requiredApplications;
-    }
-
-    public String getEnvironment() {
-
-        String environment = null;
-        if (requiredEnvironments != null && requiredEnvironments.length == 1) {
-            environment = requiredEnvironments[0];
-        }
-        return environment;
-    }
-
-    public void setEnvironment(String environment) {
-
-        requiredEnvironments = new String[]{environment};
-    }
-
-    public String getApplication() {
-
-        String application = null;
-        if (requiredApplications != null && requiredApplications.length == 1) {
-            application = requiredApplications[0];
-        }
-        return application;
-    }
-
-    public void setApplication(String application) {
-
-        requiredApplications = new String[]{application};
-    }
-
-    public String[] getRequiredKeys() {
-
-        return requiredKeys;
-    }
-
-    public void setRequiredKeys(String[] requiredKeys) {
-
-        this.requiredKeys = requiredKeys;
-    }
-
-    public void setIncludeUndefinedEnvironments(boolean includeUndefinedEnvironments) {
-
-        this.includeUndefinedEnvironments = includeUndefinedEnvironments;
-    }
-
-    public void setIncludeVersionControlProperties(boolean includeVersionControlProperties) {
-
-        this.includeVersionControlProperties = includeVersionControlProperties;
     }
 
     public Set<String> getReportableEnvironments() throws ConfigurationException {
 
         if (reportableEnvironments == null) {
             reportableEnvironments =
-                    environments.getEnvironmentNames(requiredEnvironments, getApplication(),
-                            includeUndefinedEnvironments);
+                    environments.getEnvironmentNames(parameters.getEnvironments(),
+                            parameters.getApplication(),
+                            parameters.isIncludeUndefinedEnvironments());
         }
         return reportableEnvironments;
     }
@@ -156,7 +76,8 @@ public class ReportData {
 
         if (reportableApplications == null) {
             reportableApplications =
-                    applications.getApplicationNames(getReportableEnvironments(), requiredApplications);
+                    applications.getApplicationNames(getReportableEnvironments(),
+                            parameters.getApplications());
         }
         return reportableApplications;
     }
@@ -188,7 +109,7 @@ public class ReportData {
         Map<String, String> propertyCache = environmentCache.get(application);
         if (propertyCache == null) {
             try {
-                propertyCache = properties.getAllProperties(environment, application, includeVersionControlProperties);
+                propertyCache = properties.getAllProperties(environment, application);
             } catch (Throwable throwable) {
             }
             if (propertyCache == null) {
@@ -197,15 +118,5 @@ public class ReportData {
             environmentCache.put(application, propertyCache);
         }
         return propertyCache;
-    }
-
-    public PropertyValue getProperty(String environment, String application, String key) {
-
-        String value = null;
-        Map<String, String> properties = getProperties(environment, application);
-        if (properties != null && properties.containsKey(key)) {
-            value = properties.get(key);
-        }
-        return new PropertyValue(value);
     }
 }

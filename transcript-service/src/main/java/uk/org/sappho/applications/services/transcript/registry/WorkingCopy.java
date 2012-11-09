@@ -11,7 +11,6 @@ import com.google.gson.internal.StringMap;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import org.codehaus.plexus.util.FileUtils;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
 
@@ -19,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -26,39 +26,28 @@ import java.util.TreeMap;
 @Singleton
 public class WorkingCopy {
 
-    private String workingCopyPath;
-    private String workingCopyId;
-    private boolean useCache;
-    private boolean readOnly;
-    private VersionControlSystem versionControlSystem;
-    private WorkingCopyLocking workingCopyLocking;
+    private final TranscriptParameters transcriptParameters;
+    private final VersionControlSystem versionControlSystem;
+    private final static Map<String, Object> LOCKS = new HashMap<String, Object>();
 
     @Inject
-    public WorkingCopy(@Named("working.copy.path") String workingCopyPath,
-                       @Named("working.copy.id") String workingCopyId,
-                       @Named("use.cache") String useCache,
-                       @Named("read.only") String readOnly,
-                       VersionControlSystem versionControlSystem,
-                       WorkingCopyLocking workingCopyLocking) throws ConfigurationException {
+    public WorkingCopy(TranscriptParameters transcriptParameters,
+                       VersionControlSystem versionControlSystem) {
 
-        this.workingCopyPath = workingCopyPath;
-        this.workingCopyId = workingCopyId;
-        this.useCache = useCache.equals("true");
-        this.readOnly = readOnly.equals("true");
+        this.transcriptParameters = transcriptParameters;
         this.versionControlSystem = versionControlSystem;
-        this.workingCopyLocking = workingCopyLocking;
     }
 
     public File getUpToDatePath(String path) throws ConfigurationException {
 
-        File workingCopy = new File(workingCopyPath, workingCopyId);
+        File workingCopy = new File(transcriptParameters.getWorkingCopyPath(), transcriptParameters.getWorkingCopyId());
         synchronized (getLock()) {
             if (workingCopy.exists()) {
                 if (!workingCopy.isDirectory()) {
-                    throw new ConfigurationException("Requested working copy " + workingCopyId +
-                            " is not a directory");
+                    throw new ConfigurationException("Requested working copy " +
+                            transcriptParameters.getWorkingCopyId() + " is not a directory");
                 }
-                if (!useCache) {
+                if (!transcriptParameters.isUseCache()) {
                     versionControlSystem.update(path);
                 }
             } else {
@@ -68,67 +57,47 @@ public class WorkingCopy {
         return new File(workingCopy, path);
     }
 
-    public SortedMap<String, String> getProperties(String environment, String application,
-                                                   boolean includeVersionControlProperties)
+    public SortedMap<String, String> getStringProperties(String environment, String application)
             throws ConfigurationException {
 
-        try {
-            SortedMap<String, String> properties = new TreeMap<String, String>();
-            synchronized (getLock()) {
-                File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-                if (jsonFile.exists()) {
-                    FileReader fileReader = new FileReader(jsonFile);
-                    try {
-                        properties = new Gson().fromJson(fileReader, TreeMap.class);
-                    } finally {
-                        try {
-                            fileReader.close();
-                        } catch (Throwable throwable) {
-                        }
-                    }
-                    if (properties == null) {
-                        properties = new TreeMap<String, String>();
-                    }
-                    if (includeVersionControlProperties) {
-                        Map<String, String> versionControlProperties =
-                                versionControlSystem.getProperties(getJsonFilename(environment, application));
-                        for (String key : versionControlProperties.keySet()) {
-                            properties.put(key, versionControlProperties.get(key));
-                        }
-                    }
-                }
-            }
-            return properties;
-        } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
-        }
+        return (SortedMap<String, String>) getProperties(environment, application, new TreeMap<String, String>());
     }
 
-    public StringMap getProperties(String environment, String application) throws ConfigurationException {
+    public StringMap getPropertyTree(String environment, String application) throws ConfigurationException {
 
+        return (StringMap) getProperties(environment, application, new StringMap());
+    }
+
+    private Map getProperties(String environment, String application, Map emptyProperties)
+            throws ConfigurationException {
+
+        Map properties = emptyProperties;
         try {
-            StringMap properties = new StringMap();
             synchronized (getLock()) {
                 File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
                 if (jsonFile.exists()) {
                     FileReader fileReader = new FileReader(jsonFile);
                     try {
-                        properties = new Gson().fromJson(fileReader, StringMap.class);
+                        properties = new Gson().fromJson(fileReader, emptyProperties.getClass());
                     } finally {
                         try {
                             fileReader.close();
                         } catch (Throwable throwable) {
                         }
                     }
-                    if (properties == null) {
-                        properties = new StringMap();
+                }
+                if (transcriptParameters.isIncludeVersionControlProperties()) {
+                    Map<String, String> versionControlProperties =
+                            versionControlSystem.getProperties(getJsonFilename(environment, application));
+                    for (String key : versionControlProperties.keySet()) {
+                        properties.put(key, versionControlProperties.get(key));
                     }
                 }
             }
-            return properties;
         } catch (Throwable throwable) {
             throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
         }
+        return properties;
     }
 
     public void putProperties(String environment, String application, SortedMap<String, String> properties)
@@ -137,7 +106,8 @@ public class WorkingCopy {
         checkWritable();
         synchronized (getLock()) {
             File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
-            File directory = new File(new File(workingCopyPath, workingCopyId), environment);
+            File directory = new File(new File(transcriptParameters.getWorkingCopyPath(),
+                    transcriptParameters.getWorkingCopyId()), environment);
             boolean isNewDirectory = !directory.exists();
             boolean isNewFile = !jsonFile.exists();
             try {
@@ -191,8 +161,9 @@ public class WorkingCopy {
 
     private void checkWritable() throws ConfigurationException {
 
-        if (readOnly) {
-            throw new ConfigurationException("Working copy " + workingCopyId + " is read only");
+        if (transcriptParameters.isReadOnly()) {
+            throw new ConfigurationException("Working copy " + transcriptParameters.getWorkingCopyId() +
+                    " is read only");
         }
     }
 
@@ -208,6 +179,13 @@ public class WorkingCopy {
 
     private Object getLock() {
 
-        return workingCopyLocking.getLock(workingCopyId);
+        synchronized (LOCKS) {
+            Object lock = LOCKS.get(transcriptParameters.getWorkingCopyId());
+            if (lock == null) {
+                lock = new Object();
+                LOCKS.put(transcriptParameters.getWorkingCopyId(), lock);
+            }
+            return lock;
+        }
     }
 }
