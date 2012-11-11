@@ -1,26 +1,25 @@
-${setIncludeUndefinedEnvironments(true)}
+<#include "macros.ftl">
+${parameters.setIncludeUndefinedEnvironments(true)}
 <#escape x as x?html>
-<div <#if reportId??>id="${reportId}" </#if>class="pivot-table-wrap table-wrap">
-    <table class="pivot-table confluenceTable">
+<div <#if reportId??>id="${reportId}" </#if>class="pivot-table table-wrap">
+    <table class="confluenceTable">
         <thead>
         <tr>
-            <th class="key-names confluenceTh"><#list requiredKeys as key>
-                <div class="key-name">${key}</div></#list>
-            </th>
+            <th class="key-names confluenceTh"><#list parameters.keys as key>
+                <div class="key-name">${key}</div></#list></th>
             <#list reportableEnvironments as environment>
-                <th class="environment-name confluenceTh">${dictionary.environments[environment].name!environment}</th>
+                <th class="environment-name confluenceTh"><@label type="environments" id=environment /></th>
             </#list>
         </tr>
         </thead>
         <tbody>
             <#list reportableApplications as application>
             <tr>
-                <th class="application-name confluenceTh">${dictionary.applications[application].name!application}</th>
+                <th class="application-name confluenceTh"><@label type="applications" id=application /></th>
                 <#list reportableEnvironments as environment>
                     <td class="property-value confluenceTd">
-                        <#list requiredKeys as key>
-                            <#assign property = getProperty(environment, application, key)>
-                            <div class="<#if property.value??><#if property.value?length != 0>defined<#else>blank</#if><#else>undefined</#if>-property-value confluenceTd">${property.value!""}</div>
+                        <#list parameters.keys as key>
+                            <div><@property class="property-value" environment=environment application=application key=key /></div>
                         </#list>
                     </td>
                 </#list>

@@ -39,7 +39,7 @@ public class HtmlPropertyRestService {
         RestServiceContext<Properties> context = restServiceContextResolver.getContext(Properties.class);
         String value = null;
         try {
-            value = context.getService().get(environment, application, key, true);
+            value = context.getService().get(environment, application, key);
         } catch (Throwable throwable) {
         }
         return value != null ? value : (defaultValue != null ? defaultValue : "");

@@ -6,20 +6,29 @@
 
 package uk.org.sappho.applications.restful.transcript.jersey;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import freemarker.cache.TemplateLoader;
+import freemarker.cache.WebappTemplateLoader;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
-import uk.org.sappho.applications.services.transcript.registry.TranscriptServiceModule;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptModule;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptParameters;
+import uk.org.sappho.applications.services.transcript.registry.vcs.product.SubversionModule;
+import uk.org.sappho.applications.services.transcript.registry.vcs.product.SubversionParameters;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class RestServiceContext<T> {
 
-    private UriInfo uriInfo;
-    private ServletContext servletContext;
-    private Class<T> type;
+    private final UriInfo uriInfo;
+    private final ServletContext servletContext;
+    private final Class<T> type;
 
     public RestServiceContext(UriInfo uriInfo, ServletContext servletContext, Class<T> type) {
 
@@ -30,18 +39,87 @@ public class RestServiceContext<T> {
 
     public T getService() throws ConfigurationException {
 
-        TranscriptServiceModule transcriptServiceModule = new TranscriptServiceModule();
-        Enumeration keys = servletContext.getInitParameterNames();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement().toString();
-            transcriptServiceModule.setProperty(key, servletContext.getInitParameter(key));
+        Map<String, String> parameters = new TreeMap<String, String>();
+        if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
+            for (String key : System.getProperties().stringPropertyNames()) {
+                parameters.put(key, System.getProperty(key));
+            }
+        }
+        Enumeration parameterNames = servletContext.getInitParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String key = parameterNames.nextElement().toString();
+            parameters.put(key, servletContext.getInitParameter(key));
         }
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
         for (String key : queryParameters.keySet()) {
             if (!key.equals("working.copy.path")) {
-                transcriptServiceModule.setProperty(key, queryParameters.get(key));
+                List<String> values = queryParameters.get(key);
+                String value = null;
+                if (values != null && values.size() > 0) {
+                    value = values.get(values.size() - 1);
+                }
+                parameters.put(key, value);
             }
         }
-        return Guice.createInjector(transcriptServiceModule.getConfiguredModules()).getInstance(type);
+        String readOnly = parameters.get("read.only");
+        String useCache = parameters.get("use.cache");
+        String includeVersionControlProperties = parameters.get("include.vcs.properties");
+        String environments = parameters.get("environments");
+        String[] requiredEnvironments = new String[0];
+        if (environments != null && environments.length() != 0) {
+            requiredEnvironments = environments.split(",");
+        }
+        String applications = parameters.get("applications");
+        String[] requiredApplications = new String[0];
+        if (applications != null && applications.length() != 0) {
+            requiredApplications = applications.split(",");
+        }
+        String keys = parameters.get("keys");
+        String[] requiredKeys = new String[0];
+        if (keys != null && keys.length() != 0) {
+            requiredKeys = keys.split(",");
+        }
+        String includeUndefinedEnvironments = parameters.get("include.undefined.environments");
+        TranscriptParameters transcriptParameters = new TranscriptParameters(
+                parameters.get("working.copy.path"),
+                parameters.get("working.copy.id"),
+                readOnly != null && readOnly.equalsIgnoreCase("true"),
+                useCache != null && useCache.equalsIgnoreCase("true"),
+                includeVersionControlProperties != null && includeVersionControlProperties.equalsIgnoreCase("true"),
+                parameters.get("dictionary.environment"),
+                parameters.get("dictionary.application"),
+                parameters.get("templates.environment"),
+                parameters.get("templates.application"),
+                parameters.get("report.id"),
+                requiredEnvironments,
+                requiredApplications,
+                requiredKeys,
+                includeUndefinedEnvironments != null && includeUndefinedEnvironments.equalsIgnoreCase("true"));
+        TranscriptModule transcriptModule = new TranscriptModule(transcriptParameters);
+        AbstractModule vcsModule;
+        String vcs = parameters.get("vcs");
+        if (vcs != null && vcs.length() != 0) {
+            if (vcs.equals("svn")) {
+                String trustServerCertificate = parameters.get("trust.server.certificate");
+                SubversionParameters subversionParameters = new SubversionParameters(
+                        parameters.get("url"),
+                        parameters.get("username"),
+                        parameters.get("password"),
+                        parameters.get("commit.message"),
+                        parameters.get("executable"),
+                        trustServerCertificate != null && trustServerCertificate.equalsIgnoreCase("true"));
+                vcsModule = new SubversionModule(subversionParameters);
+            } else {
+                throw new ConfigurationException("Specified VCS " + vcs + " is not supported");
+            }
+        } else {
+            throw new ConfigurationException("No VCS has been specified");
+        }
+        return Guice.createInjector(transcriptModule, vcsModule).getInstance(type);
+    }
+
+    public TemplateLoader getTemplateloader() {
+
+        return new WebappTemplateLoader(servletContext, "templates");
     }
 }

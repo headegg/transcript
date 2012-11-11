@@ -67,7 +67,7 @@ public class Environments {
             environments = new TreeMap<String, String>();
             for (String environment : requiredEnvironments) {
                 if (includeUndefinedEnvironments ||
-                        !properties.getAllProperties(environment, applicationName, false).isEmpty()) {
+                        !properties.getAllProperties(environment, applicationName).isEmpty()) {
                     environments.put(environment, environment);
                 }
             }

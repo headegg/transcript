@@ -1,37 +1,27 @@
-${setIncludeUndefinedEnvironments(true)}
-${setIncludeVersionControlProperties(false)}
+<#include "macros.ftl">
+${parameters.setIncludeUndefinedEnvironments(true)}
+${parameters.setIncludeVersionControlProperties(false)}
 <#escape x as x?html>
-<div <#if reportId??>id="${reportId}" </#if>class="pivot-table-wrap table-wrap">
-<table class="pivot-table confluenceTable">
-    <thead>
-    <tr>
-        <th class="owners confluenceTh">Owners:</th>
-        <#list reportableEnvironments as environment>
-            <th class="environment-name confluenceTh">${dictionary.environments[environment].name!environment}</th>
-        </#list>
-    </tr>
-    </thead>
-<tbody>
-    <#list reportableApplications as application>
-    <tr>
-    <th class="application-name confluenceTh">${dictionary.applications[application].name!application}</th>
-        <#list reportableEnvironments as environment>
-            <#assign name = getProperty(environment, application, "application.owner.name")>
-            <#if name.value?? && name.value?length != 0>
-                <#assign email = getProperty(environment, application, "application.owner.email")>
-                <#if email.value?? && email.value?length != 0>
-                    <#assign owner = "<a href=\"mailto:${email.value}\">${name.value}</a>">
-                <#else>
-                    <#assign owner = name.value>
-                </#if>
-            <td class="defined-property-value confluenceTd"><#noescape>${owner}</#noescape></div>
-            <#else>
-            <td class="undefined-property-value confluenceTd"/>
-            </#if>
-        </#list>
-    </tr>
-    </#list>
-</tbody>
-</table>
+<div <#if reportId??>id="${reportId}" </#if>class="owners-table table-wrap">
+    <table class="confluenceTable">
+        <thead>
+        <tr>
+            <th class="confluenceTh"></th>
+            <#list reportableEnvironments as environment>
+                <th class="environment-name confluenceTh"><@label type="environments" id=environment /></th>
+            </#list>
+        </tr>
+        </thead>
+        <tbody>
+            <#list reportableApplications as application>
+            <tr>
+                <th class="application-name confluenceTh"><@label type="applications" id=application /></th>
+                <#list reportableEnvironments as environment>
+                    <td class="owner-name confluenceTd"><@property class="owner-name" environment=environment application=application key="application.owner.name" /></td>
+                </#list>
+            </tr>
+            </#list>
+        </tbody>
+    </table>
 </div>
 </#escape>

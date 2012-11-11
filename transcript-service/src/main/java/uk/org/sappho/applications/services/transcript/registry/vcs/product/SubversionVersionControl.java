@@ -7,8 +7,8 @@
 package uk.org.sappho.applications.services.transcript.registry.vcs.product;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import uk.org.sappho.applications.services.transcript.registry.ConfigurationException;
+import uk.org.sappho.applications.services.transcript.registry.TranscriptParameters;
 import uk.org.sappho.applications.services.transcript.registry.vcs.Command;
 import uk.org.sappho.applications.services.transcript.registry.vcs.CommandExecuter;
 import uk.org.sappho.applications.services.transcript.registry.vcs.VersionControlSystem;
@@ -21,55 +21,36 @@ import java.util.regex.Pattern;
 
 public class SubversionVersionControl implements VersionControlSystem {
 
-    private final static Map<Pattern, String> patterns = new LinkedHashMap<Pattern, String>();
-    private String workingCopyPath;
-    private String workingCopyId;
-    private String url;
-    private String username;
-    private String password;
-    private String commitMessage;
-    private String executable;
-    private String certificateTrust;
-    private boolean readOnly;
+    private TranscriptParameters transcriptParameters;
+    private SubversionParameters subversionParameters;
     private CommandExecuter commandExecuter;
+
     private String lastUpdatePath = null;
 
+    private final static Map<Pattern, String> PATTERNS = new LinkedHashMap<Pattern, String>();
+
     static {
-        patterns.put(Pattern.compile(".*<commit.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<commit.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.revision");
-        patterns.put(Pattern.compile(".*<commit.*?<date>(.+)</date>.*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<commit.*?<date>(.+)</date>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.date");
-        patterns.put(Pattern.compile(".*<commit.*?<author>(.+)</author>.*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<commit.*?<author>(.+)</author>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.last.changed.author");
-        patterns.put(Pattern.compile(".*<checksum>(.+)</checksum>.*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<checksum>(.+)</checksum>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.hash");
-        patterns.put(Pattern.compile(".*<url>(.+)</url>.*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<url>(.+)</url>.*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.repository.location");
-        patterns.put(Pattern.compile(".*<entry.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
+        PATTERNS.put(Pattern.compile(".*<entry.*?revision=\"([0-9]*)\".*", Pattern.MULTILINE + Pattern.DOTALL),
                 "vcs.revision");
     }
 
     @Inject
-    public SubversionVersionControl(@Named("working.copy.path") String workingCopyPath,
-                                    @Named("working.copy.id") String workingCopyId,
-                                    @Named("url") String url,
-                                    @Named("username") String username,
-                                    @Named("password") String password,
-                                    @Named("commit.message") String commitMessage,
-                                    @Named("svn") String executable,
-                                    @Named("trust.server.certificate") String trustServerCertificate,
-                                    @Named("read.only") String readOnly,
+    public SubversionVersionControl(TranscriptParameters transcriptParameters,
+                                    SubversionParameters subversionParameters,
                                     CommandExecuter commandExecuter) {
 
-        this.workingCopyPath = workingCopyPath;
-        this.workingCopyId = workingCopyId;
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.commitMessage = commitMessage;
-        this.executable = executable.length() != 0 ? executable : "svn";
-        certificateTrust = trustServerCertificate.equalsIgnoreCase("true") ? "--trust-server-cert" : "";
-        this.readOnly = readOnly.equals("true");
+        this.transcriptParameters = transcriptParameters;
+        this.subversionParameters = subversionParameters;
         this.commandExecuter = commandExecuter;
     }
 
@@ -77,7 +58,7 @@ public class SubversionVersionControl implements VersionControlSystem {
 
         if (lastUpdatePath == null || !path.startsWith(lastUpdatePath)) {
             try {
-                if (!readOnly) {
+                if (!transcriptParameters.isReadOnly()) {
                     execute("revert", new String[]{"--quiet", path.length() == 0 ? "." : path});
                 }
                 execute("info", new String[]{path});
@@ -96,10 +77,10 @@ public class SubversionVersionControl implements VersionControlSystem {
 
         Map<String, String> properties = new LinkedHashMap<String, String>();
         String output = execute("info", new String[]{"--xml", path});
-        for (Pattern pattern : patterns.keySet()) {
+        for (Pattern pattern : PATTERNS.keySet()) {
             Matcher matcher = pattern.matcher(output);
             if (matcher.matches()) {
-                properties.put(patterns.get(pattern), matcher.group(1));
+                properties.put(PATTERNS.get(pattern), matcher.group(1));
             }
         }
         return properties;
@@ -107,51 +88,40 @@ public class SubversionVersionControl implements VersionControlSystem {
 
     public void checkout() throws ConfigurationException {
 
-        if (url.length() == 0) {
-            throw new ConfigurationException("Subversion repository checkout URL not supplied");
-        }
-        execute("checkout", new String[]{"--quiet", url, workingCopyId});
+        execute("checkout", new String[]{"--quiet", subversionParameters.getUrl(),
+                transcriptParameters.getWorkingCopyId()});
     }
 
     public void commit(String path, boolean isNew) throws ConfigurationException {
 
-        checkCommitMessage();
         if (isNew) {
             execute("add", new String[]{"--quiet", "--no-ignore", path});
         }
-        execute("commit", new String[]{"--quiet", "--message", commitMessage, path});
+        execute("commit", new String[]{"--quiet", "--message", subversionParameters.getCommitMessage(), path});
     }
 
     public void delete(String path) throws ConfigurationException {
 
-        checkCommitMessage();
         execute("delete", new String[]{"--quiet", path});
-        execute("commit", new String[]{"--quiet", "--message", commitMessage, path});
-    }
-
-    private void checkCommitMessage() throws ConfigurationException {
-
-        if (commitMessage.length() == 0) {
-            throw new ConfigurationException("Subversion commit message not supplied");
-        }
+        execute("commit", new String[]{"--quiet", "--message", subversionParameters.getCommitMessage(), path});
     }
 
     private String execute(String subversionCommand, String[] parameters)
             throws ConfigurationException {
 
         Command command = new Command();
-        command.add(executable, false);
+        command.add(subversionParameters.getExecutable(), false);
         command.add(subversionCommand, false);
         command.add("--non-interactive", false);
-        command.add(certificateTrust, false);
-        command.add("--username", username, false);
-        command.add("--password", password, true);
+        command.add(subversionParameters.isTrustServerCertificate() ? "--trust-server-cert" : "", false);
+        command.add("--username", subversionParameters.getUsername(), false);
+        command.add("--password", subversionParameters.getPassword(), true);
         for (String parameter : parameters) {
             command.add(parameter, false);
         }
-        File directory = new File(workingCopyPath);
+        File directory = new File(transcriptParameters.getWorkingCopyPath());
         if (!subversionCommand.equals("checkout")) {
-            directory = new File(directory, workingCopyId);
+            directory = new File(directory, transcriptParameters.getWorkingCopyId());
         }
         return commandExecuter.execute(command, directory);
     }
