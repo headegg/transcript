@@ -4,22 +4,37 @@
     </#compress>
 </#macro>
 
-<#macro property class environment application key>
+<#macro property class environment application key default="">
     <#compress>
         <#attempt>
             <#assign value = getProperties(environment, application)[key]>
             <#if value?length != 0>
-            <span class="defined-${class}">${value}</span>
+            <div class="defined-${class}">${value}</div>
             <#else>
-            <span class="blank-${class}"></span>
+            <div class="blank-${class}">${default}</div>
             </#if>
             <#recover>
-            <span class="undefined-${class}"></span>
+            <div class="undefined-${class}">${default}</div>
         </#attempt>
     </#compress>
 </#macro>
 
-<#macro nameAndEmail class type environment application key>
+<#macro taggedProperty class environment application key default="">
+    <#compress>
+        <#attempt>
+            <#assign value = getProperties(environment, application)[key]>
+            <#if value?length != 0>
+            <div class="${value}-${class}">${value}</div>
+            <#else>
+            <div class="blank-${class}">${default}</div>
+            </#if>
+            <#recover>
+            <div class="undefined-${class}">${default}</div>
+        </#attempt>
+    </#compress>
+</#macro>
+
+<#macro nameAndEmail class type environment application key default="">
     <#compress>
         <#attempt>
             <#assign id = getProperties(environment, application)[key]>
@@ -28,10 +43,10 @@
                 <div class="defined-${class}"><a href="mailto:${id.email}">${id.name}</a></div>
                 </#list>
                 <#recover>
-                <span class="partly-defined-${class}">${id}</span>
+                <div class="partly-defined-${class}">${id}</div>
             </#attempt>
             <#recover>
-            <span class="undefined-${class}"></span>
+            <div class="undefined-${class}">${default}</div>
         </#attempt>
     </#compress>
 </#macro>
