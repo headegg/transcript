@@ -18,3 +18,20 @@
         </#attempt>
     </#compress>
 </#macro>
+
+<#macro nameAndEmail class type environment application key>
+    <#compress>
+        <#attempt>
+            <#assign id = getProperties(environment, application)[key]>
+            <#attempt>
+                <#list dictionary[type][id].people as id>
+                <div class="defined-${class}"><a href="mailto:${id.email}">${id.name}</a></div>
+                </#list>
+                <#recover>
+                <span class="partly-defined-${class}">${id}</span>
+            </#attempt>
+            <#recover>
+            <span class="undefined-${class}"></span>
+        </#attempt>
+    </#compress>
+</#macro>
