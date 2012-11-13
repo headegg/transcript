@@ -18,8 +18,7 @@
 
     <scm>
         <connection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git</connection>
-        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git
-        </developerConnection>
+        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git</developerConnection>
         <url>https://git.sappho.org.uk/projects/SCM/repos/transcript/browse</url>
         <tag>HEAD</tag>
     </scm>
@@ -91,9 +90,9 @@
         <module>transcript-service</module>
         <module>transcript-registry-war</module>
         <module>transcript-import</module>
-        <module>transcript-editor-war</module>
         <module>transcript-reporter-war</module>
         <module>transcript-jersey</module>
+        <module>transcript-restful-war</module>
     </modules>
 
 </project>

@@ -11,10 +11,7 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>
-                uk.org.sappho.applications.restful.transcript.reporter,
-                uk.org.sappho.applications.restful.transcript.jersey
-            </param-value>
+            <param-value>uk.org.sappho.applications.transcript.restful</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
