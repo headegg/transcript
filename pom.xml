@@ -92,7 +92,6 @@
         <module>transcript-import</module>
         <module>transcript-reporter-war</module>
         <module>transcript-jersey</module>
-        <module>transcript-restful-war</module>
     </modules>
 
 </project>
