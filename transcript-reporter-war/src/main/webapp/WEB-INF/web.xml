@@ -4,7 +4,7 @@
 
 <web-app>
 
-    <display-name>Application Configuration Reporter</display-name>
+    <display-name>Transcript Reporter</display-name>
 
     <servlet>
         <servlet-name>transcript-reporter</servlet-name>
