@@ -24,6 +24,7 @@ public class TranscriptParameters {
     private String[] applications;
     private String[] keys;
     private boolean includeUndefinedEnvironments;
+    private String defaultValue;
 
     public TranscriptParameters(String workingCopyPath,
                                 String workingCopyId,
@@ -38,7 +39,8 @@ public class TranscriptParameters {
                                 String[] environments,
                                 String[] applications,
                                 String[] keys,
-                                boolean includeUndefinedEnvironments) {
+                                boolean includeUndefinedEnvironments,
+                                String defaultValue) {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
@@ -54,6 +56,7 @@ public class TranscriptParameters {
         this.applications = applications;
         this.keys = keys;
         this.includeUndefinedEnvironments = includeUndefinedEnvironments;
+        this.defaultValue = defaultValue;
     }
 
     public String getWorkingCopyPath() throws TranscriptException {
@@ -229,5 +232,15 @@ public class TranscriptParameters {
     public void setIncludeUndefinedEnvironments(boolean includeUndefinedEnvironments) {
 
         this.includeUndefinedEnvironments = includeUndefinedEnvironments;
+    }
+
+    public String getDefaultValue() {
+
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+
+        this.defaultValue = defaultValue;
     }
 }

@@ -101,7 +101,7 @@ public class WorkingCopy {
         return properties;
     }
 
-    public void putProperties(String environment, String application, SortedMap<String, String> properties)
+    public void putProperties(String environment, String application, Object properties)
             throws TranscriptException {
 
         checkWritable();

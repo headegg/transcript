@@ -34,14 +34,14 @@ public class PropertyRestService {
     private ContextResolver<RestServiceContext> restServiceContextResolver;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN, MediaType.TEXT_HTML})
     public String getProperty() throws TranscriptException {
 
         return getService().get(environment, application, key);
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     public void setProperty(final String value) throws TranscriptException {
 
         getService().put(environment, application, key, value);

@@ -94,7 +94,8 @@ public class RestServiceContext<T> {
                 requiredEnvironments,
                 requiredApplications,
                 requiredKeys,
-                includeUndefinedEnvironments != null && includeUndefinedEnvironments.equalsIgnoreCase("true"));
+                includeUndefinedEnvironments != null && includeUndefinedEnvironments.equalsIgnoreCase("true"),
+                parameters.get("default"));
         TranscriptModule transcriptModule = new TranscriptModule(transcriptParameters);
         AbstractModule vcsModule;
         String vcs = parameters.get("vcs");

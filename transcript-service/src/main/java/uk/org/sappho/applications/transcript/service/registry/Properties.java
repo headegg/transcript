@@ -13,11 +13,13 @@ import java.util.SortedMap;
 
 public class Properties {
 
+    private TranscriptParameters transcriptParameters;
     private WorkingCopy workingCopy;
 
     @Inject
-    public Properties(WorkingCopy workingCopy) throws TranscriptException {
+    public Properties(TranscriptParameters transcriptParameters, WorkingCopy workingCopy) throws TranscriptException {
 
+        this.transcriptParameters = transcriptParameters;
         this.workingCopy = workingCopy;
     }
 
@@ -31,12 +33,15 @@ public class Properties {
 
         String value = getAllProperties(environment, application).get(key);
         if (value == null) {
-            throw new TranscriptException("There is no value for " + key);
+            value = transcriptParameters.getDefaultValue();
+            if (value == null) {
+                throw new TranscriptException("There is no value for " + key);
+            }
         }
         return value;
     }
 
-    public void put(String environment, String application, SortedMap<String, String> properties)
+    public void put(String environment, String application, Object properties)
             throws TranscriptException {
 
         workingCopy.putProperties(environment, application, properties);
