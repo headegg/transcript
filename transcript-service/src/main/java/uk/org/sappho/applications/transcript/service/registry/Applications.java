@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -28,19 +29,19 @@ public class Applications {
         this.workingCopy = workingCopy;
     }
 
-    public String[] getApplicationNames(String environment) throws ConfigurationException {
+    public String[] getApplicationNames(String environment) throws TranscriptException {
 
         return getApplicationNames(environment, ALL);
     }
 
     public String[] getApplicationNames(String environment, String applicationNamePrefix)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         return getApplicationNames(environment,
                 Pattern.compile("^" + applicationNamePrefix.replace(".", "\\.") + ".*\\.json$"));
     }
 
-    private String[] getApplicationNames(String environment, final Pattern pattern) throws ConfigurationException {
+    private String[] getApplicationNames(String environment, final Pattern pattern) throws TranscriptException {
 
         String[] applications = workingCopy.getUpToDatePath(environment).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -60,7 +61,7 @@ public class Applications {
     }
 
     public Set<String> getApplicationNames(Set<String> requiredEnvironments, String[] requiredApplications)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         Map<String, String> applications = new TreeMap<String, String>();
         if (requiredApplications == null || requiredApplications.length == 0) {

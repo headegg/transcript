@@ -12,6 +12,7 @@ import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.codehaus.plexus.util.FileUtils;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
 
 import java.io.File;
@@ -38,13 +39,13 @@ public class WorkingCopy {
         this.versionControlSystem = versionControlSystem;
     }
 
-    public File getUpToDatePath(String path) throws ConfigurationException {
+    public File getUpToDatePath(String path) throws TranscriptException {
 
         File workingCopy = new File(transcriptParameters.getWorkingCopyPath(), transcriptParameters.getWorkingCopyId());
         synchronized (getLock()) {
             if (workingCopy.exists()) {
                 if (!workingCopy.isDirectory()) {
-                    throw new ConfigurationException("Requested working copy " +
+                    throw new TranscriptException("Requested working copy " +
                             transcriptParameters.getWorkingCopyId() + " is not a directory");
                 }
                 if (!transcriptParameters.isUseCache()) {
@@ -58,18 +59,18 @@ public class WorkingCopy {
     }
 
     public SortedMap<String, String> getStringProperties(String environment, String application)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         return (SortedMap<String, String>) getProperties(environment, application, new TreeMap<String, String>());
     }
 
-    public StringMap getPropertyTree(String environment, String application) throws ConfigurationException {
+    public StringMap getPropertyTree(String environment, String application) throws TranscriptException {
 
         return (StringMap) getProperties(environment, application, new StringMap());
     }
 
     private Map getProperties(String environment, String application, Map emptyProperties)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         Map properties = emptyProperties;
         try {
@@ -95,13 +96,13 @@ public class WorkingCopy {
                 }
             }
         } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to read " + getJsonFilename(environment, application), throwable);
+            throw new TranscriptException("Unable to read " + getJsonFilename(environment, application), throwable);
         }
         return properties;
     }
 
     public void putProperties(String environment, String application, SortedMap<String, String> properties)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         checkWritable();
         synchronized (getLock()) {
@@ -144,12 +145,12 @@ public class WorkingCopy {
                     } catch (Throwable deleteException) {
                     }
                 }
-                throw new ConfigurationException("Unable to write " + getJsonFilename(environment, application), throwable);
+                throw new TranscriptException("Unable to write " + getJsonFilename(environment, application), throwable);
             }
         }
     }
 
-    public void deleteProperties(String environment, String application) throws ConfigurationException {
+    public void deleteProperties(String environment, String application) throws TranscriptException {
 
         checkWritable();
         String filename = getJsonFilename(environment, application);
@@ -159,10 +160,10 @@ public class WorkingCopy {
         }
     }
 
-    private void checkWritable() throws ConfigurationException {
+    private void checkWritable() throws TranscriptException {
 
         if (transcriptParameters.isReadOnly()) {
-            throw new ConfigurationException("Working copy " + transcriptParameters.getWorkingCopyId() +
+            throw new TranscriptException("Working copy " + transcriptParameters.getWorkingCopyId() +
                     " is read only");
         }
     }

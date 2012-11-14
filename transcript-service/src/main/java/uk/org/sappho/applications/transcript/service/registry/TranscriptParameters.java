@@ -6,6 +6,8 @@
 
 package uk.org.sappho.applications.transcript.service.registry;
 
+import uk.org.sappho.applications.transcript.service.TranscriptException;
+
 public class TranscriptParameters {
 
     private String workingCopyPath;
@@ -54,10 +56,10 @@ public class TranscriptParameters {
         this.includeUndefinedEnvironments = includeUndefinedEnvironments;
     }
 
-    public String getWorkingCopyPath() throws ConfigurationException {
+    public String getWorkingCopyPath() throws TranscriptException {
 
         if (workingCopyPath == null || workingCopyPath.length() == 0) {
-            throw new ConfigurationException("Working copy path not specified");
+            throw new TranscriptException("Working copy path not specified");
         }
         return workingCopyPath;
     }

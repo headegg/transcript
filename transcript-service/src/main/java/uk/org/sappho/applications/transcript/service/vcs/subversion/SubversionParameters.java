@@ -6,7 +6,7 @@
 
 package uk.org.sappho.applications.transcript.service.vcs.subversion;
 
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystemParameters;
 
 public class SubversionParameters implements VersionControlSystemParameters {
@@ -33,10 +33,10 @@ public class SubversionParameters implements VersionControlSystemParameters {
         this.trustServerCertificate = trustServerCertificate;
     }
 
-    public String getUrl() throws ConfigurationException {
+    public String getUrl() throws TranscriptException {
 
         if (url == null || url.length() == 0) {
-            throw new ConfigurationException("Subversion repository checkout URL not supplied");
+            throw new TranscriptException("Subversion repository checkout URL not supplied");
         }
         return url;
     }

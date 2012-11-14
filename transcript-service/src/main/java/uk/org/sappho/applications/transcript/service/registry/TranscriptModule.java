@@ -7,12 +7,13 @@
 package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.inject.AbstractModule;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 public class TranscriptModule extends AbstractModule {
 
     private final TranscriptParameters transcriptParameters;
 
-    public TranscriptModule(TranscriptParameters transcriptParameters) throws ConfigurationException {
+    public TranscriptModule(TranscriptParameters transcriptParameters) throws TranscriptException {
 
         this.transcriptParameters = transcriptParameters;
     }

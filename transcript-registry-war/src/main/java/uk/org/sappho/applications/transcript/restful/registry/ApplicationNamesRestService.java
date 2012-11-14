@@ -7,8 +7,8 @@
 package uk.org.sappho.applications.transcript.restful.registry;
 
 import uk.org.sappho.applications.transcript.restful.jersey.RestServiceContext;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,7 +28,7 @@ public class ApplicationNamesRestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String[] getApplications() throws ConfigurationException {
+    public String[] getApplications() throws TranscriptException {
 
         RestServiceContext<Applications> context = restServiceContextResolver.getContext(Applications.class);
         return context.getService().getApplicationNames(environment);

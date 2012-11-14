@@ -4,16 +4,16 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.registry;
+package uk.org.sappho.applications.transcript.service;
 
-public class ConfigurationException extends Exception {
+public class TranscriptException extends Exception {
 
-    public ConfigurationException(String message) {
+    public TranscriptException(String message) {
 
         super(message);
     }
 
-    public ConfigurationException(String message, Throwable throwable) {
+    public TranscriptException(String message, Throwable throwable) {
 
         super(message + "\n" + throwable.getMessage(), throwable);
     }

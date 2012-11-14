@@ -10,7 +10,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import freemarker.cache.TemplateLoader;
 import freemarker.cache.WebappTemplateLoader;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptModule;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionModule;
@@ -37,7 +37,7 @@ public class RestServiceContext<T> {
         this.type = type;
     }
 
-    public T getService() throws ConfigurationException {
+    public T getService() throws TranscriptException {
 
         Map<String, String> parameters = new TreeMap<String, String>();
         if (System.getProperty("use.system.properties", "false").equalsIgnoreCase("true")) {
@@ -110,10 +110,10 @@ public class RestServiceContext<T> {
                         trustServerCertificate != null && trustServerCertificate.equalsIgnoreCase("true"));
                 vcsModule = new SubversionModule(subversionParameters);
             } else {
-                throw new ConfigurationException("Specified VCS " + vcs + " is not supported");
+                throw new TranscriptException("Specified VCS " + vcs + " is not supported");
             }
         } else {
-            throw new ConfigurationException("No VCS has been specified");
+            throw new TranscriptException("No VCS has been specified");
         }
         return Guice.createInjector(transcriptModule, vcsModule).getInstance(type);
     }

@@ -11,7 +11,7 @@ import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.WorkingCopy;
 
 import java.io.StringWriter;
@@ -34,7 +34,7 @@ public class TextTemplatedReport {
 
     public String generate(String templateName,
                            TemplateLoader sourceTemplateLoader)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         try {
             workingCopy.getUpToDatePath("");
@@ -48,7 +48,7 @@ public class TextTemplatedReport {
             stringWriter.close();
             return stringWriter.toString();
         } catch (Throwable throwable) {
-            throw new ConfigurationException("Unable to generate HTML report", throwable);
+            throw new TranscriptException("Unable to generate HTML report", throwable);
         }
     }
 }

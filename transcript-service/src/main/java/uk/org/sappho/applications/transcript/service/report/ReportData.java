@@ -8,8 +8,8 @@ package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.gson.internal.StringMap;
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
@@ -52,7 +52,7 @@ public class ReportData {
         return parameters;
     }
 
-    public StringMap getDictionary() throws ConfigurationException {
+    public StringMap getDictionary() throws TranscriptException {
 
         if (dictionary == null) {
             dictionary = workingCopy.getPropertyTree(parameters.getDictionaryEnvironment(),
@@ -61,7 +61,7 @@ public class ReportData {
         return dictionary;
     }
 
-    public Set<String> getReportableEnvironments() throws ConfigurationException {
+    public Set<String> getReportableEnvironments() throws TranscriptException {
 
         if (reportableEnvironments == null) {
             reportableEnvironments =
@@ -72,7 +72,7 @@ public class ReportData {
         return reportableEnvironments;
     }
 
-    public Set<String> getReportableApplications() throws ConfigurationException {
+    public Set<String> getReportableApplications() throws TranscriptException {
 
         if (reportableApplications == null) {
             reportableApplications =
@@ -82,7 +82,7 @@ public class ReportData {
         return reportableApplications;
     }
 
-    public Set<String> getReportableKeys() throws ConfigurationException {
+    public Set<String> getReportableKeys() throws TranscriptException {
 
         if (reportableKeys == null) {
             Map<String, String> keys = new TreeMap<String, String>();

@@ -7,7 +7,7 @@
 package uk.org.sappho.applications.transcript.restful.report;
 
 import uk.org.sappho.applications.transcript.restful.jersey.RestServiceContext;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.report.TextTemplatedReport;
 
 import javax.ws.rs.GET;
@@ -28,7 +28,7 @@ public class TextReportRestService {
 
     @GET
     @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
-    public String getProperty() throws ConfigurationException {
+    public String getProperty() throws TranscriptException {
 
         RestServiceContext<TextTemplatedReport> context =
                 restServiceContextResolver.getContext(TextTemplatedReport.class);

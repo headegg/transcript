@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.util.SortedMap;
 
@@ -15,34 +16,34 @@ public class Properties {
     private WorkingCopy workingCopy;
 
     @Inject
-    public Properties(WorkingCopy workingCopy) throws ConfigurationException {
+    public Properties(WorkingCopy workingCopy) throws TranscriptException {
 
         this.workingCopy = workingCopy;
     }
 
     public SortedMap<String, String> getAllProperties(String environment, String application)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         return workingCopy.getStringProperties(environment, application);
     }
 
-    public String get(String environment, String application, String key) throws ConfigurationException {
+    public String get(String environment, String application, String key) throws TranscriptException {
 
         String value = getAllProperties(environment, application).get(key);
         if (value == null) {
-            throw new ConfigurationException("There is no value for " + key);
+            throw new TranscriptException("There is no value for " + key);
         }
         return value;
     }
 
     public void put(String environment, String application, SortedMap<String, String> properties)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         workingCopy.putProperties(environment, application, properties);
     }
 
     public void put(String environment, String application, String key, String value)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         SortedMap<String, String> properties = workingCopy.getStringProperties(environment, application);
         boolean changed = false;
@@ -61,12 +62,12 @@ public class Properties {
         }
     }
 
-    public void delete(String environment, String application, String key) throws ConfigurationException {
+    public void delete(String environment, String application, String key) throws TranscriptException {
 
         put(environment, application, key, null);
     }
 
-    public void delete(String environment, String application) throws ConfigurationException {
+    public void delete(String environment, String application) throws TranscriptException {
 
         workingCopy.deleteProperties(environment, application);
     }

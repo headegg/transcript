@@ -7,7 +7,7 @@
 package uk.org.sappho.applications.transcript.restful.registry;
 
 import uk.org.sappho.applications.transcript.restful.jersey.RestServiceContext;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 
 import javax.ws.rs.GET;
@@ -34,7 +34,7 @@ public class HtmlPropertyRestService {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String getProperty() throws ConfigurationException {
+    public String getProperty() throws TranscriptException {
 
         RestServiceContext<Properties> context = restServiceContextResolver.getContext(Properties.class);
         String value = null;

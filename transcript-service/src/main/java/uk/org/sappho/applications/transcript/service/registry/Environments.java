@@ -7,6 +7,7 @@
 package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -31,17 +32,17 @@ public class Environments {
         this.properties = properties;
     }
 
-    public String[] getEnvironmentNames() throws ConfigurationException {
+    public String[] getEnvironmentNames() throws TranscriptException {
 
         return getEnvironmentNames(ALL);
     }
 
-    public String[] getEnvironmentNames(String environmentNamePrefix) throws ConfigurationException {
+    public String[] getEnvironmentNames(String environmentNamePrefix) throws TranscriptException {
 
         return getEnvironmentNames(Pattern.compile("^" + environmentNamePrefix.replace(".", "\\.") + ".*$"));
     }
 
-    private String[] getEnvironmentNames(final Pattern pattern) throws ConfigurationException {
+    private String[] getEnvironmentNames(final Pattern pattern) throws TranscriptException {
 
         String[] environments = workingCopy.getUpToDatePath("").list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -59,7 +60,7 @@ public class Environments {
 
     public Set<String> getEnvironmentNames(String[] requiredEnvironments, String applicationName,
                                            boolean includeUndefinedEnvironments)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         Map<String, String> environments = null;
         if (requiredEnvironments == null || requiredEnvironments.length == 0) {

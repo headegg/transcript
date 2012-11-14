@@ -6,7 +6,7 @@
 
 package uk.org.sappho.applications.transcript.service.vcs;
 
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.util.Map;
 
@@ -14,11 +14,11 @@ public interface VersionControlSystem {
 
     void update(String path);
 
-    Map<String, String> getProperties(String path) throws ConfigurationException;
+    Map<String, String> getProperties(String path) throws TranscriptException;
 
-    void checkout() throws ConfigurationException;
+    void checkout() throws TranscriptException;
 
-    void commit(String path, boolean isNew) throws ConfigurationException;
+    void commit(String path, boolean isNew) throws TranscriptException;
 
-    void delete(String path) throws ConfigurationException;
+    void delete(String path) throws TranscriptException;
 }

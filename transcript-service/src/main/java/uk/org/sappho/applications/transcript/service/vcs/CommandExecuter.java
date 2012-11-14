@@ -6,7 +6,7 @@
 
 package uk.org.sappho.applications.transcript.service.vcs;
 
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,7 +20,7 @@ public class CommandExecuter {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public String execute(Command command, File directory) throws ConfigurationException {
+    public String execute(Command command, File directory) throws TranscriptException {
 
         try {
             if (logger.isLoggable(Level.INFO)) {
@@ -31,14 +31,14 @@ public class CommandExecuter {
             int exitCode = process.waitFor();
             String standardOutput = processOutput(process.getInputStream());
             if (exitCode != 0) {
-                throw new ConfigurationException(processOutput(process.getErrorStream()));
+                throw new TranscriptException(processOutput(process.getErrorStream()));
             }
             return standardOutput;
         } catch (Throwable throwable) {
             if (logger.isLoggable(Level.WARNING)) {
                 logger.warning(throwable.getMessage());
             }
-            throw new ConfigurationException("Unable to execute system command: " + command.getSafeCommand(), throwable);
+            throw new TranscriptException("Unable to execute system command: " + command.getSafeCommand(), throwable);
         }
     }
 

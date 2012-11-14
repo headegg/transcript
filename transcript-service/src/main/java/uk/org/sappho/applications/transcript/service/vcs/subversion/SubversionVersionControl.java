@@ -7,7 +7,7 @@
 package uk.org.sappho.applications.transcript.service.vcs.subversion;
 
 import com.google.inject.Inject;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.vcs.Command;
 import uk.org.sappho.applications.transcript.service.vcs.CommandExecuter;
@@ -64,7 +64,7 @@ public class SubversionVersionControl implements VersionControlSystem {
                 execute("info", new String[]{path});
                 execute("update", new String[]{"--quiet", "--force", "--accept", "theirs-full", path});
                 lastUpdatePath = path;
-            } catch (ConfigurationException exception) {
+            } catch (TranscriptException exception) {
                 if (path.length() != 0) {
                     String parent = new File(path).getParent();
                     update(parent != null ? parent : "");
@@ -73,7 +73,7 @@ public class SubversionVersionControl implements VersionControlSystem {
         }
     }
 
-    public Map<String, String> getProperties(String path) throws ConfigurationException {
+    public Map<String, String> getProperties(String path) throws TranscriptException {
 
         Map<String, String> properties = new LinkedHashMap<String, String>();
         String output = execute("info", new String[]{"--xml", path});
@@ -86,13 +86,13 @@ public class SubversionVersionControl implements VersionControlSystem {
         return properties;
     }
 
-    public void checkout() throws ConfigurationException {
+    public void checkout() throws TranscriptException {
 
         execute("checkout", new String[]{"--quiet", subversionParameters.getUrl(),
                 transcriptParameters.getWorkingCopyId()});
     }
 
-    public void commit(String path, boolean isNew) throws ConfigurationException {
+    public void commit(String path, boolean isNew) throws TranscriptException {
 
         if (isNew) {
             execute("add", new String[]{"--quiet", "--no-ignore", path});
@@ -100,14 +100,14 @@ public class SubversionVersionControl implements VersionControlSystem {
         execute("commit", new String[]{"--quiet", "--message", subversionParameters.getCommitMessage(), path});
     }
 
-    public void delete(String path) throws ConfigurationException {
+    public void delete(String path) throws TranscriptException {
 
         execute("delete", new String[]{"--quiet", path});
         execute("commit", new String[]{"--quiet", "--message", subversionParameters.getCommitMessage(), path});
     }
 
     private String execute(String subversionCommand, String[] parameters)
-            throws ConfigurationException {
+            throws TranscriptException {
 
         Command command = new Command();
         command.add(subversionParameters.getExecutable(), false);

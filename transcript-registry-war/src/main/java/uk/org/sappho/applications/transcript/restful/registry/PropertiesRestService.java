@@ -7,7 +7,7 @@
 package uk.org.sappho.applications.transcript.restful.registry;
 
 import uk.org.sappho.applications.transcript.restful.jersey.RestServiceContext;
-import uk.org.sappho.applications.transcript.service.registry.ConfigurationException;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 
 import javax.ws.rs.Consumes;
@@ -35,25 +35,25 @@ public class PropertiesRestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public SortedMap<String, String> getProperties() throws ConfigurationException {
+    public SortedMap<String, String> getProperties() throws TranscriptException {
 
         return getService().getAllProperties(environment, application);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setProperties(final TreeMap<String, String> properties) throws ConfigurationException {
+    public void setProperties(final TreeMap<String, String> properties) throws TranscriptException {
 
         getService().put(environment, application, properties);
     }
 
     @DELETE
-    public void deleteProperties() throws ConfigurationException {
+    public void deleteProperties() throws TranscriptException {
 
         getService().delete(environment, application);
     }
 
-    private Properties getService() throws ConfigurationException {
+    private Properties getService() throws TranscriptException {
 
         RestServiceContext<Properties> context = restServiceContextResolver.getContext(Properties.class);
         return context.getService();
