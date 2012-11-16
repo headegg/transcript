@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  * Provide Transcript PUT property services to Maven builds.
  *
- * @goal run
+ * @goal put
  */
 public class TranscriptPutMojo extends AbstractMojo {
 
