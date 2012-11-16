@@ -3,11 +3,10 @@ package uk.org.sappho.applications.transcript.maven.plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.logging.Logger;
 
 /**
  * Provide Transcript PUT property services to Maven builds.
@@ -58,24 +57,34 @@ public class TranscriptPutMojo extends AbstractMojo {
      */
     private String commitMessage;
 
-    private final Logger LOG = Logger.getLogger(TranscriptPutMojo.class.getName());
-
     public void execute() throws MojoExecutionException {
 
+        int responseCode = 0;
         try {
-            LOG.info("Updating:      " + environment + ":" + application + ":" + key + " to " + value);
-            LOG.info("Committing as: " + commitMessage);
+            getLog().info("Connecting to DevOps store at " + baseUrl);
+            getLog().info("Updating " + environment + ":" + application + ":" + key + " to " + value);
+            getLog().info("Committing as " + commitMessage);
             String url = baseUrl + "/" + environment + "/" + application + "/" + key +
                     "?commit.message=" + URLEncoder.encode(commitMessage, "UTF-8");
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            httpURLConnection.setRequestProperty("Content-Type", "text/plain");
+            httpURLConnection.setRequestProperty("Content-Length", "" + value.length());
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setRequestMethod("PUT");
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(httpURLConnection.getOutputStream());
-            outputStreamWriter.write(value);
-            outputStreamWriter.close();
-            LOG.info("Update completed");
+            httpURLConnection.connect();
+            OutputStream outputStream = httpURLConnection.getOutputStream();
+            outputStream.write(value.getBytes(), 0, value.length());
+            outputStream.flush();
+            outputStream.close();
+            responseCode = httpURLConnection.getResponseCode();
+            httpURLConnection.disconnect();
         } catch (Throwable throwable) {
             throw new MojoExecutionException("Unable to PUT updated data to Devops Store", throwable);
         }
+        if (responseCode != 204) {
+            throw new MojoExecutionException("Unable to PUT updated data to Devops Store - HTTP response code was " +
+                    responseCode);
+        }
+        getLog().info("Update completed");
     }
 }
