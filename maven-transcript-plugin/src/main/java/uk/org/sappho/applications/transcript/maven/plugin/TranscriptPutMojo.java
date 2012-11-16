@@ -1,12 +1,12 @@
 package uk.org.sappho.applications.transcript.maven.plugin;
 
-import com.sun.deploy.net.URLEncoder;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.logging.Logger;
 
 /**
