@@ -11,47 +11,47 @@ import java.net.URLEncoder;
 /**
  * Provide Transcript PUT property services to Maven builds.
  *
- * @goal put
+ * @goal put-string
  */
 public class TranscriptPutMojo extends AbstractMojo {
 
     /**
-     * Transctipt service base URL.
+     * Service base URL.
      *
      * @parameter expression="${baseUrl}" default-value="${transcript.baseUrl}"
      */
     private String baseUrl;
 
     /**
-     * The DevOps environment.
+     * Environment, always required.
      *
-     * @parameter expression="${environment}" default-value="${transcript.environment}"
+     * @parameter expression="${environment}"
      */
     private String environment;
 
     /**
-     * The DevOps application.
+     * Application, defaulting to artifact ID.
      *
      * @parameter expression="${application}" default-value="${project.artifactId}"
      */
     private String application;
 
     /**
-     * The DevOps property key.
+     * Property key, with default for version tracking.
      *
      * @parameter expression="${key}" default-value="application.release.version"
      */
     private String key;
 
     /**
-     * The DevOps property value.
+     * Property value, defaulting to project version.
      *
      * @parameter expression="${value}" default-value="${project.version}"
      */
     private String value;
 
     /**
-     * The DevOps commit message.
+     * Commit message.
      *
      * @parameter expression="${commitMessage}"
      */
@@ -61,7 +61,7 @@ public class TranscriptPutMojo extends AbstractMojo {
 
         int responseCode = 0;
         try {
-            getLog().info("Connecting to DevOps store at " + baseUrl);
+            getLog().info("Connecting to " + baseUrl);
             getLog().info("Updating " + environment + ":" + application + ":" + key + " to " + value);
             getLog().info("Committing as " + commitMessage);
             String url = baseUrl + "/" + environment + "/" + application + "/" + key +
@@ -79,12 +79,12 @@ public class TranscriptPutMojo extends AbstractMojo {
             responseCode = httpURLConnection.getResponseCode();
             httpURLConnection.disconnect();
         } catch (Throwable throwable) {
-            throw new MojoExecutionException("Unable to PUT updated data to Devops Store", throwable);
+            throw new MojoExecutionException("Unable to PUT updated property", throwable);
         }
         if (responseCode != 204) {
-            throw new MojoExecutionException("Unable to PUT updated data to Devops Store - HTTP response code was " +
+            throw new MojoExecutionException("Unable to PUT updated property - HTTP response code was " +
                     responseCode);
         }
-        getLog().info("Update completed");
+        getLog().info("Property update completed");
     }
 }
