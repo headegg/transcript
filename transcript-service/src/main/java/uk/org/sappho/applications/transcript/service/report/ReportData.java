@@ -72,6 +72,11 @@ public class ReportData {
         return reportableEnvironments;
     }
 
+    public void resetReportableEnvironments() {
+
+        reportableEnvironments = null;
+    }
+
     public Set<String> getReportableApplications() throws TranscriptException {
 
         if (reportableApplications == null) {
@@ -80,6 +85,11 @@ public class ReportData {
                             parameters.getApplications());
         }
         return reportableApplications;
+    }
+
+    public void resetReportableApplications() {
+
+        reportableApplications = null;
     }
 
     public Set<String> getReportableKeys() throws TranscriptException {
