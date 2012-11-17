@@ -13,7 +13,7 @@ import java.net.URLEncoder;
  *
  * @goal put-string
  */
-public class TranscriptPutMojo extends AbstractMojo {
+public class PutStringMojo extends AbstractMojo {
 
     /**
      * Service base URL.

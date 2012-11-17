@@ -17,7 +17,7 @@ import java.util.Properties;
  * @goal get
  * @phase validate
  */
-public class TranscriptGetMojo extends AbstractMojo {
+public class GetJsonMojo extends AbstractMojo {
 
     /**
      * Service base URL.
