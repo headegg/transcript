@@ -41,6 +41,13 @@ public class GetJsonMojo extends AbstractMojo {
     private String application;
 
     /**
+     * Allow defined property override, defaulting to false.
+     *
+     * @parameter expression="${override}" default-value=false
+     */
+    private boolean override;
+
+    /**
      * The Maven project context.
      *
      * @parameter default-value="${project}"
@@ -65,9 +72,9 @@ public class GetJsonMojo extends AbstractMojo {
                     break;
                 }
             }
-            if (newProperties) {
+            if (newProperties || override) {
                 for (String key : jsonProperties.keySet()) {
-                    if (mavenProperties.containsKey(key)) {
+                    if (!override && mavenProperties.containsKey(key)) {
                         getLog().info(key + " is already defined so ignoring it here");
                     } else {
                         Object value = jsonProperties.get(key);
