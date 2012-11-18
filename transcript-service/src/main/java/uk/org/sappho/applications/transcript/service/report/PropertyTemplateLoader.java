@@ -39,7 +39,7 @@ public class PropertyTemplateLoader implements TemplateLoader {
             boolean includeVersionControlProperties = transcriptParameters.isIncludeVersionControlProperties();
             transcriptParameters.setIncludeVersionControlProperties(false);
             try {
-                template = reportData.getProperties(transcriptParameters.getTemplatesEnvironment(),
+                template = (String) reportData.getProperties(transcriptParameters.getTemplatesEnvironment(),
                         transcriptParameters.getTemplatesApplication()).get(name.substring(0, name.length() - 4));
             } catch (Throwable throwable) {
             }

@@ -25,6 +25,8 @@ public class TranscriptParameters {
     private String[] keys;
     private boolean includeUndefinedEnvironments;
     private String defaultValue;
+    private boolean merge;
+    private boolean failOnValueChange;
 
     public TranscriptParameters(String workingCopyPath,
                                 String workingCopyId,
@@ -40,7 +42,9 @@ public class TranscriptParameters {
                                 String[] applications,
                                 String[] keys,
                                 boolean includeUndefinedEnvironments,
-                                String defaultValue) {
+                                String defaultValue,
+                                boolean merge,
+                                boolean failOnValueChange) {
 
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
@@ -57,6 +61,8 @@ public class TranscriptParameters {
         this.keys = keys;
         this.includeUndefinedEnvironments = includeUndefinedEnvironments;
         this.defaultValue = defaultValue;
+        this.merge = merge;
+        this.failOnValueChange = failOnValueChange;
     }
 
     public String getWorkingCopyPath() throws TranscriptException {
@@ -242,5 +248,25 @@ public class TranscriptParameters {
     public void setDefaultValue(String defaultValue) {
 
         this.defaultValue = defaultValue;
+    }
+
+    public boolean isMerge() {
+
+        return merge;
+    }
+
+    public void setMerge(boolean merge) {
+
+        this.merge = merge;
+    }
+
+    public boolean isFailOnValueChange() {
+
+        return failOnValueChange;
+    }
+
+    public void setFailOnValueChange(boolean failOnValueChange) {
+
+        this.failOnValueChange = failOnValueChange;
     }
 }

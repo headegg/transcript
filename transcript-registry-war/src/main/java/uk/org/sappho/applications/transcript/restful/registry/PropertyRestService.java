@@ -42,7 +42,7 @@ public class PropertyRestService {
 
     @PUT
     @Consumes({MediaType.TEXT_PLAIN})
-    public void setProperty(final String value) throws TranscriptException {
+    public void setProperty(String value) throws TranscriptException {
 
         getService().put(environment, application, key, value);
     }

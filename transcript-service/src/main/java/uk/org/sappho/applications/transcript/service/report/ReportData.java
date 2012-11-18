@@ -6,7 +6,6 @@
 
 package uk.org.sappho.applications.transcript.service.report;
 
-import com.google.gson.internal.StringMap;
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
@@ -26,12 +25,12 @@ public class ReportData {
     private final Properties properties;
     private final WorkingCopy workingCopy;
     private final TranscriptParameters parameters;
-    private StringMap dictionary = null;
+    private Map<String, Object> dictionary = null;
     private Set<String> reportableEnvironments = null;
     private Set<String> reportableApplications = null;
     private Set<String> reportableKeys = null;
-    private final Map<String, Map<String, Map<String, String>>> cache =
-            new TreeMap<String, Map<String, Map<String, String>>>();
+    private final Map<String, Map<String, Map<String, Object>>> cache =
+            new TreeMap<String, Map<String, Map<String, Object>>>();
 
     @Inject
     public ReportData(Environments environments,
@@ -52,10 +51,11 @@ public class ReportData {
         return parameters;
     }
 
-    public StringMap getDictionary() throws TranscriptException {
+    public Map<String, Object> getDictionary() throws TranscriptException {
 
         if (dictionary == null) {
-            dictionary = workingCopy.getPropertyTree(parameters.getDictionaryEnvironment(),
+            dictionary = workingCopy.getProperties(
+                    parameters.getDictionaryEnvironment(),
                     parameters.getDictionaryApplication());
         }
         return dictionary;
@@ -98,7 +98,7 @@ public class ReportData {
             Map<String, String> keys = new TreeMap<String, String>();
             for (String environment : getReportableEnvironments()) {
                 for (String application : getReportableApplications()) {
-                    Map<String, String> properties = getProperties(environment, application);
+                    Map<String, Object> properties = getProperties(environment, application);
                     for (String key : properties.keySet()) {
                         keys.put(key, key);
                     }
@@ -109,21 +109,21 @@ public class ReportData {
         return reportableKeys;
     }
 
-    public Map<String, String> getProperties(String environment, String application) {
+    public Map<String, Object> getProperties(String environment, String application) {
 
-        Map<String, Map<String, String>> environmentCache = cache.get(environment);
+        Map<String, Map<String, Object>> environmentCache = cache.get(environment);
         if (environmentCache == null) {
-            environmentCache = new TreeMap<String, Map<String, String>>();
+            environmentCache = new TreeMap<String, Map<String, Object>>();
             cache.put(environment, environmentCache);
         }
-        Map<String, String> propertyCache = environmentCache.get(application);
+        Map<String, Object> propertyCache = environmentCache.get(application);
         if (propertyCache == null) {
             try {
                 propertyCache = properties.getAllProperties(environment, application);
             } catch (Throwable throwable) {
             }
             if (propertyCache == null) {
-                propertyCache = new TreeMap<String, String>();
+                propertyCache = new TreeMap<String, Object>();
             }
             environmentCache.put(application, propertyCache);
         }

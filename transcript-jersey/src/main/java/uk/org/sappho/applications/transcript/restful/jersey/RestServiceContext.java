@@ -64,6 +64,8 @@ public class RestServiceContext<T> {
         String readOnly = parameters.get("read.only");
         String useCache = parameters.get("use.cache");
         String includeVersionControlProperties = parameters.get("include.vcs.properties");
+        String merge = parameters.get("merge");
+        String failOnValueChange = parameters.get("fail.change");
         String environments = parameters.get("environments");
         String[] requiredEnvironments = new String[0];
         if (environments != null && environments.length() != 0) {
@@ -95,7 +97,9 @@ public class RestServiceContext<T> {
                 requiredApplications,
                 requiredKeys,
                 includeUndefinedEnvironments != null && includeUndefinedEnvironments.equalsIgnoreCase("true"),
-                parameters.get("default"));
+                parameters.get("default"),
+                merge != null && merge.equalsIgnoreCase("true"),
+                failOnValueChange != null && failOnValueChange.equalsIgnoreCase("true"));
         TranscriptModule transcriptModule = new TranscriptModule(transcriptParameters);
         AbstractModule vcsModule;
         String vcs = parameters.get("vcs");

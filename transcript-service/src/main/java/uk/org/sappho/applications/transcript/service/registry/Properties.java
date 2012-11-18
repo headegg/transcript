@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Properties {
 
@@ -23,15 +24,15 @@ public class Properties {
         this.workingCopy = workingCopy;
     }
 
-    public SortedMap<String, String> getAllProperties(String environment, String application)
+    public SortedMap<String, Object> getAllProperties(String environment, String application)
             throws TranscriptException {
 
-        return workingCopy.getStringProperties(environment, application);
+        return workingCopy.getProperties(environment, application);
     }
 
     public String get(String environment, String application, String key) throws TranscriptException {
 
-        String value = getAllProperties(environment, application).get(key);
+        String value = (String) getAllProperties(environment, application).get(key);
         if (value == null) {
             value = transcriptParameters.getDefaultValue();
             if (value == null) {
@@ -41,35 +42,27 @@ public class Properties {
         return value;
     }
 
-    public void put(String environment, String application, Object properties)
+    public void put(String environment, String application, SortedMap<String, Object> properties)
             throws TranscriptException {
 
-        workingCopy.putProperties(environment, application, properties);
+        workingCopy.putProperties(environment, application, properties, transcriptParameters.isMerge());
     }
 
     public void put(String environment, String application, String key, String value)
             throws TranscriptException {
 
-        SortedMap<String, String> properties = workingCopy.getStringProperties(environment, application);
-        boolean changed = false;
         if (value != null) {
-            String oldValue = properties.get(key);
+            SortedMap<String, Object> properties = new TreeMap<String, Object>();
             properties.put(key, value);
-            changed = oldValue == null || !oldValue.equals(value);
+            workingCopy.putProperties(environment, application, properties, true);
         } else {
-            if (properties.containsKey(key)) {
-                properties.remove(key);
-                changed = true;
-            }
-        }
-        if (changed) {
-            workingCopy.putProperties(environment, application, properties);
+            delete(environment, application, key);
         }
     }
 
     public void delete(String environment, String application, String key) throws TranscriptException {
 
-        put(environment, application, key, null);
+        workingCopy.deleteProperty(environment, application, key);
     }
 
     public void delete(String environment, String application) throws TranscriptException {

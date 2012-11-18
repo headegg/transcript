@@ -20,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
+import java.util.SortedMap;
 
 @Path("/{environment}/{application}")
 public class PropertiesRestService {
@@ -33,14 +34,14 @@ public class PropertiesRestService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Object getProperties() throws TranscriptException {
+    public SortedMap<String, Object> getProperties() throws TranscriptException {
 
         return getService().getAllProperties(environment, application);
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public void setProperties(Object properties) throws TranscriptException {
+    public void setProperties(SortedMap<String, Object> properties) throws TranscriptException {
 
         getService().put(environment, application, properties);
     }

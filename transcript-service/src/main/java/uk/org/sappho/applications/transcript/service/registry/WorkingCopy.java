@@ -7,7 +7,6 @@
 package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.StringMap;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -58,28 +57,17 @@ public class WorkingCopy {
         return new File(workingCopy, path);
     }
 
-    public SortedMap<String, String> getStringProperties(String environment, String application)
+    private SortedMap<String, Object> getJsonProperties(String environment, String application)
             throws TranscriptException {
 
-        return (SortedMap<String, String>) getProperties(environment, application, new TreeMap<String, String>());
-    }
-
-    public StringMap getPropertyTree(String environment, String application) throws TranscriptException {
-
-        return (StringMap) getProperties(environment, application, new StringMap());
-    }
-
-    private Map getProperties(String environment, String application, Map emptyProperties)
-            throws TranscriptException {
-
-        Map properties = emptyProperties;
-        try {
-            synchronized (getLock()) {
+        SortedMap<String, Object> properties = new TreeMap<String, Object>();
+        synchronized (getLock()) {
+            try {
                 File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
                 if (jsonFile.exists()) {
                     FileReader fileReader = new FileReader(jsonFile);
                     try {
-                        properties = new Gson().fromJson(fileReader, emptyProperties.getClass());
+                        properties = new Gson().fromJson(fileReader, properties.getClass());
                     } finally {
                         try {
                             fileReader.close();
@@ -87,25 +75,35 @@ public class WorkingCopy {
                         }
                     }
                 }
-                if (transcriptParameters.isIncludeVersionControlProperties()) {
-                    Map<String, String> versionControlProperties =
-                            versionControlSystem.getProperties(getJsonFilename(environment, application));
-                    for (String key : versionControlProperties.keySet()) {
-                        properties.put(key, versionControlProperties.get(key));
-                    }
-                }
+            } catch (Throwable throwable) {
+                throw new TranscriptException("Unable to read " + getJsonFilename(environment, application), throwable);
             }
-        } catch (Throwable throwable) {
-            throw new TranscriptException("Unable to read " + getJsonFilename(environment, application), throwable);
         }
         return properties;
     }
 
-    public void putProperties(String environment, String application, Object properties)
+    public SortedMap<String, Object> getProperties(String environment, String application)
             throws TranscriptException {
 
-        checkWritable();
+        SortedMap<String, Object> properties;
         synchronized (getLock()) {
+            properties = getJsonProperties(environment, application);
+            if (transcriptParameters.isIncludeVersionControlProperties()) {
+                Map<String, String> versionControlProperties =
+                        versionControlSystem.getProperties(getJsonFilename(environment, application));
+                for (String key : versionControlProperties.keySet()) {
+                    properties.put(key, versionControlProperties.get(key));
+                }
+            }
+        }
+        return properties;
+    }
+
+    private void putProperties(String environment, String application, SortedMap<String, Object> properties)
+            throws TranscriptException {
+
+        synchronized (getLock()) {
+            checkWritable();
             File jsonFile = getUpToDatePath(getJsonFilename(environment, application));
             File directory = new File(new File(transcriptParameters.getWorkingCopyPath(),
                     transcriptParameters.getWorkingCopyId()), environment);
@@ -146,6 +144,49 @@ public class WorkingCopy {
                     }
                 }
                 throw new TranscriptException("Unable to write " + getJsonFilename(environment, application), throwable);
+            }
+        }
+    }
+
+    public void putProperties(String environment, String application, SortedMap<String, Object> properties,
+                              boolean isMerge) throws TranscriptException {
+
+        Gson gson = new Gson();
+        synchronized (getLock()) {
+            SortedMap<String, Object> oldProperties = getJsonProperties(environment, application);
+            SortedMap<String, Object> newProperties;
+            if (isMerge && !oldProperties.isEmpty()) {
+                newProperties = new TreeMap<String, Object>();
+                for (String key : oldProperties.keySet()) {
+                    newProperties.put(key, oldProperties.get(key));
+                }
+                for (String key : properties.keySet()) {
+                    Object newValue = properties.get(key);
+                    if (transcriptParameters.isFailOnValueChange() && oldProperties.containsKey(key) &&
+                            !gson.toJson(newValue).equals(gson.toJson(oldProperties.get(key)))) {
+                        throw new TranscriptException("Value of property " +
+                                environment + ":" + application + ":" + key + " would change");
+                    }
+                    newProperties.put(key, newValue);
+                }
+            } else {
+                newProperties = properties;
+            }
+            String oldJson = gson.toJson(oldProperties);
+            String newJson = gson.toJson(newProperties);
+            if (!newJson.equals(oldJson)) {
+                putProperties(environment, application, newProperties);
+            }
+        }
+    }
+
+    public void deleteProperty(String environment, String application, String key) throws TranscriptException {
+
+        synchronized (getLock()) {
+            SortedMap<String, Object> properties = getJsonProperties(environment, application);
+            if (properties.containsKey(key)) {
+                properties.remove(key);
+                putProperties(environment, application, properties);
             }
         }
     }
