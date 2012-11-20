@@ -109,7 +109,6 @@
     <modules>
         <module>transcript-service</module>
         <module>transcript-registry-war</module>
-        <module>transcript-import</module>
         <module>transcript-reporter-war</module>
         <module>transcript-jersey</module>
         <module>maven-transcript-plugin</module>
