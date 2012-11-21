@@ -7,10 +7,12 @@
 package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
 import uk.org.sappho.applications.transcript.service.registry.DataDictionary;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
+import uk.org.sappho.applications.transcript.service.registry.RestfulClient;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 
 import java.util.LinkedList;
@@ -27,6 +29,7 @@ public class ReportData {
     private final Properties properties;
     private final TranscriptParameters transcriptParameters;
     private final DataDictionary dataDictionary;
+    private final RestfulClient restfulClient;
     private Map<String, Map<String, Map<String, Object>>> environmentCache;
 
     @Inject
@@ -34,13 +37,15 @@ public class ReportData {
                       Applications applications,
                       Properties properties,
                       TranscriptParameters transcriptParameters,
-                      DataDictionary dataDictionary) {
+                      DataDictionary dataDictionary,
+                      RestfulClient restfulClient) {
 
         this.environments = environments;
         this.applications = applications;
         this.properties = properties;
         this.transcriptParameters = transcriptParameters;
         this.dataDictionary = dataDictionary;
+        this.restfulClient = restfulClient;
         resetPropertyCache();
     }
 
@@ -201,5 +206,10 @@ public class ReportData {
         } catch (Throwable throwable) {
         }
         return name;
+    }
+
+    public Object getJson(String url) throws TranscriptException {
+
+        return restfulClient.get(url);
     }
 }
