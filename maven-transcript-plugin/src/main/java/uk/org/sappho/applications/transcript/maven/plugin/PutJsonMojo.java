@@ -75,6 +75,8 @@ public class PutJsonMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
 
         int responseCode = 0;
+        HttpURLConnection httpURLConnection = null;
+        OutputStream outputStream = null;
         try {
             getLog().info("Connecting to " + baseUrl);
             getLog().info("Updating " + environment + ":" + application);
@@ -86,20 +88,32 @@ public class PutJsonMojo extends AbstractMojo {
             String url = baseUrl + "/" + environment + "/" + application +
                     "?merge=" + isMerge + "&fail.change=" + failOnValueChange +
                     "&commit.message=" + URLEncoder.encode(commitMessage, "UTF-8");
-            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("Content-Length", "" + json.length());
             httpURLConnection.setDoOutput(true);
             httpURLConnection.setRequestMethod("PUT");
             httpURLConnection.connect();
-            OutputStream outputStream = httpURLConnection.getOutputStream();
+            outputStream = httpURLConnection.getOutputStream();
             outputStream.write(json.getBytes(), 0, json.length());
             outputStream.flush();
             outputStream.close();
             responseCode = httpURLConnection.getResponseCode();
-            httpURLConnection.disconnect();
         } catch (Throwable throwable) {
             throw new MojoExecutionException("Unable to PUT updated properties", throwable);
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Throwable throwable) {
+                }
+            }
+            if (httpURLConnection != null) {
+                try {
+                    httpURLConnection.disconnect();
+                } catch (Throwable throwable) {
+                }
+            }
         }
         if (responseCode != 204) {
             throw new MojoExecutionException("Unable to PUT updated properties - HTTP response code was " +

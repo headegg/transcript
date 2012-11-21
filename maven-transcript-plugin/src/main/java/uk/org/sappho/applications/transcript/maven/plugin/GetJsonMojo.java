@@ -13,6 +13,7 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
@@ -63,11 +64,14 @@ public class GetJsonMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
 
         boolean newProperties = false;
+        HttpURLConnection httpURLConnection = null;
+        InputStream inputStream = null;
         try {
             getLog().info("Connecting to " + baseUrl);
             getLog().info("Getting properties from " + environment + ":" + application);
             String url = baseUrl + "/" + environment + "/" + application;
-            InputStream inputStream = new URL(url).openConnection().getInputStream();
+            httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            inputStream = httpURLConnection.getInputStream();
             Map<String, Object> jsonProperties =
                     (Map<String, Object>) new Gson().fromJson(new InputStreamReader(inputStream), Object.class);
             inputStream.close();
@@ -91,6 +95,19 @@ public class GetJsonMojo extends AbstractMojo {
             }
         } catch (Throwable throwable) {
             throw new MojoExecutionException("Unable to GET properties", throwable);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Throwable throwable) {
+                }
+            }
+            if (httpURLConnection != null) {
+                try {
+                    httpURLConnection.disconnect();
+                } catch (Throwable throwable) {
+                }
+            }
         }
         getLog().info(newProperties ?
                 "Properties are now available to build" : "There are no new properties to import");
