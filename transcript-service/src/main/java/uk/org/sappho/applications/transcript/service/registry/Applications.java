@@ -35,8 +35,8 @@ public class Applications {
 
         String[] applications = workingCopy.getUpToDatePath(environment).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                boolean found = new File(dir, name).isFile();
-                if (found && name.endsWith(".json")) {
+                boolean found = new File(dir, name).isFile() && name.endsWith(".json");
+                if (found) {
                     name = name.substring(0, name.length() - 5);
                     found = pattern.matcher(name).matches();
                 }
