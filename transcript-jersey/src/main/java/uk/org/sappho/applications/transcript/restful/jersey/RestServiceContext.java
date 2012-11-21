@@ -66,40 +66,16 @@ public class RestServiceContext<T> {
         String includeVersionControlProperties = parameters.get("include.vcs.properties");
         String merge = parameters.get("merge");
         String failOnValueChange = parameters.get("fail.change");
-        String environments = parameters.get("environments");
-        String[] requiredEnvironments = new String[0];
-        if (environments != null && environments.length() != 0) {
-            requiredEnvironments = environments.split(",");
-        }
-        String applications = parameters.get("applications");
-        String[] requiredApplications = new String[0];
-        if (applications != null && applications.length() != 0) {
-            requiredApplications = applications.split(",");
-        }
-        String keys = parameters.get("keys");
-        String[] requiredKeys = new String[0];
-        if (keys != null && keys.length() != 0) {
-            requiredKeys = keys.split(",");
-        }
-        String includeUndefinedEnvironments = parameters.get("include.undefined.environments");
         TranscriptParameters transcriptParameters = new TranscriptParameters(
                 parameters.get("working.copy.path"),
                 parameters.get("working.copy.id"),
                 readOnly != null && readOnly.equalsIgnoreCase("true"),
                 useCache != null && useCache.equalsIgnoreCase("true"),
                 includeVersionControlProperties != null && includeVersionControlProperties.equalsIgnoreCase("true"),
-                parameters.get("dictionary.environment"),
-                parameters.get("dictionary.application"),
-                parameters.get("templates.environment"),
-                parameters.get("templates.application"),
-                parameters.get("report.id"),
-                requiredEnvironments,
-                requiredApplications,
-                requiredKeys,
-                includeUndefinedEnvironments != null && includeUndefinedEnvironments.equalsIgnoreCase("true"),
                 parameters.get("default"),
                 merge != null && merge.equalsIgnoreCase("true"),
-                failOnValueChange != null && failOnValueChange.equalsIgnoreCase("true"));
+                failOnValueChange != null && failOnValueChange.equalsIgnoreCase("true"),
+                parameters);
         TranscriptModule transcriptModule = new TranscriptModule(transcriptParameters);
         AbstractModule vcsModule;
         String vcs = parameters.get("vcs");

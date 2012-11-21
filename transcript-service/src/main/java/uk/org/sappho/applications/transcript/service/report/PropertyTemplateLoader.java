@@ -36,14 +36,13 @@ public class PropertyTemplateLoader implements TemplateLoader {
         String template = null;
         if (name.endsWith(".ftl")) {
             TranscriptParameters transcriptParameters = reportData.getParameters();
-            boolean includeVersionControlProperties = transcriptParameters.isIncludeVersionControlProperties();
-            transcriptParameters.setIncludeVersionControlProperties(false);
             try {
-                template = (String) reportData.getProperties(transcriptParameters.getTemplatesEnvironment(),
-                        transcriptParameters.getTemplatesApplication()).get(name.substring(0, name.length() - 4));
+                template = (String) reportData.getProperties(
+                        transcriptParameters.get("templates.environment", ".devops"),
+                        transcriptParameters.get("templates.application", ".templates"), false)
+                        .get(name.substring(0, name.length() - 4));
             } catch (Throwable throwable) {
             }
-            transcriptParameters.setIncludeVersionControlProperties(includeVersionControlProperties);
         }
         return template != null ? template : sourceTemplateLoader.findTemplateSource(name);
     }

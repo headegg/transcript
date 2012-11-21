@@ -12,9 +12,6 @@ import uk.org.sappho.applications.transcript.service.TranscriptException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Environments {
@@ -37,12 +34,7 @@ public class Environments {
         return getEnvironmentNames(ALL);
     }
 
-    public String[] getEnvironmentNames(String environmentNamePrefix) throws TranscriptException {
-
-        return getEnvironmentNames(Pattern.compile("^" + environmentNamePrefix.replace(".", "\\.") + ".*$"));
-    }
-
-    private String[] getEnvironmentNames(final Pattern pattern) throws TranscriptException {
+    public String[] getEnvironmentNames(final Pattern pattern) throws TranscriptException {
 
         String[] environments = workingCopy.getUpToDatePath("").list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -56,36 +48,5 @@ public class Environments {
             environments = new String[0];
         }
         return environments;
-    }
-
-    public Set<String> getEnvironmentNames(String[] requiredEnvironments, String applicationName,
-                                           boolean includeUndefinedEnvironments)
-            throws TranscriptException {
-
-        Map<String, String> environments = null;
-        if (requiredEnvironments == null || requiredEnvironments.length == 0) {
-            requiredEnvironments = getEnvironmentNames();
-            environments = new TreeMap<String, String>();
-            for (String environment : requiredEnvironments) {
-                if (includeUndefinedEnvironments ||
-                        !properties.getAllProperties(environment, applicationName).isEmpty()) {
-                    environments.put(environment, environment);
-                }
-            }
-        }
-        if (environments == null) {
-            environments = new TreeMap<String, String>();
-            for (String environment : requiredEnvironments) {
-                if (environment.endsWith("*")) {
-                    for (String discoveredEnvironment :
-                            getEnvironmentNames(environment.substring(0, environment.length() - 1))) {
-                        environments.put(discoveredEnvironment, discoveredEnvironment);
-                    }
-                } else {
-                    environments.put(environment, environment);
-                }
-            }
-        }
-        return environments.keySet();
     }
 }

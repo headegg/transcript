@@ -1,23 +1,25 @@
 <#include "macros.ftl">
-${parameters.setIncludeUndefinedEnvironments(true)}
-${parameters.setIncludeVersionControlProperties(false)}
+<#assign environments = getEnvironments(parameters.environments)>
+<#assign applications = getApplications(environments, parameters.applications)>
+<#assign namedEnvironments = getAssociations(environments, "environments")>
+<#assign namedApplications = getAssociations(applications, "applications")>
 <#escape x as x?html>
-<div <#if reportId??>id="${reportId}" </#if>class="owners-table table-wrap">
+<div id="${parameters.get("report.id", "owners-table")}" class="owners-table table-wrap">
     <table class="confluenceTable">
         <thead>
         <tr>
             <th class="confluenceTh"></th>
-            <#list reportableEnvironments as environment>
-                <th class="environment-name confluenceTh"><@label type="environments" id=environment /></th>
+            <#list namedEnvironments?keys as environmentName>
+                <th class="environment-name confluenceTh">${environmentName}</th>
             </#list>
         </tr>
         </thead>
         <tbody>
-            <#list reportableApplications as application>
+            <#list namedApplications?keys as applicationName>
             <tr>
-                <th class="application-name confluenceTh"><@label type="applications" id=application /></th>
-                <#list reportableEnvironments as environment>
-                    <td class="owner-name confluenceTd"><@property class="owner-name" environment=environment application=application key="application.owner.name" /></td>
+                <th class="application-name confluenceTh">${applicationName}</th>
+                <#list namedEnvironments?keys as environmentName>
+                    <td class="owner confluenceTd"><@nameAndEmail class="owner" type="owners" environment=namedEnvironments[environmentName] application=namedApplications[applicationName] key="application.owner.name" /></td>
                 </#list>
             </tr>
             </#list>

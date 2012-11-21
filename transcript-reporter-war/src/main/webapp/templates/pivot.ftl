@@ -1,25 +1,33 @@
 <#include "macros.ftl">
-${parameters.setIncludeUndefinedEnvironments(true)}
+<#assign environments = getEnvironments(parameters.environments)>
+<#assign applications = getApplications(environments, parameters.applications)>
+<#if !parameters.get("undefined", false)>
+    <#assign environments = getEnvironmentsWithApplications(environments, applications, parameters.keys, parameters.includeVersionControlProperties)>
+    <#assign applications = getApplicationsWithEnvironments(environments, applications, parameters.keys, parameters.includeVersionControlProperties)>
+</#if>
+<#assign keys = getKeys(environments, applications, parameters.keys, parameters.includeVersionControlProperties)>
+<#assign namedEnvironments = getAssociations(environments, "environments")>
+<#assign namedApplications = getAssociations(applications, "applications")>
 <#escape x as x?html>
-<div <#if reportId??>id="${reportId}" </#if>class="pivot-table table-wrap">
+<div id="${parameters.get("report.id", "pivot-table")}" class="pivot-table table-wrap">
     <table class="confluenceTable">
         <thead>
         <tr>
-            <th class="key-names confluenceTh"><#list parameters.keys as key>
+            <th class="key-names confluenceTh"><#list keys as key>
                 <div class="key-name">${key}</div></#list></th>
-            <#list reportableEnvironments as environment>
-                <th class="environment-name confluenceTh"><@label type="environments" id=environment /></th>
+            <#list namedEnvironments?keys as environmentName>
+                <th class="environment-name confluenceTh">${environmentName}</th>
             </#list>
         </tr>
         </thead>
         <tbody>
-            <#list reportableApplications as application>
+            <#list namedApplications?keys as applicationName>
             <tr>
-                <th class="application-name confluenceTh"><@label type="applications" id=application /></th>
-                <#list reportableEnvironments as environment>
+                <th class="application-name confluenceTh">${applicationName}</th>
+                <#list namedEnvironments?keys as environmentName>
                     <td class="property-value confluenceTd">
-                        <#list parameters.keys as key>
-                            <div><@property class="property-value" environment=environment application=application key=key /></div>
+                        <#list keys as key>
+                            <div><@property class="property-value" environment=namedEnvironments[environmentName] application=namedApplications[applicationName] key=key /></div>
                         </#list>
                     </td>
                 </#list>

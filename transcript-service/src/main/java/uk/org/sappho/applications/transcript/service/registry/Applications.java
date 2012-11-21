@@ -12,16 +12,13 @@ import uk.org.sappho.applications.transcript.service.TranscriptException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class Applications {
 
     private WorkingCopy workingCopy;
 
-    private static final Pattern ALL = Pattern.compile("^[^\\.].*\\.json$");
+    private static final Pattern ALL = Pattern.compile("^[^\\.].*$");
 
     @Inject
     public Applications(WorkingCopy workingCopy) {
@@ -34,18 +31,16 @@ public class Applications {
         return getApplicationNames(environment, ALL);
     }
 
-    public String[] getApplicationNames(String environment, String applicationNamePrefix)
-            throws TranscriptException {
-
-        return getApplicationNames(environment,
-                Pattern.compile("^" + applicationNamePrefix.replace(".", "\\.") + ".*\\.json$"));
-    }
-
-    private String[] getApplicationNames(String environment, final Pattern pattern) throws TranscriptException {
+    public String[] getApplicationNames(String environment, final Pattern pattern) throws TranscriptException {
 
         String[] applications = workingCopy.getUpToDatePath(environment).list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return new File(dir, name).isFile() && pattern.matcher(name).matches();
+                boolean found = new File(dir, name).isFile();
+                if (found && name.endsWith(".json")) {
+                    name = name.substring(0, name.length() - 5);
+                    found = pattern.matcher(name).matches();
+                }
+                return found;
             }
         });
         if (applications != null) {
@@ -58,33 +53,5 @@ public class Applications {
             applications = new String[0];
         }
         return applications;
-    }
-
-    public Set<String> getApplicationNames(Set<String> requiredEnvironments, String[] requiredApplications)
-            throws TranscriptException {
-
-        Map<String, String> applications = new TreeMap<String, String>();
-        if (requiredApplications == null || requiredApplications.length == 0) {
-            for (String environment : requiredEnvironments) {
-                for (String application : getApplicationNames(environment)) {
-                    applications.put(application, application);
-                }
-            }
-        } else {
-            for (String environment : requiredEnvironments) {
-                for (String requiredApplication : requiredApplications) {
-                    if (requiredApplication.endsWith("*")) {
-                        for (String discoveredApplication :
-                                getApplicationNames(environment,
-                                        requiredApplication.substring(0, requiredApplication.length() - 1))) {
-                            applications.put(discoveredApplication, discoveredApplication);
-                        }
-                    } else {
-                        applications.put(requiredApplication, requiredApplication);
-                    }
-                }
-            }
-        }
-        return applications.keySet();
     }
 }

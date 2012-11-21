@@ -30,6 +30,13 @@ public class Properties {
         return workingCopy.getProperties(environment, application);
     }
 
+    public SortedMap<String, Object> getAllProperties(String environment, String application,
+                                                      boolean includeVersionControlProperties)
+            throws TranscriptException {
+
+        return workingCopy.getProperties(environment, application, includeVersionControlProperties);
+    }
+
     public String get(String environment, String application, String key) throws TranscriptException {
 
         String value = (String) getAllProperties(environment, application).get(key);

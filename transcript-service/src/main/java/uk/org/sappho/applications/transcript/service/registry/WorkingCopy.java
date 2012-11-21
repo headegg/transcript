@@ -85,10 +85,17 @@ public class WorkingCopy {
     public SortedMap<String, Object> getProperties(String environment, String application)
             throws TranscriptException {
 
+        return getProperties(environment, application, transcriptParameters.isIncludeVersionControlProperties());
+    }
+
+    public SortedMap<String, Object> getProperties(String environment, String application,
+                                                   boolean includeVersionControlProperties)
+            throws TranscriptException {
+
         SortedMap<String, Object> properties;
         synchronized (getLock()) {
             properties = getJsonProperties(environment, application);
-            if (transcriptParameters.isIncludeVersionControlProperties()) {
+            if (includeVersionControlProperties) {
                 Map<String, String> versionControlProperties =
                         versionControlSystem.getProperties(getJsonFilename(environment, application));
                 for (String key : versionControlProperties.keySet()) {
