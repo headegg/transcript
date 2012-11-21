@@ -8,6 +8,7 @@ package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
+import uk.org.sappho.applications.transcript.service.registry.DataDictionary;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
@@ -25,19 +26,21 @@ public class ReportData {
     private final Applications applications;
     private final Properties properties;
     private final TranscriptParameters transcriptParameters;
-    private Map<String, Object> dictionary = null;
+    private final DataDictionary dataDictionary;
     private Map<String, Map<String, Map<String, Object>>> environmentCache;
 
     @Inject
     public ReportData(Environments environments,
                       Applications applications,
                       Properties properties,
-                      TranscriptParameters transcriptParameters) {
+                      TranscriptParameters transcriptParameters,
+                      DataDictionary dataDictionary) {
 
         this.environments = environments;
         this.applications = applications;
         this.properties = properties;
         this.transcriptParameters = transcriptParameters;
+        this.dataDictionary = dataDictionary;
         resetPropertyCache();
     }
 
@@ -48,10 +51,10 @@ public class ReportData {
 
     public Map<String, Object> getDictionary() {
 
-        if (dictionary == null) {
-            dictionary = getProperties(
-                    getParameters().get("dictionary.environment", ".devops"),
-                    getParameters().get("dictionary.application", ".dictionary"), false);
+        Map<String, Object> dictionary = new TreeMap<String, Object>();
+        try {
+            dictionary = dataDictionary.getDictionary();
+        } catch (Throwable throwable) {
         }
         return dictionary;
     }
