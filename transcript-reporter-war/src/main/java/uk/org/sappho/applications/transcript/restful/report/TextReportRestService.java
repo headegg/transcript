@@ -27,7 +27,7 @@ public class TextReportRestService {
     private ContextResolver<RestServiceContext> restServiceContextResolver;
 
     @GET
-    @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
+    @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
     public String getProperty() throws TranscriptException {
 
         RestServiceContext<TextTemplatedReport> context =

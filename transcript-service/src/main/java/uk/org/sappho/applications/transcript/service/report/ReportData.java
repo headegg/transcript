@@ -6,6 +6,7 @@
 
 package uk.org.sappho.applications.transcript.service.report;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
@@ -30,6 +31,7 @@ public class ReportData {
     private final TranscriptParameters transcriptParameters;
     private final DataDictionary dataDictionary;
     private final RestfulClient restfulClient;
+    private final Gson gson;
     private Map<String, Map<String, Map<String, Object>>> environmentCache;
 
     @Inject
@@ -38,7 +40,8 @@ public class ReportData {
                       Properties properties,
                       TranscriptParameters transcriptParameters,
                       DataDictionary dataDictionary,
-                      RestfulClient restfulClient) {
+                      RestfulClient restfulClient,
+                      Gson gson) {
 
         this.environments = environments;
         this.applications = applications;
@@ -46,6 +49,7 @@ public class ReportData {
         this.transcriptParameters = transcriptParameters;
         this.dataDictionary = dataDictionary;
         this.restfulClient = restfulClient;
+        this.gson = gson;
         resetPropertyCache();
     }
 
@@ -211,5 +215,10 @@ public class ReportData {
     public Object getJson(String url) throws TranscriptException {
 
         return restfulClient.get(url);
+    }
+
+    public String toJson(Object object) {
+
+        return gson.toJson(object);
     }
 }
