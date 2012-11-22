@@ -1,7 +1,7 @@
-<#macro property class environment application key default="">
+<#macro property class environment application key default="" includeVersionControlProperties=parameters.includeVersionControlProperties>
     <#compress>
         <#attempt>
-            <#assign value = getProperties(environment, application, parameters.includeVersionControlProperties)[key]>
+            <#assign value = getProperties(environment, application, includeVersionControlProperties)[key]>
             <#if value?length != 0>
             <div class="defined-${class}">${value}</div>
             <#else>
