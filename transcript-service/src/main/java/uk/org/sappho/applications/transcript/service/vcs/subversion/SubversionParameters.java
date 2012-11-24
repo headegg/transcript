@@ -7,9 +7,8 @@
 package uk.org.sappho.applications.transcript.service.vcs.subversion;
 
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystemParameters;
 
-public class SubversionParameters implements VersionControlSystemParameters {
+public class SubversionParameters {
 
     private String url;
     private String username;

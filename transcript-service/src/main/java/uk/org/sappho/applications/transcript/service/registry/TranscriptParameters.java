@@ -138,6 +138,14 @@ public class TranscriptParameters {
 
     public boolean get(String key, boolean defaultValue) {
 
-        return parameters.containsKey(key) ? get(key).equalsIgnoreCase("true") : defaultValue;
+        boolean value = defaultValue;
+        if (parameters.containsKey(key)) {
+            String rawValue = get(key);
+            boolean isTrue = rawValue.equalsIgnoreCase("true");
+            if (isTrue || rawValue.equalsIgnoreCase("false")) {
+                value = isTrue;
+            }
+        }
+        return value;
     }
 }

@@ -23,8 +23,7 @@ public class TextTemplatedReport {
     private final PropertyTemplateLoader propertyTemplateLoader;
 
     @Inject
-    public TextTemplatedReport(WorkingCopy workingCopy,
-                               ReportData reportData,
+    public TextTemplatedReport(WorkingCopy workingCopy, ReportData reportData,
                                PropertyTemplateLoader propertyTemplateLoader) {
 
         this.workingCopy = workingCopy;
@@ -32,8 +31,7 @@ public class TextTemplatedReport {
         this.propertyTemplateLoader = propertyTemplateLoader;
     }
 
-    public String generate(String templateName,
-                           TemplateLoader sourceTemplateLoader)
+    public String generate(String templateName, TemplateLoader sourceTemplateLoader)
             throws TranscriptException {
 
         try {

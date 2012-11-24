@@ -8,7 +8,6 @@ package uk.org.sappho.applications.transcript.service.vcs.subversion;
 
 import com.google.inject.AbstractModule;
 import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystemParameters;
 
 public class SubversionModule extends AbstractModule {
 
@@ -22,7 +21,6 @@ public class SubversionModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        bind(VersionControlSystemParameters.class).toInstance(subversionParameters);
         bind(SubversionParameters.class).toInstance(subversionParameters);
         bind(VersionControlSystem.class).to(SubversionVersionControl.class);
     }
