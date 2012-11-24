@@ -35,11 +35,11 @@ public class TextTemplatedReportTest {
         parameters.put("bad-boolean-param", "bad-value");
         TextTemplatedReport textTemplatedReport =
                 testService.getService(TextTemplatedReport.class,
-                        "transcript-service/target/test-work-space",
+                        "target/test-work-space",
                         null, true, false, "def-value", false, false, parameters);
         String report = textTemplatedReport.generate("test-params", testService.getTemplateloader());
         Assert.assertEquals("Parameters are not as expected",
-                FileUtils.readFileToString(new File("transcript-service/src/test/resources/expected-reports/test-params.txt")),
+                FileUtils.readFileToString(new File("src/test/resources/expected-reports/test-params.txt")),
                 report);
     }
 

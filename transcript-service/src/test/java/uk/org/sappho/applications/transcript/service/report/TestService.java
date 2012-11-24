@@ -37,6 +37,6 @@ public class TestService<T> {
 
     public TemplateLoader getTemplateloader() throws IOException {
 
-        return new FileTemplateLoader(new File("transcript-service/src/test/resources/templates"));
+        return new FileTemplateLoader(new File("src/test/resources/templates"));
     }
 }

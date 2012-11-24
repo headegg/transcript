@@ -1,4 +1,4 @@
-<transcript-service/target/test-work-space>
+<target/test-work-space>
 <default>
 <true>
 <false>
