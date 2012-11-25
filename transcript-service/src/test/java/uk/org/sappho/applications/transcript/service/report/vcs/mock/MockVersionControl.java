@@ -20,7 +20,7 @@ public class MockVersionControl implements VersionControlSystem {
 
     private TranscriptParameters transcriptParameters;
 
-    private static final File SOURCE = new File("src/test/files/data/store");
+    private static final String BASE_DIRECTORY = (String) System.getProperties().get("basedir");
 
     @Inject
     public MockVersionControl(TranscriptParameters transcriptParameters) {
@@ -42,9 +42,10 @@ public class MockVersionControl implements VersionControlSystem {
     public void checkout() throws TranscriptException {
 
         try {
+            File sourceDirectory = new File(BASE_DIRECTORY, "src/test/files/data-store");
             File workingDirectory =
                     new File(transcriptParameters.getWorkingCopyPath(), transcriptParameters.getWorkingCopyId());
-            FileUtils.copyDirectory(SOURCE, workingDirectory);
+            FileUtils.copyDirectory(sourceDirectory, workingDirectory);
         } catch (Throwable throwable) {
             throw new TranscriptException("Unable to \"checkout\" test data", throwable);
         }

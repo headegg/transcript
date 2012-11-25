@@ -43,6 +43,7 @@ public class TestServiceContext<T> {
 
     public TemplateLoader getTemplateloader() throws IOException {
 
-        return new FileTemplateLoader(new File("src/test/files/templates"));
+        return new FileTemplateLoader(
+                new File((String) System.getProperties().get("basedir"), "src/test/files/templates"));
     }
 }

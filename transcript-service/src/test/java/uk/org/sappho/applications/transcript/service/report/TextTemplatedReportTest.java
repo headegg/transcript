@@ -19,6 +19,7 @@ import java.util.Map;
 
 public class TextTemplatedReportTest {
 
+    private static final String BASE_DIRECTORY = (String) System.getProperties().get("basedir");
     private static final String TEST_WORK_SPACE = "target/test-work-space";
     private static final TestServiceContext<TextTemplatedReport> SERVICE_CONTEXT =
             new TestServiceContext<TextTemplatedReport>(TextTemplatedReport.class);
@@ -45,7 +46,8 @@ public class TextTemplatedReportTest {
                 SERVICE_CONTEXT.getService(TEST_WORK_SPACE, null, true, false, "def-value", false, false, parameters);
         String report = textTemplatedReport.generate("test-params", SERVICE_CONTEXT.getTemplateloader());
         Assert.assertEquals("Parameters are not as expected",
-                FileUtils.readFileToString(new File("src/test/files/expected-reports/test-params.txt")),
+                FileUtils.readFileToString(
+                        new File(BASE_DIRECTORY, "src/test/files/expected-reports/test-params.txt")),
                 report);
     }
 
@@ -66,7 +68,8 @@ public class TextTemplatedReportTest {
                         new HashMap<String, String>());
         String report = textTemplatedReport.generate("test-data-dictionary", SERVICE_CONTEXT.getTemplateloader());
         Assert.assertEquals("Data dictionary is not as expected",
-                FileUtils.readFileToString(new File("src/test/files/expected-reports/test-data-dictionary.txt")),
+                FileUtils.readFileToString(
+                        new File(BASE_DIRECTORY, "src/test/files/expected-reports/test-data-dictionary.txt")),
                 report);
     }
 }
