@@ -1,0 +1,42 @@
+{ all environments
+<dev>
+<prod>
+<uat>
+<undefined>
+}
+{ environments starting with D
+<dev>
+}
+{ really all environments
+<.devops>
+<dev>
+<prod>
+<uat>
+<undefined>
+}
+{ all applications in all environments
+<acme-directory>
+<acme-service>
+}
+{ all applications in all environments that start with acme-s
+<acme-service>
+}
+{ really all applications in all environments
+<.hidden>
+<acme-directory>
+<acme-service>
+}
+{ all environments with acme-service defined
+<dev>
+<prod>
+<uat>
+}
+{ Applications that are defined in dev
+<acme-service>
+}
+{ all defined keys
+<announcement>
+<cpu>
+<service.host>
+<service.port>
+}

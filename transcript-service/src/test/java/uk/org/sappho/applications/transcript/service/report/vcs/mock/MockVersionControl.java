@@ -52,8 +52,12 @@ public class MockVersionControl implements VersionControlSystem {
     }
 
     public void commit(String path, boolean isNew) throws TranscriptException {
+
+        throw new TranscriptException("Committing is not allowed in a test report");
     }
 
     public void delete(String path) throws TranscriptException {
+
+        throw new TranscriptException("Deleting is not allowed in a test report");
     }
 }

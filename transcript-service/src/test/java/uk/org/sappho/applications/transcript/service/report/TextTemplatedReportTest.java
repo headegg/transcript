@@ -80,4 +80,15 @@ public class TextTemplatedReportTest {
         Assert.assertEquals("Template is not as expected",
                 "This is the expected output of the template loaded correctly from the repository.", report);
     }
+
+    @Test
+    public void testReportDataModel() throws TranscriptException, IOException {
+
+        TextTemplatedReport textTemplatedReport =
+                SERVICE_CONTEXT.getService(TEST_WORK_SPACE, null, true, false, "", false, false,
+                        new HashMap<String, String>());
+        String report = textTemplatedReport.generate("test-data-model", SERVICE_CONTEXT.getTemplateloader());
+        Assert.assertEquals("Data dictionary is not as expected",
+                FileUtils.readFileToString(new File(EXPECTED_REPORTS, "test-data-model.txt")), report);
+    }
 }
