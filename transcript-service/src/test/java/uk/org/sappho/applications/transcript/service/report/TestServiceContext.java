@@ -6,7 +6,6 @@
 
 package uk.org.sappho.applications.transcript.service.report;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -19,9 +18,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public class TestService<T> {
+public class TestServiceContext<T> {
 
-    public T getService(Class<T> type, String workingCopyPath, String workingCopyId, boolean readOnly,
+    private final Class<T> type;
+
+    public TestServiceContext(Class<T> type) {
+
+        this.type = type;
+    }
+
+    public T getService(String workingCopyPath, String workingCopyId, boolean readOnly,
                         boolean includeVersionControlProperties,
                         String defaultValue, boolean isMerge, boolean failOnValueChange,
                         Map<String, String> parameters) throws TranscriptException {
@@ -37,6 +43,6 @@ public class TestService<T> {
 
     public TemplateLoader getTemplateloader() throws IOException {
 
-        return new FileTemplateLoader(new File("src/test/resources/templates"));
+        return new FileTemplateLoader(new File("src/test/files/templates"));
     }
 }
