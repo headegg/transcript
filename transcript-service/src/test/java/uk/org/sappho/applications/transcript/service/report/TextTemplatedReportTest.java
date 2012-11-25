@@ -10,16 +10,11 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionParameters;
-
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static junit.framework.Assert.assertTrue;
 
 public class TextTemplatedReportTest {
 
@@ -51,24 +46,5 @@ public class TextTemplatedReportTest {
                 testService.getService(TextTemplatedReport.class,
                         null, null, true, false, "", false, false, new HashMap<String, String>());
         textTemplatedReport.generate("test-params", testService.getTemplateloader());
-    }
-
-    @Test
-    public void testSubversionParameters() throws TranscriptException {
-
-        SubversionParameters subversionParameters = new SubversionParameters("http://example.com/svn",
-                "user", "password", "Test commit.", null, true);
-        Assert.assertEquals("The Subversion URL isn't correct",
-                subversionParameters.getUrl(), "http://example.com/svn");
-        Assert.assertEquals("The username isn't correct",
-                subversionParameters.getUsername(), "user");
-        Assert.assertEquals("The password isn't correct",
-                subversionParameters.getPassword(), "password");
-        Assert.assertEquals("The commit message isn't correct",
-                subversionParameters.getCommitMessage(), "Test commit.");
-        Assert.assertEquals("The Subversion executable isn't correct",
-                subversionParameters.getExecutable(), "svn");
-        Assert.assertEquals("The trust flag isn't correct",
-                subversionParameters.isTrustServerCertificate(), true);
     }
 }
