@@ -15,9 +15,8 @@ import uk.org.sappho.applications.transcript.service.registry.TranscriptParamete
 import uk.org.sappho.applications.transcript.service.report.freemarker.EmbeddedFreemarker;
 import uk.org.sappho.applications.transcript.service.report.restful.client.RestfulClient;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-public class ReportData {
+public class ReportData extends BasicReportData {
 
     private final Environments environments;
     private final Applications applications;
@@ -47,6 +46,7 @@ public class ReportData {
                       Gson gson,
                       EmbeddedFreemarker freemarker) {
 
+        super(new HashMap<String, Object>());
         this.environments = environments;
         this.applications = applications;
         this.properties = properties;
@@ -235,11 +235,6 @@ public class ReportData {
     public String toJson(Object object) {
 
         return gson.toJson(object);
-    }
-
-    public String urlEncode(String plainText) throws UnsupportedEncodingException {
-
-        return URLEncoder.encode(plainText, "UTF-8");
     }
 
     public EmbeddedFreemarker getFreemarker() {

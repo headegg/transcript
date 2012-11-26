@@ -11,8 +11,10 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
+import uk.org.sappho.applications.transcript.service.report.BasicReportData;
 
 import java.io.StringWriter;
+import java.util.Map;
 
 public class EmbeddedFreemarker {
 
@@ -24,7 +26,7 @@ public class EmbeddedFreemarker {
         this.freemarkerConfiguration = freemarkerConfiguration;
     }
 
-    public String generate(Object data, String template)
+    public String generate(Map<String, Object> data, String template)
             throws TranscriptException {
 
         try {
@@ -32,7 +34,7 @@ public class EmbeddedFreemarker {
             freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
             Template freemarkerTemplate = freemarkerConfiguration.getTemplate("");
             StringWriter stringWriter = new StringWriter();
-            freemarkerTemplate.process(data, stringWriter);
+            freemarkerTemplate.process(new BasicReportData(data), stringWriter);
             stringWriter.close();
             return stringWriter.toString();
         } catch (Throwable throwable) {
