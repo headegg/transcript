@@ -10,10 +10,8 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
-import uk.org.sappho.applications.transcript.service.registry.DataDictionary;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
-import uk.org.sappho.applications.transcript.service.registry.RestfulClient;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 
 import java.util.LinkedList;

@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.registry;
+package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.gson.Gson;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
