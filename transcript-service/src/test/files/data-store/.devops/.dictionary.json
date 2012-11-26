@@ -1,0 +1,13 @@
+{
+    "environments":{
+        "dev":{
+            "name":"Development"
+        },
+        "uat":{
+            "name":"User Acceptance Testing"
+        },
+        "prod":{
+            "name":"Production"
+        }
+    }
+}
