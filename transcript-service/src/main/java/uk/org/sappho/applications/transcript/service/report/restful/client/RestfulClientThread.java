@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.report;
+package uk.org.sappho.applications.transcript.service.report.restful.client;
 
 import org.apache.commons.io.IOUtils;
 import uk.org.sappho.applications.transcript.service.TranscriptException;

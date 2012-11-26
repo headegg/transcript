@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.report;
+package uk.org.sappho.applications.transcript.service.report.restful.client;
 
 public class RestfulClientState {
 

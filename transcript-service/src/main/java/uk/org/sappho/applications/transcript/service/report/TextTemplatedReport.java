@@ -13,6 +13,7 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.WorkingCopy;
+import uk.org.sappho.applications.transcript.service.report.freemarker.PropertyTemplateLoader;
 
 import java.io.StringWriter;
 

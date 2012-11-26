@@ -4,11 +4,12 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.report;
+package uk.org.sappho.applications.transcript.service.report.freemarker;
 
 import com.google.inject.Inject;
 import freemarker.cache.TemplateLoader;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.report.ReportData;
 
 import java.io.IOException;
 import java.io.Reader;

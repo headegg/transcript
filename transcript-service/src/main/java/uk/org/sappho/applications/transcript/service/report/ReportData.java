@@ -12,6 +12,8 @@ import uk.org.sappho.applications.transcript.service.registry.Applications;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.report.freemarker.EmbeddedFreemarker;
+import uk.org.sappho.applications.transcript.service.report.restful.client.RestfulClient;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,6 +34,7 @@ public class ReportData {
     private final DataDictionary dataDictionary;
     private final RestfulClient restfulClient;
     private final Gson gson;
+    private final EmbeddedFreemarker freemarker;
     private Map<String, Map<String, Map<String, Object>>> environmentCache;
 
     @Inject
@@ -41,7 +44,8 @@ public class ReportData {
                       TranscriptParameters transcriptParameters,
                       DataDictionary dataDictionary,
                       RestfulClient restfulClient,
-                      Gson gson) {
+                      Gson gson,
+                      EmbeddedFreemarker freemarker) {
 
         this.environments = environments;
         this.applications = applications;
@@ -50,6 +54,7 @@ public class ReportData {
         this.dataDictionary = dataDictionary;
         this.restfulClient = restfulClient;
         this.gson = gson;
+        this.freemarker = freemarker;
         resetPropertyCache();
     }
 
@@ -235,5 +240,10 @@ public class ReportData {
     public String urlEncode(String plainText) throws UnsupportedEncodingException {
 
         return URLEncoder.encode(plainText, "UTF-8");
+    }
+
+    public EmbeddedFreemarker getFreemarker() {
+
+        return freemarker;
     }
 }
