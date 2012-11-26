@@ -8,12 +8,12 @@ package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -210,9 +210,19 @@ public class ReportData {
         return name;
     }
 
-    public Object getJson(String url) throws TranscriptException {
+    public RestfulClient getRestfulClient() {
 
-        return restfulClient.get(url);
+        return restfulClient;
+    }
+
+    public Object fromJson(String json) {
+
+        return gson.fromJson(json, Object.class);
+    }
+
+    public Object fromJson(byte[] json) {
+
+        return gson.fromJson(Arrays.toString(json), Object.class);
     }
 
     public String toJson(Object object) {
