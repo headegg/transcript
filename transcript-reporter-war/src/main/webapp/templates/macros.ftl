@@ -44,3 +44,9 @@
         </#attempt>
     </#compress>
 </#macro>
+
+<#macro restfulGet url key connectTimeout=2000 readTimeout=2000 expectedResponseCode=200>
+    <#compress>
+    ${restfulClient.get(url, key, connectTimeout, readTimeout, expectedResponseCode)}
+    </#compress>
+</#macro>

@@ -13,6 +13,8 @@ import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
 import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -228,5 +230,10 @@ public class ReportData {
     public String toJson(Object object) {
 
         return gson.toJson(object);
+    }
+
+    public String urlEncode(String plainText) throws UnsupportedEncodingException {
+
+        return URLEncoder.encode(plainText, "UTF-8");
     }
 }
