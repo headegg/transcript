@@ -8,10 +8,10 @@ package uk.org.sappho.applications.transcript.service.report;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.registry.Applications;
 import uk.org.sappho.applications.transcript.service.registry.Environments;
 import uk.org.sappho.applications.transcript.service.registry.Properties;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.report.freemarker.EmbeddedFreemarker;
 import uk.org.sappho.applications.transcript.service.report.restful.client.RestfulClient;
 

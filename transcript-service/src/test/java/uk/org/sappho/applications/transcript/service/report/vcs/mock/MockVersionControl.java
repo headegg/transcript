@@ -9,7 +9,7 @@ package uk.org.sappho.applications.transcript.service.report.vcs.mock;
 import com.google.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
 
 import java.io.File;

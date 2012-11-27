@@ -4,10 +4,9 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.registry;
+package uk.org.sappho.applications.transcript.service;
 
 import com.google.inject.AbstractModule;
-import uk.org.sappho.applications.transcript.service.TranscriptException;
 
 public class TranscriptModule extends AbstractModule {
 

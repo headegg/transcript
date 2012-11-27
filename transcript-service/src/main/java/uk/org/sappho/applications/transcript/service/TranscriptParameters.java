@@ -4,9 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.registry;
-
-import uk.org.sappho.applications.transcript.service.TranscriptException;
+package uk.org.sappho.applications.transcript.service;
 
 import java.util.Map;
 

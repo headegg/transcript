@@ -10,8 +10,8 @@ import com.google.inject.Guice;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptModule;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.TranscriptModule;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.report.vcs.mock.MockVersionControlModule;
 
 import java.io.File;

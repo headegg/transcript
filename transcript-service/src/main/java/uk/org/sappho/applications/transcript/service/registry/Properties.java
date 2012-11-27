@@ -8,6 +8,7 @@ package uk.org.sappho.applications.transcript.service.registry;
 
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 
 import java.util.SortedMap;
 import java.util.TreeMap;

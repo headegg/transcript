@@ -8,7 +8,7 @@ package uk.org.sappho.applications.transcript.service.vcs.subversion;
 
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.vcs.Command;
 import uk.org.sappho.applications.transcript.service.vcs.CommandExecuter;
 import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;

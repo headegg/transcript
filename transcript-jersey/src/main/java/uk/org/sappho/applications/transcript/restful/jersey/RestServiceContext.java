@@ -11,8 +11,8 @@ import com.google.inject.Guice;
 import freemarker.cache.TemplateLoader;
 import freemarker.cache.WebappTemplateLoader;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptModule;
-import uk.org.sappho.applications.transcript.service.registry.TranscriptParameters;
+import uk.org.sappho.applications.transcript.service.TranscriptModule;
+import uk.org.sappho.applications.transcript.service.TranscriptParameters;
 import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionModule;
 import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionParameters;
 
