@@ -7,7 +7,7 @@
 package uk.org.sappho.applications.transcript.service.report.vcs.mock;
 
 import com.google.inject.AbstractModule;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.transcript.service.registry.vcs.VersionControlSystem;
 
 public class MockVersionControlModule extends AbstractModule {
 

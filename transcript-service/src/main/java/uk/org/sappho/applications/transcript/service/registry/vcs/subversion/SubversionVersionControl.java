@@ -4,14 +4,14 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.vcs.subversion;
+package uk.org.sappho.applications.transcript.service.registry.vcs.subversion;
 
 import com.google.inject.Inject;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.TranscriptParameters;
-import uk.org.sappho.applications.transcript.service.vcs.Command;
-import uk.org.sappho.applications.transcript.service.vcs.CommandExecuter;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.transcript.service.registry.vcs.Command;
+import uk.org.sappho.applications.transcript.service.registry.vcs.CommandExecuter;
+import uk.org.sappho.applications.transcript.service.registry.vcs.VersionControlSystem;
 
 import java.io.File;
 import java.util.LinkedHashMap;

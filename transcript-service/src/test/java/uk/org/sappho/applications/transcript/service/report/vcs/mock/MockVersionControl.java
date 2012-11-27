@@ -10,7 +10,7 @@ import com.google.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.TranscriptParameters;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.transcript.service.registry.vcs.VersionControlSystem;
 
 import java.io.File;
 import java.util.HashMap;

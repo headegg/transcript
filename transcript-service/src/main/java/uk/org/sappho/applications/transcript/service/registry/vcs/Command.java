@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.vcs;
+package uk.org.sappho.applications.transcript.service.registry.vcs;
 
 import java.util.ArrayList;
 import java.util.List;

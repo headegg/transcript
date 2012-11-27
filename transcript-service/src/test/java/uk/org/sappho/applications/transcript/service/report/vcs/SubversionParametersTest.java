@@ -9,7 +9,7 @@ package uk.org.sappho.applications.transcript.service.report.vcs;
 import junit.framework.Assert;
 import org.junit.Test;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
-import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionParameters;
+import uk.org.sappho.applications.transcript.service.registry.vcs.subversion.SubversionParameters;
 
 public class SubversionParametersTest {
 

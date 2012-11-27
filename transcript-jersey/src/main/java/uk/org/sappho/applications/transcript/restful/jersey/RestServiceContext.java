@@ -13,8 +13,8 @@ import freemarker.cache.WebappTemplateLoader;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 import uk.org.sappho.applications.transcript.service.TranscriptModule;
 import uk.org.sappho.applications.transcript.service.TranscriptParameters;
-import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionModule;
-import uk.org.sappho.applications.transcript.service.vcs.subversion.SubversionParameters;
+import uk.org.sappho.applications.transcript.service.registry.vcs.subversion.SubversionModule;
+import uk.org.sappho.applications.transcript.service.registry.vcs.subversion.SubversionParameters;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;

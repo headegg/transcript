@@ -4,10 +4,10 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.vcs.subversion;
+package uk.org.sappho.applications.transcript.service.registry.vcs.subversion;
 
 import com.google.inject.AbstractModule;
-import uk.org.sappho.applications.transcript.service.vcs.VersionControlSystem;
+import uk.org.sappho.applications.transcript.service.registry.vcs.VersionControlSystem;
 
 public class SubversionModule extends AbstractModule {
 

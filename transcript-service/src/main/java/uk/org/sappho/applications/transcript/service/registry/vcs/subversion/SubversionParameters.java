@@ -4,7 +4,7 @@
  *** Copyright 2012 Andrew Heald.
  */
 
-package uk.org.sappho.applications.transcript.service.vcs.subversion;
+package uk.org.sappho.applications.transcript.service.registry.vcs.subversion;
 
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 
