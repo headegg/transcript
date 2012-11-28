@@ -12,6 +12,7 @@
     </parent>
 
     <artifactId>transcript-service</artifactId>
+    <name>Transcript - Registry Service</name>
 
     <dependencies>
         <dependency>

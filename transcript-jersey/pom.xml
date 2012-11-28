@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>transcript-jersey</artifactId>
+    <name>Transcript - Basic Jersey Utilities</name>
 
     <dependencies>
         <dependency>

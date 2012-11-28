@@ -15,11 +15,15 @@
     <artifactId>transcript</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>Transcript</name>
+    <description>Manage your environment configuration</description>
+    <url>https://wiki.sappho.org.uk/display/AC/Transcript</url>
+    <inceptionYear>2012</inceptionYear>
 
     <scm>
-        <connection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git</connection>
-        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/SCM/transcript.git</developerConnection>
-        <url>https://git.sappho.org.uk/projects/SCM/repos/transcript/browse</url>
+        <connection>scm:git:ssh://git@git.sappho.org.uk:7999/DEVOPS/transcript.git</connection>
+        <developerConnection>scm:git:ssh://git@git.sappho.org.uk:7999/DEVOPS/transcript.git</developerConnection>
+        <url>https://git.sappho.org.uk/projects/DEVOPS/repos/transcript/browse</url>
         <tag>HEAD</tag>
     </scm>
 

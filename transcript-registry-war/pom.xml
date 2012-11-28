@@ -11,6 +11,7 @@
 
     <artifactId>transcript-registry-war</artifactId>
     <packaging>war</packaging>
+    <name>Transcript - Registry Web Application</name>
 
     <dependencies>
         <dependency>

@@ -11,6 +11,7 @@
 
     <artifactId>transcript-reporter-war</artifactId>
     <packaging>war</packaging>
+    <name>Transcript - Reporting Web Application</name>
 
     <dependencies>
         <dependency>
