@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.org.sappho.applications.configuration</groupId>
         <artifactId>transcript</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
+        <version>0.1.1</version>
     </parent>
 
     <artifactId>transcript-reporter-war</artifactId>
