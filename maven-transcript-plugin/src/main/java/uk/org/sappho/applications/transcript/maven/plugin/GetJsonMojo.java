@@ -6,17 +6,10 @@
 
 package uk.org.sappho.applications.transcript.maven.plugin;
 
-import com.google.gson.Gson;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
-import java.util.Properties;
+import uk.org.sappho.applications.transcript.restful.client.ApplicationConfiguration;
 
 /**
  * Provide Transcript GET property services to Maven builds.
@@ -63,53 +56,17 @@ public class GetJsonMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-        boolean newProperties = false;
-        HttpURLConnection httpURLConnection = null;
-        InputStream inputStream = null;
         try {
-            getLog().info("Connecting to " + baseUrl);
-            getLog().info("Getting properties from " + environment + ":" + application);
-            String url = baseUrl + "/" + environment + "/" + application;
-            httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
-            inputStream = httpURLConnection.getInputStream();
-            Map<String, Object> jsonProperties =
-                    (Map<String, Object>) new Gson().fromJson(new InputStreamReader(inputStream), Object.class);
-            inputStream.close();
-            Properties mavenProperties = mavenProject.getProperties();
-            for (String key : jsonProperties.keySet()) {
-                if (!mavenProperties.containsKey(key)) {
-                    newProperties = true;
-                    break;
-                }
-            }
-            if (newProperties || override) {
-                for (String key : jsonProperties.keySet()) {
-                    if (!override && mavenProperties.containsKey(key)) {
-                        getLog().info(key + " is already defined so ignoring it here");
-                    } else {
-                        Object value = jsonProperties.get(key);
-                        mavenProperties.put(key, value);
-                        getLog().info(key + ": " + value.toString());
-                    }
-                }
-            }
+            ApplicationConfiguration applicationConfiguration =
+                    new ApplicationConfiguration(baseUrl, environment, application, override, 0, true, true) {
+                        @Override
+                        protected void log(String message) {
+                            getLog().info(message);
+                        }
+                    };
+            applicationConfiguration.refresh(mavenProject.getProperties());
         } catch (Throwable throwable) {
             throw new MojoExecutionException("Unable to GET properties", throwable);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Throwable throwable) {
-                }
-            }
-            if (httpURLConnection != null) {
-                try {
-                    httpURLConnection.disconnect();
-                } catch (Throwable throwable) {
-                }
-            }
         }
-        getLog().info(newProperties ?
-                "Properties are now available to build" : "There are no new properties to import");
     }
 }
