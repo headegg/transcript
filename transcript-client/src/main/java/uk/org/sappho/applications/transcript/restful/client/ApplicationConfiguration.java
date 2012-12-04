@@ -25,10 +25,13 @@ public abstract class ApplicationConfiguration {
     private final long cacheTime;
     private final boolean logIgnores;
     private final boolean logAllPropertyPuts;
+    private final int connectTimeout;
+    private final int readTimeout;
     private long lastUpdateTime;
 
     public ApplicationConfiguration(String baseUrl, String environment, String application, boolean override,
-                                    long cacheTime, boolean logIgnores, boolean logAllPropertyPuts) {
+                                    long cacheTime, boolean logIgnores, boolean logAllPropertyPuts,
+                                    int connectTimeout, int readTimeout) {
 
         this.baseUrl = baseUrl;
         this.environment = environment;
@@ -37,6 +40,8 @@ public abstract class ApplicationConfiguration {
         this.cacheTime = cacheTime;
         this.logIgnores = logIgnores;
         this.logAllPropertyPuts = logAllPropertyPuts;
+        this.connectTimeout = connectTimeout;
+        this.readTimeout = readTimeout;
         lastUpdateTime = System.currentTimeMillis() - cacheTime;
     }
 
@@ -53,10 +58,16 @@ public abstract class ApplicationConfiguration {
                 log("Getting properties for " + environment + ":" + application);
                 String url = baseUrl + "/" + environment + "/" + application;
                 httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+                httpURLConnection.setConnectTimeout(connectTimeout);
+                httpURLConnection.setReadTimeout(readTimeout);
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setRequestProperty("User-Agent", "TranscriptRESTfulClient/1.0");
+                httpURLConnection.connect();
                 inputStream = httpURLConnection.getInputStream();
                 Map<String, Object> jsonProperties =
                         (Map<String, Object>) new Gson().fromJson(new InputStreamReader(inputStream), Object.class);
                 inputStream.close();
+                inputStream = null;
                 for (String key : jsonProperties.keySet()) {
                     if (!properties.containsKey(key)) {
                         newProperties = true;

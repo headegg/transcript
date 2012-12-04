@@ -72,6 +72,20 @@ public class PutJsonMojo extends AbstractMojo {
      */
     private String commitMessage;
 
+    /**
+     * RESTful connection timeout.
+     *
+     * @parameter expression="${connectTimeout}" default-value=5000
+     */
+    private int connectTimeout;
+
+    /**
+     * RESTful read timeout.
+     *
+     * @parameter expression="${readTimeout}" default-value=5000
+     */
+    private int readTimeout;
+
     public void execute() throws MojoExecutionException {
 
         int responseCode = 0;
@@ -89,6 +103,8 @@ public class PutJsonMojo extends AbstractMojo {
                     "?merge=" + isMerge + "&fail.change=" + failOnValueChange +
                     "&commit.message=" + URLEncoder.encode(commitMessage, "UTF-8");
             httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+            httpURLConnection.setConnectTimeout(connectTimeout);
+            httpURLConnection.setReadTimeout(readTimeout);
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("Content-Length", "" + json.length());
             httpURLConnection.setDoOutput(true);
@@ -98,6 +114,7 @@ public class PutJsonMojo extends AbstractMojo {
             outputStream.write(json.getBytes(), 0, json.length());
             outputStream.flush();
             outputStream.close();
+            outputStream = null;
             responseCode = httpURLConnection.getResponseCode();
         } catch (Throwable throwable) {
             throw new MojoExecutionException("Unable to PUT updated properties", throwable);

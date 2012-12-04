@@ -48,6 +48,20 @@ public class GetJsonMojo extends AbstractMojo {
     private boolean override;
 
     /**
+     * RESTful connection timeout.
+     *
+     * @parameter expression="${connectTimeout}" default-value=5000
+     */
+    private int connectTimeout;
+
+    /**
+     * RESTful read timeout.
+     *
+     * @parameter expression="${readTimeout}" default-value=5000
+     */
+    private int readTimeout;
+
+    /**
      * The Maven project context.
      *
      * @parameter default-value="${project}"
@@ -58,7 +72,8 @@ public class GetJsonMojo extends AbstractMojo {
 
         try {
             ApplicationConfiguration applicationConfiguration =
-                    new ApplicationConfiguration(baseUrl, environment, application, override, 0, true, true) {
+                    new ApplicationConfiguration(baseUrl, environment, application, override, 0, true, true,
+                            connectTimeout, readTimeout) {
                         @Override
                         protected void log(String message) {
                             getLog().info(message);
