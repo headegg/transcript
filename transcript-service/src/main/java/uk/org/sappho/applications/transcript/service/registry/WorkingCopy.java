@@ -52,6 +52,14 @@ public class WorkingCopy {
                     versionControlSystem.update(path);
                 }
             } else {
+                File baseDirectory = new File(transcriptParameters.getWorkingCopyPath());
+                if (!baseDirectory.exists()) {
+                    try {
+                        FileUtils.forceMkdir(baseDirectory);
+                    } catch (Throwable throwable) {
+                        throw new TranscriptException("Unable to create base directory for working copies", throwable);
+                    }
+                }
                 versionControlSystem.checkout();
             }
         }

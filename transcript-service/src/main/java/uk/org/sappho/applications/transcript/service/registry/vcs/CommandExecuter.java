@@ -6,13 +6,14 @@
 
 package uk.org.sappho.applications.transcript.service.registry.vcs;
 
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import uk.org.sappho.applications.transcript.service.TranscriptException;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,31 +27,25 @@ public class CommandExecuter {
             if (logger.isLoggable(Level.INFO)) {
                 logger.info(command.getSafeCommand());
             }
-            String[] commandArray = new String[command.getCommand().size()];
-            Process process = Runtime.getRuntime().exec(command.getCommand().toArray(commandArray), null, directory);
-            int exitCode = process.waitFor();
-            String standardOutput = processOutput(process.getInputStream());
-            if (exitCode != 0) {
-                throw new TranscriptException(processOutput(process.getErrorStream()));
+            DefaultExecutor executor = new DefaultExecutor();
+            DefaultExecuteResultHandler commandResultsHandler = new DefaultExecuteResultHandler();
+            ByteArrayOutputStream commandOutputStream = new ByteArrayOutputStream();
+            ByteArrayOutputStream commandErrorStream = new ByteArrayOutputStream();
+            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(commandOutputStream, commandErrorStream);
+            executor.setWatchdog(new ExecuteWatchdog(60000));
+            executor.setStreamHandler(pumpStreamHandler);
+            executor.setWorkingDirectory(directory);
+            executor.execute(command.getCommandLine(), commandResultsHandler);
+            commandResultsHandler.waitFor();
+            if (commandResultsHandler.getExitValue() != 0) {
+                throw new TranscriptException(commandErrorStream.toString());
             }
-            return standardOutput;
+            return commandOutputStream.toString();
         } catch (Throwable throwable) {
             if (logger.isLoggable(Level.WARNING)) {
                 logger.warning(throwable.getMessage());
             }
             throw new TranscriptException("Unable to execute system command: " + command.getSafeCommand(), throwable);
         }
-    }
-
-    private String processOutput(InputStream inputStream) throws IOException {
-
-        String output = "";
-        String line;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        while ((line = reader.readLine()) != null) {
-            output += line + "\n";
-        }
-        reader.close();
-        return output;
     }
 }

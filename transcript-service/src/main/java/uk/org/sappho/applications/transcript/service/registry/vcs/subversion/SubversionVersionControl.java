@@ -109,8 +109,7 @@ public class SubversionVersionControl implements VersionControlSystem {
     private String execute(String subversionCommand, String[] parameters)
             throws TranscriptException {
 
-        Command command = new Command();
-        command.add(subversionParameters.getExecutable(), false);
+        Command command = new Command(subversionParameters.getExecutable());
         command.add(subversionCommand, false);
         command.add("--non-interactive", false);
         command.add(subversionParameters.isTrustServerCertificate() ? "--trust-server-cert" : "", false);

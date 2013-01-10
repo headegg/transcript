@@ -6,18 +6,23 @@
 
 package uk.org.sappho.applications.transcript.service.registry.vcs;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.util.StringUtils;
 
 public class Command {
 
-    private List<String> command = new ArrayList<String>();
+    private CommandLine commandLine;
     private String safeCommand = "";
+
+    public Command(String executable) {
+
+        commandLine = new CommandLine(executable);
+    }
 
     public void add(String part, boolean hide) {
 
         if (part != null && part.length() != 0) {
-            command.add(part);
+            commandLine.addArgument(part);
             addToSafeCommand(part, hide);
         }
     }
@@ -25,8 +30,8 @@ public class Command {
     public void add(String name, String value, boolean hide) {
 
         if (name != null && name.length() != 0 && value != null && value.length() != 0) {
-            command.add(name);
-            command.add(value);
+            commandLine.addArgument(name);
+            commandLine.addArgument(value);
             addToSafeCommand(name, false);
             addToSafeCommand(value, hide);
         }
@@ -40,17 +45,13 @@ public class Command {
         if (hide) {
             safeCommand += "******";
         } else {
-            if (part.contains(" ")) {
-                safeCommand += "\"" + part + "\"";
-            } else {
-                safeCommand += part;
-            }
+            safeCommand += StringUtils.quoteArgument(part);
         }
     }
 
-    public List<String> getCommand() {
+    public CommandLine getCommandLine() {
 
-        return command;
+        return commandLine;
     }
 
     public String getSafeCommand() {
