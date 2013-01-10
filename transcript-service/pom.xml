@@ -6,7 +6,7 @@
     <parent>
         <groupId>uk.org.sappho.applications.configuration</groupId>
         <artifactId>transcript</artifactId>
-        <version>0.1.2</version>
+        <version>0.1.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>transcript-service</artifactId>
