@@ -48,9 +48,7 @@ public class WorkingCopy {
                     throw new TranscriptException("Requested working copy " +
                             transcriptParameters.getWorkingCopyId() + " is not a directory");
                 }
-                if (!transcriptParameters.isUseCache()) {
-                    versionControlSystem.update(path);
-                }
+                versionControlSystem.update(path);
             } else {
                 File baseDirectory = new File(transcriptParameters.getWorkingCopyPath());
                 if (!baseDirectory.exists()) {

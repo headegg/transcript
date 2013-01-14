@@ -1,7 +1,6 @@
 <${parameters.workingCopyPath}>
 <${parameters.workingCopyId}>
 <${parameters.readOnly?string}>
-<${parameters.useCache?string}>
 <${parameters.includeVersionControlProperties?string}>
 <${parameters.defaultValue}>
 <${parameters.merge?string}>
@@ -18,5 +17,3 @@
 <${parameters.get("bad-boolean-param", false)?string}>
 <${parameters.get("not-defined", true)?string}>
 <${parameters.get("not-defined", false)?string}>
-<${parameters.setWorkingCopyId("test-working-copy")}>
-<${parameters.workingCopyId}>

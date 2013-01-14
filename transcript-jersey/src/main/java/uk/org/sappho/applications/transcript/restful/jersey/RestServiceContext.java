@@ -62,7 +62,6 @@ public class RestServiceContext<T> {
             }
         }
         String readOnly = parameters.get("read.only");
-        String useCache = parameters.get("use.cache");
         String includeVersionControlProperties = parameters.get("include.vcs.properties");
         String merge = parameters.get("merge");
         String failOnValueChange = parameters.get("fail.change");
@@ -70,7 +69,6 @@ public class RestServiceContext<T> {
                 parameters.get("working.copy.path"),
                 parameters.get("working.copy.id"),
                 readOnly != null && readOnly.equalsIgnoreCase("true"),
-                useCache != null && useCache.equalsIgnoreCase("true"),
                 includeVersionControlProperties != null && includeVersionControlProperties.equalsIgnoreCase("true"),
                 parameters.get("default"),
                 merge != null && merge.equalsIgnoreCase("true"),

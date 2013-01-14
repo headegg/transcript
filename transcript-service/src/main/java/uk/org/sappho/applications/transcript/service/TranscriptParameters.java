@@ -13,7 +13,6 @@ public class TranscriptParameters {
     private String workingCopyPath;
     private String workingCopyId;
     private boolean readOnly;
-    private boolean useCache;
     private boolean includeVersionControlProperties;
     private String defaultValue;
     private boolean merge;
@@ -23,7 +22,6 @@ public class TranscriptParameters {
     public TranscriptParameters(String workingCopyPath,
                                 String workingCopyId,
                                 boolean readOnly,
-                                boolean useCache,
                                 boolean includeVersionControlProperties,
                                 String defaultValue,
                                 boolean merge,
@@ -33,7 +31,6 @@ public class TranscriptParameters {
         this.workingCopyPath = workingCopyPath;
         this.workingCopyId = workingCopyId;
         this.readOnly = readOnly;
-        this.useCache = useCache;
         this.includeVersionControlProperties = includeVersionControlProperties;
         this.defaultValue = defaultValue;
         this.merge = merge;
@@ -49,39 +46,14 @@ public class TranscriptParameters {
         return workingCopyPath;
     }
 
-    public void setWorkingCopyPath(String workingCopyPath) {
-
-        this.workingCopyPath = workingCopyPath;
-    }
-
     public String getWorkingCopyId() {
 
         return workingCopyId != null && workingCopyId.length() != 0 ? workingCopyId : "default";
     }
 
-    public void setWorkingCopyId(String workingCopyId) {
-
-        this.workingCopyId = workingCopyId;
-    }
-
     public boolean isReadOnly() {
 
         return readOnly;
-    }
-
-    public void setReadOnly(boolean readOnly) {
-
-        this.readOnly = readOnly;
-    }
-
-    public boolean isUseCache() {
-
-        return useCache;
-    }
-
-    public void setUseCache(boolean useCache) {
-
-        this.useCache = useCache;
     }
 
     public boolean isIncludeVersionControlProperties() {

@@ -2,7 +2,6 @@
 <default>
 <true>
 <false>
-<false>
 <def-value>
 <false>
 <false>
@@ -18,5 +17,3 @@
 <false>
 <true>
 <false>
-<>
-<test-working-copy>

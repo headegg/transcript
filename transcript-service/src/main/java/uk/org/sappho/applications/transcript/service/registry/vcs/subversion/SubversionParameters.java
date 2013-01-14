@@ -40,11 +40,6 @@ public class SubversionParameters {
         return url;
     }
 
-    public void setUrl(String url) {
-
-        this.url = url;
-    }
-
     public String getUsername() {
 
         return username;
@@ -80,18 +75,8 @@ public class SubversionParameters {
         return executable != null && executable.length() != 0 ? executable : "svn";
     }
 
-    public void setExecutable(String executable) {
-
-        this.executable = executable;
-    }
-
     public boolean isTrustServerCertificate() {
 
         return trustServerCertificate;
-    }
-
-    public void setTrustServerCertificate(boolean trustServerCertificate) {
-
-        this.trustServerCertificate = trustServerCertificate;
     }
 }

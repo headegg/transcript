@@ -34,8 +34,7 @@ public class TestServiceContext<T> {
 
         TranscriptParameters transcriptParameters = new TranscriptParameters(
                 workingCopyPath, workingCopyId,
-                readOnly, false, includeVersionControlProperties, defaultValue, isMerge, failOnValueChange,
-                parameters);
+                readOnly, includeVersionControlProperties, defaultValue, isMerge, failOnValueChange, parameters);
         TranscriptModule transcriptModule = new TranscriptModule(transcriptParameters);
         MockVersionControlModule vcsModule = new MockVersionControlModule();
         return Guice.createInjector(transcriptModule, vcsModule).getInstance(type);
