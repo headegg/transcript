@@ -73,6 +73,11 @@ public class SubversionVersionControl implements VersionControlSystem {
         }
     }
 
+    public void clearUpdateCache() {
+
+        lastUpdatePath = null;
+    }
+
     public Map<String, String> getProperties(String path) throws TranscriptException {
 
         Map<String, String> properties = new LinkedHashMap<String, String>();

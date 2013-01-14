@@ -14,6 +14,8 @@ public interface VersionControlSystem {
 
     void update(String path);
 
+    void clearUpdateCache();
+
     Map<String, String> getProperties(String path) throws TranscriptException;
 
     void checkout() throws TranscriptException;

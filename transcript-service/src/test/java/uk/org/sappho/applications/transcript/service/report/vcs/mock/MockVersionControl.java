@@ -31,6 +31,9 @@ public class MockVersionControl implements VersionControlSystem {
     public void update(String path) {
     }
 
+    public void clearUpdateCache() {
+    }
+
     public Map<String, String> getProperties(String path) throws TranscriptException {
 
         Map<String, String> properties = new HashMap<String, String>();

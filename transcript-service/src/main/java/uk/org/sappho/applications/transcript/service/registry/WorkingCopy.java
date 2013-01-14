@@ -66,6 +66,13 @@ public class WorkingCopy {
         return new File(workingCopy, path);
     }
 
+    public void clearUpdateCache() {
+
+        synchronized (getLock()) {
+            versionControlSystem.clearUpdateCache();
+        }
+    }
+
     private SortedMap<String, Object> getJsonProperties(String environment, String application)
             throws TranscriptException {
 
